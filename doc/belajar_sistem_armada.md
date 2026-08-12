@@ -264,7 +264,7 @@ sequenceDiagram
 ## DIAGRAM KOMPONEN (Component Diagram)
 
 ```mermaid
-component
+graph TD
     [Web Browser] --> [Laravel routing]
     
     subgraph Laravel Application
