@@ -265,18 +265,18 @@ sequenceDiagram
 
 ```mermaid
 graph TD
-    [Web Browser] --> [Laravel routing]
+    Browser[Web Browser] --> Routing[Laravel routing]
     
     subgraph Laravel Application
-        [Laravel routing] --> [Middleware: CheckRole]
-        [Middleware: CheckRole] --> [Controllers]
-        [Controllers] --> [Eloquent Models]
-        [Controllers] --> [Views (Bootstrap 5 + jQuery)]
+        Routing --> Middleware[Middleware: CheckRole]
+        Middleware --> Controllers[Controllers]
+        Controllers --> Models[Eloquent Models]
+        Controllers --> Views["Views (Bootstrap 5 + jQuery)"]
     end
     
     subgraph Storage
-        [Eloquent Models] --> [MySQL Database]
-        [Controllers] --> [Public/Storage Uploads]
+        Models --> DB[(MySQL Database)]
+        Controllers --> Uploads[Public/Storage Uploads]
     end
 ```
 
