@@ -60,4 +60,18 @@ class DailyChecklistController extends Controller
 
         return redirect()->route('checklist.index')->with('success', 'Data checklist berhasil dihapus!');
     }
+
+    public function updateOdometer(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'odometer' => 'required|integer|min:0',
+        ]);
+
+        $checklist = DailyChecklist::findOrFail($id);
+        $checklist->update([
+            'odometer' => $validated['odometer']
+        ]);
+
+        return redirect()->back()->with('success', 'Angka odometer berhasil diperbarui.');
+    }
 }

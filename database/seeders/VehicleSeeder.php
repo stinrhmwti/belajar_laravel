@@ -16,7 +16,7 @@ class VehicleSeeder extends Seeder
                 'tipe' => 'Canter FE 74',
                 'plat_nomor' => 'B 1234 KTR',
                 'lokasi_pool' => 'Jakarta',
-                'supir_utama' => 'Budi Santoso',
+                'supir_utama' => 'Driver Utama',
                 'odometer_awal' => 120500,
                 'pajak_tahunan' => 4500000,
                 'pajak_5_tahunan' => 20000000,
@@ -194,7 +194,20 @@ class VehicleSeeder extends Seeder
             ],
         ];
 
-        foreach ($vehicles as $v) {
+        // Center coordinates: Jakarta/Java region
+        $baseLat = -6.17511;
+        $baseLng = 106.82717;
+
+        foreach ($vehicles as $index => $v) {
+            // Assign coordinate offsets based on vehicle locations
+            if (str_contains(strtolower($v['lokasi_pool']), 'bandung')) {
+                $v['latitude'] = -6.91746 + ($index * 0.0035);
+                $v['longitude'] = 107.61912 + ($index * 0.0042);
+            } else {
+                $v['latitude'] = $baseLat + (($index % 5) * 0.0073) - 0.015;
+                $v['longitude'] = $baseLng + (($index % 5) * 0.0084) - 0.015;
+            }
+
             Vehicle::updateOrCreate(
                 ['plat_nomor' => $v['plat_nomor']],
                 $v

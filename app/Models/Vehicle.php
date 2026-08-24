@@ -63,6 +63,11 @@ class Vehicle extends Model
         return $this->hasMany(Expense::class);
     }
 
+    public function histories()
+    {
+        return $this->hasMany(VehicleHistory::class)->orderByDesc('tanggal');
+    }
+
     /**
      * Warning system: hijau (aman), kuning (mendekati jatuh tempo <=30 hari),
      * merah (sudah lewat jatuh tempo)

@@ -3,8 +3,212 @@
 
 @section('content')
 
+@php
+    $role = auth()->user()->role;
+    $menuItems = [];
+    
+    if ($role === 'superadmin' || $role === 'admin') {
+        $menuItems = [
+            [
+                'label' => 'Armada Master',
+                'icon'  => 'bi-car-front-fill',
+                'url'   => route('vehicles.index'),
+                'active'=> false
+            ],
+            [
+                'label' => 'Servis Berkala',
+                'icon'  => 'bi-calendar3-event',
+                'url'   => '#calendarSection',
+                'active'=> true
+            ],
+            [
+                'label' => 'Persetujuan Biaya',
+                'icon'  => 'bi-wallet2',
+                'url'   => route('expenses.index'),
+                'active'=> false
+            ],
+            [
+                'label' => 'Kelola Akun',
+                'icon'  => 'bi-people-fill',
+                'url'   => route('users.index'),
+                'active'=> false
+            ]
+        ];
+    } elseif ($role === 'teknisi') {
+        $menuItems = [
+            [
+                'label' => 'Input Checklist',
+                'icon'  => 'bi-clipboard2-check-fill',
+                'url'   => route('checklist.create'),
+                'active'=> true
+            ],
+            [
+                'label' => 'Jadwal Servis',
+                'icon'  => 'bi-calendar3-event',
+                'url'   => '#calendarSection',
+                'active'=> false
+            ],
+            [
+                'label' => 'Catat Biaya',
+                'icon'  => 'bi-cash-coin',
+                'url'   => route('expenses.create'),
+                'active'=> false
+            ],
+            [
+                'label' => 'Daftar Keluhan',
+                'icon'  => 'bi-exclamation-octagon-fill',
+                'url'   => route('complaints.index'),
+                'active'=> false
+            ]
+        ];
+    } elseif ($role === 'pimpinan') {
+         $menuItems = [
+            [
+                'label' => 'Armada Master',
+                'icon'  => 'bi-car-front-fill',
+                'url'   => route('vehicles.index'),
+                'active'=> false
+            ],
+            [
+                'label' => 'Servis Berkala',
+                'icon'  => 'bi-calendar3-event',
+                'url'   => '#calendarSection',
+                'active'=> true
+            ],
+            [
+                'label' => 'Rekap Biaya',
+                'icon'  => 'bi-wallet2',
+                'url'   => route('expenses.index'),
+                'active'=> false
+            ],
+            [
+                'label' => 'Kontak Admin',
+                'icon'  => 'bi-whatsapp',
+                'url'   => 'https://wa.me/6287738565383?text=Halo%20Admin,%20saya%20Pimpinan%20butuh%20bantuan',
+                'active'=> false,
+                'target'=> '_blank'
+            ]
+        ];
+    } else { // user/driver
+        $menuItems = [
+            [
+                'label' => 'Armada Saya',
+                'icon'  => 'bi-car-front-fill',
+                'url'   => route('vehicles.index'),
+                'active'=> false
+            ],
+            [
+                'label' => 'Lapor Keluhan',
+                'icon'  => 'bi-megaphone-fill',
+                'url'   => route('complaints.create'),
+                'active'=> true
+            ],
+            [
+                'label' => 'Histori Checklist',
+                'icon'  => 'bi-clipboard-data-fill',
+                'url'   => route('checklist.index'),
+                'active'=> false
+            ],
+            [
+                'label' => 'Kontak Admin',
+                'icon'  => 'bi-whatsapp',
+                'url'   => 'https://wa.me/6287738565383?text=Halo%20Admin,%20saya%20Driver%20butuh%20bantuan%20terkait%20armada',
+                'active'=> false,
+                'target'=> '_blank'
+            ]
+        ];
+    }
+@endphp
+
+
 @push('styles')
 <style>
+    /* ===== PREMIUM WIDGETS ANIMS & EFFECTS ===== */
+    .premium-pulse-success {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background-color: #d1fae5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+        animation: premium-pulsate 2s infinite;
+    }
+    body.dark-theme .premium-pulse-success {
+        background-color: rgba(16, 185, 129, 0.15) !important;
+    }
+    @keyframes premium-pulsate {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+        70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+    .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    }
+    .hover-lift:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.06) !important;
+        border-color: rgba(0,0,0,0.08) !important;
+    }
+    body.dark-theme .hover-lift:hover {
+        border-color: rgba(255,255,255,0.08) !important;
+    }
+    body.dark-theme .bg-white.hover-lift {
+        background-color: #1f2937 !important;
+        border-color: #374151 !important;
+    }
+
+    /* Welcome Greetings & Quick Action Enhancements */
+    .bg-light-soft {
+        background: rgba(248, 250, 252, 0.65) !important;
+        border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    }
+    body.dark-theme .bg-light-soft {
+        background: rgba(30, 41, 59, 0.4) !important;
+        border-color: rgba(255, 255, 255, 0.05) !important;
+    }
+    .dark-text-white {
+        color: #0f172a !important;
+    }
+    body.dark-theme .dark-text-white {
+        color: #f8fafc !important;
+    }
+    .welcome-banner-card {
+        background-color: #ffffff !important;
+        border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    }
+    body.dark-theme .welcome-banner-card {
+        background-color: #1e293b !important;
+        border-color: #334155 !important;
+    }
+    
+    .bg-soft-primary {
+        background-color: rgba(79, 70, 229, 0.12) !important;
+        color: #4f46e5 !important;
+    }
+    .bg-soft-info {
+        background-color: rgba(8, 145, 178, 0.12) !important;
+        color: #0891b2 !important;
+    }
+    .bg-soft-success {
+        background-color: rgba(16, 185, 129, 0.12) !important;
+        color: #10b981 !important;
+    }
+    .bg-soft-warning {
+        background-color: rgba(245, 158, 11, 0.12) !important;
+        color: #d97706 !important;
+    }
+    .bg-soft-danger {
+        background-color: rgba(239, 68, 68, 0.12) !important;
+        color: #ef4444 !important;
+    }
+    .badge-soft-primary {
+        background-color: rgba(79, 70, 229, 0.12) !important;
+        color: #4f46e5 !important;
+        border: 1px solid rgba(79, 70, 229, 0.25) !important;
+    }
+
     /* CSS for Service Calendar */
     .calendar-container {
         display: grid;
@@ -19,9 +223,33 @@
         color: #64748b;
         padding: 6px 0;
     }
+    .calendar-card-custom {
+        position: relative;
+        border-radius: 16px !important;
+        background-color: #fff5f5 !important;
+        border: 1px solid #f5c2c7 !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02) !important;
+        transition: box-shadow 0.2s ease;
+        overflow: hidden !important;
+    }
+    .calendar-card-custom::before {
+        content: '';
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 5px;
+        background: linear-gradient(to bottom, #ef4444, #dc2626) !important;
+        z-index: 10;
+    }
+    .calendar-card-custom:hover {
+        box-shadow: 0 8px 25px rgba(0,0,0,0.05) !important;
+    }
+    body.dark-theme .calendar-card-custom {
+        background-color: rgba(239, 68, 68, 0.05) !important;
+        border-color: #842029 !important;
+    }
     .calendar-cell {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
+        background: #ffffff !important;
+        border: 1.5px solid #f5c2c7 !important;
         border-radius: 8px;
         min-height: 52px;
         padding: 4px;
@@ -31,16 +259,27 @@
         transition: all 0.2s ease;
     }
     body.dark-theme .calendar-cell {
-        background: #1e293b;
-        border-color: #334155;
+        background: #1e293b !important;
+        border-color: #842029 !important;
+    }
+    .calendar-cell-empty {
+        background: rgba(255, 255, 255, 0.5) !important;
+        border: 1px dashed #f5c2c7 !important;
+        border-radius: 8px;
+        min-height: 52px;
+        opacity: 0.7;
+    }
+    body.dark-theme .calendar-cell-empty {
+        background: rgba(30, 41, 59, 0.4) !important;
+        border-color: #842029 !important;
     }
     .calendar-cell:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
     .calendar-cell.today {
-        border: 2px solid #4f46e5 !important;
-        background: rgba(79, 70, 229, 0.05) !important;
+        border: 2px solid #dc2626 !important;
+        background: rgba(220, 38, 38, 0.05) !important;
     }
     .calendar-date-number {
         font-size: 0.75rem;
@@ -70,58 +309,129 @@
     }
 
     .card-grad-1 {
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
-        color: #ffffff !important; border: none !important;
-        box-shadow: 0 8px 20px -6px rgba(59, 130, 246, 0.3) !important;
+        background: #0f172a !important;
+        color: #ffffff !important;
+        border: none !important;
+        border-left: 5px solid rgba(255, 255, 255, 0.85) !important;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15) !important;
         position: relative; overflow: hidden;
     }
     .card-grad-2 {
-        background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%) !important;
-        color: #ffffff !important; border: none !important;
-        box-shadow: 0 8px 20px -6px rgba(239, 68, 68, 0.3) !important;
+        background: #0f2742 !important;
+        color: #ffffff !important;
+        border: none !important;
+        border-left: 5px solid rgba(255, 255, 255, 0.85) !important;
+        box-shadow: 0 4px 12px rgba(15, 39, 66, 0.15) !important;
         position: relative; overflow: hidden;
     }
     .card-grad-3 {
-        background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%) !important;
-        color: #ffffff !important; border: none !important;
-        box-shadow: 0 8px 20px -6px rgba(245, 158, 11, 0.3) !important;
+        background: #0e7490 !important;
+        color: #ffffff !important;
+        border: none !important;
+        border-left: 5px solid rgba(255, 255, 255, 0.85) !important;
+        box-shadow: 0 4px 12px rgba(14, 116, 144, 0.15) !important;
         position: relative; overflow: hidden;
     }
     .card-grad-4 {
-        background: linear-gradient(135deg, #10b981 0%, #047857 100%) !important;
-        color: #ffffff !important; border: none !important;
-        box-shadow: 0 8px 20px -6px rgba(16, 185, 129, 0.3) !important;
+        background: #0891b2 !important;
+        color: #ffffff !important;
+        border: none !important;
+        border-left: 5px solid rgba(255, 255, 255, 0.85) !important;
+        box-shadow: 0 4px 12px rgba(8, 145, 178, 0.15) !important;
         position: relative; overflow: hidden;
     }
 
-    /* Glassmorphic Gradient Spheres */
+    /* Glassmorphic Gradient Spheres disabled for flat design */
     .card-grad-1::after, .card-grad-2::after, .card-grad-3::after, .card-grad-4::after {
-        content: ''; position: absolute; right: -15px; bottom: -15px;
-        width: 120px; height: 120px; border-radius: 50%;
-        background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%); pointer-events: none;
-        filter: blur(5px);
+        display: none;
     }
     .card-grad-1::before, .card-grad-2::before, .card-grad-3::before, .card-grad-4::before {
-        content: ''; position: absolute; left: -20px; top: -20px;
-        width: 90px; height: 90px; border-radius: 50%;
-        background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 70%); pointer-events: none;
-        filter: blur(5px);
+        display: none;
+    }
+
+    .card-grad-1 h2, .card-grad-2 h2, .card-grad-3 h2, .card-grad-4 h2 {
+        color: #ffffff !important;
+    }
+    .card-grad-title {
+        color: rgba(255, 255, 255, 0.85) !important;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+    }
+    .card-grad-1 .text-white-50, .card-grad-2 .text-white-50, .card-grad-3 .text-white-50, .card-grad-4 .text-white-50 {
+        color: rgba(255, 255, 255, 0.7) !important;
+    }
+    .card-grad-1 .fw-bold.text-white, .card-grad-2 .fw-bold.text-white, .card-grad-3 .fw-bold.text-white, .card-grad-4 .fw-bold.text-white {
+        color: #ffffff !important;
+    }
+    .card-grad-1 .progress, .card-grad-2 .progress, .card-grad-3 .progress, .card-grad-4 .progress {
+        background: rgba(255, 255, 255, 0.25) !important;
+    }
+    .card-grad-1 .progress-bar, .card-grad-2 .progress-bar, .card-grad-3 .progress-bar, .card-grad-4 .progress-bar {
+        background-color: #ffffff !important;
     }
 
     .card-grad-icon {
-        background: rgba(255, 255, 255, 0.18) !important; backdrop-filter: blur(8px); border-radius: 12px;
-        width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #ffffff !important;
-        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255, 255, 255, 0.18) !important;
+        color: #ffffff !important;
+        border-radius: 12px;
+        width: 48px; height: 48px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.4rem;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
     }
-    .card-grad-title { color: rgba(255, 255, 255, 0.85) !important; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; }
+
     
-    .dashboard-card { border-radius: 16px !important; border: 1px solid rgba(0,0,0,0.05) !important; box-shadow: 0 4px 15px rgba(0,0,0,0.02) !important; transition: box-shadow 0.2s ease; }
+    .dashboard-card {
+        position: relative;
+        border-radius: 16px !important;
+        border: 1px solid #f5c2c7 !important;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02) !important;
+        transition: box-shadow 0.2s ease;
+        overflow: hidden !important;
+    }
+    .dashboard-card::before {
+        content: '';
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 5px;
+        background: linear-gradient(to bottom, #ef4444, #dc2626) !important;
+        z-index: 10;
+    }
+    .card-border-grad-orange {
+        border: 1px solid #ffe69c !important;
+    }
+    .card-border-grad-orange::before {
+        background: linear-gradient(to bottom, #f59e0b, #d97706) !important;
+    }
+    .card-border-grad-red {
+        border: 1px solid #f5c2c7 !important;
+    }
+    .card-border-grad-red::before {
+        background: linear-gradient(to bottom, #ef4444, #b91c1c) !important;
+    }
+    .card-border-grad-green {
+        border: 1px solid #badbcc !important;
+    }
+    .card-border-grad-green::before {
+        background: linear-gradient(to bottom, #10b981, #059669) !important;
+    }
     .dashboard-card:hover { box-shadow: 0 8px 25px rgba(0,0,0,0.05) !important; }
     .dashboard-card .card-header { background-color: #fff !important; border-bottom: 1px solid rgba(0,0,0,0.04) !important; padding: 1.1rem 1.4rem; font-weight: 700; color: #0f172a; border-radius: 16px 16px 0 0 !important; }
     
     body.dark-theme .dashboard-card {
         background-color: #111827 !important;
-        border-color: #1e293b !important;
+        border-color: #842029 !important;
+    }
+    body.dark-theme .card-border-grad-orange {
+        border-color: #664d03 !important;
+    }
+    body.dark-theme .card-border-grad-red {
+        border-color: #842029 !important;
+    }
+    body.dark-theme .card-border-grad-green {
+        border-color: #0f5132 !important;
     }
     body.dark-theme .dashboard-card .card-header {
         background-color: #1e293b !important;
@@ -412,165 +722,220 @@
         50% { opacity: 1; }
         100% { transform: scale(1.8, 1.8); opacity: 0; }
     }
+
+
 </style>
 @endpush
 
-{{-- HEADER WELCOME --}}
-<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 p-3 rounded-4 shadow-sm welcome-banner-card">
-    <div class="d-flex align-items-center gap-3">
-        <div class="rounded-circle bg-primary-subtle text-primary fw-bold d-flex align-items-center justify-content-center" style="width:48px; height:48px; font-size:1.2rem;">
-            {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+{{-- HEADER WELCOME (Daya Motor Style Layout - Full Width) --}}
+<div class="mb-4">
+    <!-- Breadcrumb Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <nav style="--bs-breadcrumb-divider: '/';" aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0" style="font-size: 0.85rem; font-weight: 600;">
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none" style="color: #64748b;">Dashboard</a></li>
+                <li class="breadcrumb-item active" style="color: #0891b2;" aria-current="page">Pemeliharaan Armada</li>
+            </ol>
+        </nav>
+        <span id="liveClock" class="text-muted fw-semibold font-monospace" style="font-size: 0.78rem;"></span>
+    </div>
+
+    <!-- Banner Image Card -->
+    <div class="card border-0 shadow-sm overflow-hidden mb-4 rounded-4" style="background: url('{{ asset('images/box_truck_new.jpg') }}') no-repeat center right; background-size: cover; min-height: 280px; position: relative; border-radius: 16px;">
+        <div class="card-body p-4 p-md-5 d-flex align-items-center text-white position-relative" style="z-index: 2; min-height: 280px;">
+            <div class="col-12 col-md-8 col-lg-7 text-start">
+                <span class="badge bg-warning text-dark fw-bold mb-3" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; border-radius: 5px;">SERVIS DIGITAL &amp; STANDARISASI</span>
+                <h2 class="fw-extrabold mb-2 text-white" style="letter-spacing: -1px; font-size: clamp(1.8rem, 5vw, 2.5rem); line-height: 1.1;">SERVIS <span class="text-warning">PASTI</span> DARI YANG AHLI</h2>
+                <p class="text-white-50 small mb-0 d-none d-sm-block" style="font-size: 0.88rem; line-height: 1.5; text-shadow: 0 2px 4px rgba(0,0,0,0.6);">Inspeksi harian armada dan penjadwalan servis teratur demi keselamatan dan kelancaran operasional di jalan raya.</p>
+            </div>
         </div>
-        <div>
-            <div class="d-flex align-items-center gap-2">
-                <h4 class="fw-extrabold mb-0 text-dark">Selamat Datang, {{ auth()->user()->name }}! 👋</h4>
-                @if(auth()->user()->role === 'superadmin')
-                    <span class="role-badge bg-dark text-white">Super Admin</span>
-                @elseif(auth()->user()->role === 'admin')
-                    <span class="role-badge bg-primary text-white">Admin Fleet</span>
-                @elseif(auth()->user()->role === 'teknisi')
-                    <span class="role-badge bg-info text-white">Mekanik / Teknisi</span>
-                @elseif(auth()->user()->role === 'pimpinan')
-                    <span class="role-badge bg-warning text-dark">Pimpinan</span>
+        <!-- Gradient overlay for text readability -->
+        <div style="position: absolute; inset: 0; background: linear-gradient(to right, rgba(15,23,42,0.7) 0%, rgba(15,23,42,0.3) 50%, rgba(15,23,42,0.05) 100%); pointer-events: none;"></div>
+    </div>
+
+    <!-- Selamat Datang Greetings Card -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 welcome-banner-card" style="border-radius: 16px;">
+        <!-- Top accent line -->
+        <div style="height: 6px; background: linear-gradient(to right, #0891b2, #0e7490, #4f46e5);"></div>
+        <div class="card-body p-4 p-md-5">
+            <div class="row mb-4">
+                <div class="col-12 text-start">
+                    <span class="badge badge-soft-success mb-2 py-1.5 px-3 fw-bold" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; border-radius: 5px;">
+                        <i class="bi bi-shield-check me-1"></i> Panel {{ ucfirst($role) }}
+                    </span>
+                    <h3 class="fw-extrabold text-dark mb-2 dark-text-white" style="font-size: clamp(1.4rem, 4vw, 1.8rem); letter-spacing: -0.5px;">Selamat Datang di Bengkel Resmi FleetMaintenance</h3>
+                    <p class="text-muted mb-0" style="font-size: 0.9rem; line-height: 1.6; max-width: 900px;">
+                        Untuk menjamin keamanan dan kenyamanan dalam berkendara, pastikan armada Anda mendapatkan servis terbaik dari mekanik ahli, dilengkapi dengan prosedur standar dan pencatatan riwayat terpadu.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Quick Action Cards Grid based on Role -->
+            <div class="row g-3">
+                @if ($role === 'superadmin' || $role === 'admin')
+                    <!-- Action 1 -->
+                    <div class="col-md-4">
+                        <div class="card h-100 hover-lift border-0 shadow-xs p-3 text-start bg-light-soft" style="border-radius: 12px; background: rgba(8, 145, 178, 0.04); border: 1px solid rgba(8, 145, 178, 0.08) !important;">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="icon-box d-flex align-items-center justify-content-center bg-soft-info text-info rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                                    <i class="bi bi-car-front-fill"></i>
+                                </div>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Kelola Armada</h6>
+                            </div>
+                            <p class="text-secondary small mb-3">Pantau status kesiapan, detail spesifikasi, dan jadwal servis unit armada.</p>
+                            <a href="{{ route('vehicles.index') }}" class="btn btn-sm btn-info text-white fw-bold w-100 py-2 rounded-3 mt-auto">
+                                Buka Master Armada <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Action 2 -->
+                    <div class="col-md-4">
+                        <div class="card h-100 hover-lift border-0 shadow-xs p-3 text-start bg-light-soft" style="border-radius: 12px; background: rgba(79, 70, 229, 0.04); border: 1px solid rgba(79, 70, 229, 0.08) !important;">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="icon-box d-flex align-items-center justify-content-center bg-soft-primary text-primary rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                                    <i class="bi bi-people-fill"></i>
+                                </div>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Kelola Pengguna</h6>
+                            </div>
+                            <p class="text-secondary small mb-3">Daftarkan dan atur hak akses untuk supir, mekanik, dan pimpinan.</p>
+                            <a href="{{ route('users.index') }}" class="btn btn-sm btn-primary fw-bold w-100 py-2 rounded-3 mt-auto">
+                                Buka Manajemen User <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Action 3 -->
+                    <div class="col-md-4">
+                        <div class="card h-100 hover-lift border-0 shadow-xs p-3 text-start bg-light-soft" style="border-radius: 12px; background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.08) !important;">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="icon-box d-flex align-items-center justify-content-center bg-soft-success text-success rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                                    <i class="bi bi-printer-fill"></i>
+                                </div>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Cetak Laporan</h6>
+                            </div>
+                            <p class="text-secondary small mb-3">Ekspor atau cetak seluruh riwayat aktivitas pemeliharaan armada.</p>
+                            <button onclick="window.print()" class="btn btn-sm btn-success fw-bold w-100 py-2 rounded-3 mt-auto text-white">
+                                Cetak Laporan Sekarang <i class="bi bi-printer ms-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                @elseif ($role === 'teknisi')
+                    <!-- Action 1 -->
+                    <div class="col-md-4">
+                        <div class="card h-100 hover-lift border-0 shadow-xs p-3 text-start bg-light-soft" style="border-radius: 12px; background: rgba(8, 145, 178, 0.04); border: 1px solid rgba(8, 145, 178, 0.08) !important;">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="icon-box d-flex align-items-center justify-content-center bg-soft-info text-info rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                                    <i class="bi bi-clipboard2-check-fill"></i>
+                                </div>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Input Checklist</h6>
+                            </div>
+                            <p class="text-secondary small mb-3">Catat kondisi kelayakan fisik & fungsional kendaraan hari ini.</p>
+                            <a href="{{ route('checklist.create') }}" class="btn btn-sm btn-info text-white fw-bold w-100 py-2 rounded-3 mt-auto">
+                                Mulai Checklist Baru <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Action 2 -->
+                    <div class="col-md-4">
+                        <div class="card h-100 hover-lift border-0 shadow-xs p-3 text-start bg-light-soft" style="border-radius: 12px; background: rgba(245, 158, 11, 0.04); border: 1px solid rgba(245, 158, 11, 0.08) !important;">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="icon-box d-flex align-items-center justify-content-center bg-soft-warning text-warning rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                                    <i class="bi bi-wallet2"></i>
+                                </div>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Catat Biaya Bengkel</h6>
+                            </div>
+                            <p class="text-secondary small mb-3">Input pengeluaran suku cadang, jasa servis, dan perbaikan unit.</p>
+                            <a href="{{ route('expenses.create') }}" class="btn btn-sm btn-warning text-white fw-bold w-100 py-2 rounded-3 mt-auto">
+                                Input Biaya Servis <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Action 3 -->
+                    <div class="col-md-4">
+                        <div class="card h-100 hover-lift border-0 shadow-xs p-3 text-start bg-light-soft" style="border-radius: 12px; background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.08) !important;">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="icon-box d-flex align-items-center justify-content-center bg-soft-success text-success rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                                    <i class="bi bi-printer-fill"></i>
+                                </div>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Cetak Laporan</h6>
+                            </div>
+                            <p class="text-secondary small mb-3">Cetak rangkuman aktivitas perawatan armada ke kertas atau PDF.</p>
+                            <button onclick="window.print()" class="btn btn-sm btn-success fw-bold w-100 py-2 rounded-3 text-white mt-auto">
+                                Cetak Laporan Sekarang <i class="bi bi-printer ms-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                @elseif ($role === 'pimpinan')
+                    <!-- Action 1 -->
+                    <div class="col-md-6">
+                        <div class="card h-100 hover-lift border-0 shadow-xs p-3 text-start bg-light-soft" style="border-radius: 12px; background: rgba(245, 158, 11, 0.04); border: 1px solid rgba(245, 158, 11, 0.08) !important;">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="icon-box d-flex align-items-center justify-content-center bg-soft-warning text-warning rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                                    <i class="bi bi-wallet2"></i>
+                                </div>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Rekap Biaya Operasional</h6>
+                            </div>
+                            <p class="text-secondary small mb-3">Tinjau, setujui, dan pantau seluruh transaksi pengeluaran perawatan armada.</p>
+                            <a href="{{ route('expenses.index') }}" class="btn btn-sm btn-warning text-white fw-bold w-100 py-2 rounded-3 mt-auto">
+                                Buka Rekap Biaya <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Action 2 -->
+                    <div class="col-md-6">
+                        <div class="card h-100 hover-lift border-0 shadow-xs p-3 text-start bg-light-soft" style="border-radius: 12px; background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.08) !important;">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="icon-box d-flex align-items-center justify-content-center bg-soft-success text-success rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                                    <i class="bi bi-printer-fill"></i>
+                                </div>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Cetak Laporan</h6>
+                            </div>
+                            <p class="text-secondary small mb-3">Cetak rangkuman aktivitas keuangan dan perbaikan armada.</p>
+                            <button onclick="window.print()" class="btn btn-sm btn-success fw-bold w-100 py-2 rounded-3 text-white mt-auto">
+                                Cetak Laporan Sekarang <i class="bi bi-printer ms-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
                 @else
-                    <span class="role-badge bg-success text-white">Driver / Pengemudi</span>
+                    <!-- Action 1 -->
+                    <div class="col-md-6">
+                        <div class="card h-100 hover-lift border-0 shadow-xs p-3 text-start bg-light-soft" style="border-radius: 12px; background: rgba(239, 68, 68, 0.04); border: 1px solid rgba(239, 68, 68, 0.08) !important;">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="icon-box d-flex align-items-center justify-content-center bg-soft-danger text-danger rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                                    <i class="bi bi-megaphone-fill"></i>
+                                </div>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Lapor Keluhan</h6>
+                            </div>
+                            <p class="text-secondary small mb-3">Laporkan kendala atau keluhan kerusakan kendaraan Anda ke tim bengkel.</p>
+                            <a href="{{ route('complaints.create') }}" class="btn btn-sm btn-danger fw-bold w-100 py-2 rounded-3 mt-auto">
+                                Buat Laporan Keluhan <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Action 2 -->
+                    <div class="col-md-6">
+                        <div class="card h-100 hover-lift border-0 shadow-xs p-3 text-start bg-light-soft" style="border-radius: 12px; background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.08) !important;">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="icon-box d-flex align-items-center justify-content-center bg-soft-success text-success rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                                    <i class="bi bi-printer-fill"></i>
+                                </div>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Cetak Laporan</h6>
+                            </div>
+                            <p class="text-secondary small mb-3">Cetak rangkuman data laporan atau halaman dashboard ini.</p>
+                            <button onclick="window.print()" class="btn btn-sm btn-success fw-bold w-100 py-2 rounded-3 text-white mt-auto">
+                                Cetak Halaman Ini <i class="bi bi-printer ms-1"></i>
+                            </button>
+                        </div>
+                    </div>
                 @endif
             </div>
-            <p class="text-muted mb-0" style="font-size:0.875rem;">Berikut ringkasan status operasional &amp; pemeliharaan armada Anda hari ini.</p>
-            <div class="d-flex align-items-center gap-2 mt-2 flex-wrap">
-                <span class="badge bg-success-subtle text-success border border-success-subtle d-flex align-items-center gap-1.5 py-1 px-2" style="border-radius: 6px; font-size: 0.72rem;">
-                    <span class="pulse-dot-green" style="width: 6px; height: 6px; box-shadow: none; animation: pulse-green 2s infinite;"></span>
-                    Sistem Normal
-                </span>
-                <span id="liveClock" class="text-muted fw-semibold font-monospace" style="font-size: 0.75rem;"></span>
-            </div>
-        </div>
-    </div>
-    <div class="d-flex gap-2 flex-wrap align-items-center">
-        @if(auth()->user()->role === 'superadmin')
-            <a href="{{ route('vehicles.create') }}" class="btn btn-primary px-3 py-2 d-flex align-items-center gap-1.5" style="border-radius: 10px;" data-bs-toggle="tooltip" data-bs-title="Tambah Armada Kendaraan Baru">
-                <i class="bi bi-plus-circle-fill"></i> Tambah Kendaraan
-            </a>
-            <a href="{{ route('users.index') }}" class="btn btn-dark px-3 py-2 d-flex align-items-center gap-1.5" style="border-radius: 10px;" data-bs-toggle="tooltip" data-bs-title="Kelola Akun & Hak Akses Pengguna">
-                <i class="bi bi-people-fill"></i> Kelola User
-            </a>
-        @elseif(auth()->user()->role === 'admin')
-            <a href="{{ route('vehicles.create') }}" class="btn btn-primary px-3 py-2 d-flex align-items-center gap-1.5" style="border-radius: 10px;" data-bs-toggle="tooltip" data-bs-title="Tambah Armada Kendaraan Baru">
-                <i class="bi bi-plus-circle-fill"></i> Tambah Kendaraan
-            </a>
-            <a href="{{ route('checklist.create') }}" class="btn btn-outline-primary px-3 py-2 d-flex align-items-center gap-1.5" style="border-radius: 10px;" data-bs-toggle="tooltip" data-bs-title="Input Checklist Fisik Kendaraan">
-                <i class="bi bi-clipboard-plus-fill"></i> Input Checklist
-            </a>
-        @elseif(auth()->user()->role === 'teknisi')
-            <a href="{{ route('checklist.create') }}" class="btn btn-primary px-3 py-2 d-flex align-items-center gap-1.5" style="border-radius: 10px;" data-bs-toggle="tooltip" data-bs-title="Input Checklist Fisik Kendaraan">
-                <i class="bi bi-clipboard-plus-fill"></i> Input Checklist
-            </a>
-            <a href="{{ route('expenses.create') }}" class="btn btn-outline-secondary px-3 py-2 d-flex align-items-center gap-1.5" style="border-radius: 10px;" data-bs-toggle="tooltip" data-bs-title="Catat Pengeluaran Operasional / BBM">
-                <i class="bi bi-wallet2"></i> Catat Biaya
-            </a>
-        @elseif(auth()->user()->role === 'pimpinan')
-            <a href="{{ route('expenses.index') }}" class="btn btn-warning text-dark px-3 py-2 d-flex align-items-center gap-1.5 fw-bold" style="border-radius: 10px;" data-bs-toggle="tooltip" data-bs-title="Buka Panel Persetujuan Anggaran">
-                <i class="bi bi-shield-check"></i> Persetujuan Biaya
-            </a>
-        @else
-            <a href="{{ route('complaints.create') }}" class="btn btn-primary px-3 py-2 d-flex align-items-center gap-1.5" style="border-radius: 10px;" data-bs-toggle="tooltip" data-bs-title="Laporkan Masalah / Kerusakan Kendaraan">
-                <i class="bi bi-megaphone-fill"></i> Lapor Keluhan
-            </a>
-        @endif
-        <button onclick="window.print()" class="btn btn-cetak-laporan px-3 py-2 d-flex align-items-center gap-1.5" style="border-radius: 10px;" data-bs-toggle="tooltip" data-bs-title="Cetak Halaman ini Sebagai Laporan Bisnis">
-            <i class="bi bi-printer-fill"></i> Cetak Laporan
-        </button>
-    </div>
-</div>
-
-{{-- PUSAT PENGUMUMAN & SYSTEM ALERTS PANEL --}}
-<div class="row g-3 mb-4">
-    <div class="col-12">
-        <div class="card border-0 shadow-sm welcome-banner-card overflow-hidden" style="border-left: 5px solid #4f46e5 !important;">
-            <div class="card-body p-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="rounded-3 bg-indigo-subtle text-indigo d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; background: rgba(79, 70, 229, 0.1); color: #4f46e5;">
-                        <i class="bi bi-megaphone-fill fs-5"></i>
-                    </div>
-                    <div>
-                        <h6 class="fw-bold mb-1 text-dark" style="font-size:0.875rem;">Pusat Pemberitahuan Sistem</h6>
-                        <span class="text-muted" style="font-size:0.75rem;">
-                            @php
-                                $totalKuning = $vehicles->filter(fn($v) => $v->status_kir === 'kuning')->count();
-                                $totalMerah = $vehicles->filter(fn($v) => $v->status_kir === 'merah')->count();
-                            @endphp
-                            • KIR Kendaraan: Terdapat <strong>{{ $totalMerah }}</strong> unit lewat tempo (Merah), dan <strong>{{ $totalKuning }}</strong> unit mendekati jatuh tempo (Kuning). Mohon segera jadwalkan pengurusan dokumen.
-                        </span>
-                    </div>
-                </div>
-                <div>
-                    <button type="button" class="btn btn-xs btn-outline-secondary px-2.5 py-1" onclick="this.closest('.row').remove()" style="font-size: 0.7rem; border-radius: 6px;">Tutup</button>
-                </div>
-            </div>
         </div>
     </div>
 </div>
 
-{{-- PERINGATAN SERVIS TERLATE LEWAT TEMPO --}}
-@if(isset($perluServis) && $perluServis->count() > 0)
-<div class="card mb-4 border-0 shadow-sm overflow-hidden" style="background-color: #fff5f5; border-left: 5px solid #ef4444 !important;">
-    <div class="card-body p-4">
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-            <div class="d-flex align-items-center gap-3">
-                <div class="p-3 rounded-circle bg-danger text-white d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
-                    <i class="bi bi-exclamation-triangle-fill fs-5"></i>
-                </div>
-                <div>
-                    <h6 class="fw-bold text-danger mb-0 fs-6">Peringatan: {{ $perluServis->count() }} Kendaraan Melewati Jadwal Servis Berkala</h6>
-                    <small class="text-muted">Armada berikut memerlukan tindak lanjut teknisi segera demi keselamatan operasional.</small>
-                </div>
-            </div>
-            <a href="{{ route('vehicles.index') }}" class="btn btn-sm btn-danger px-3 py-2 rounded-3 fw-bold">Kelola Semua Kendaraan</a>
-        </div>
-        <div class="row g-3">
-            @foreach($perluServis->take(3) as $v)
-            @php
-                $alasan = [];
-                
-                // 1. Cek servis rutin
-                $lastService = $v->expenses()
-                    ->where('jenis_pengeluaran', 'like', '%Servis%')
-                    ->latest('tanggal')->first();
-                if ($lastService) {
-                    $nextServiceDate = \Carbon\Carbon::parse($lastService->tanggal)->addMonths(3);
-                    if (now()->greaterThan($nextServiceDate)) {
-                        $alasan[] = 'Servis Terlewat';
-                    }
-                }
-                
-                // 2. Cek keluhan terlambat
-                $activeComplaints = \App\Models\Complaint::where('vehicle_id', $v->id)
-                    ->where('status', '!=', 'Selesai')->get();
-                foreach ($activeComplaints as $c) {
-                    $targetDate = \Carbon\Carbon::parse($c->tanggal)->addDays(2);
-                    if (now()->startOfDay()->greaterThan($targetDate->startOfDay())) {
-                        $alasan[] = 'Keluhan: ' . \Illuminate\Support\Str::limit($c->keluhan, 20);
-                        break;
-                    }
-                }
-                
-                $textAlasan = count($alasan) > 0 ? implode(', ', $alasan) : 'Perlu Pengecekan';
-            @endphp
-            <div class="col-md-4">
-                <div class="p-3 rounded-3 bg-white border border-danger-subtle d-flex justify-content-between align-items-center shadow-xs h-100">
-                    <div>
-                        <span class="fw-bold font-monospace text-dark d-block"><i class="bi bi-car-front-fill me-1 text-danger"></i>{{ $v->plat_nomor }}</span>
-                        <small class="text-muted d-block" style="font-size:0.75rem;">{{ $v->merek }} {{ $v->tipe }}</small>
-                        <span class="badge bg-danger-subtle text-danger px-2 py-1 mt-2 d-inline-block fw-bold" style="font-size:0.68rem; border-radius:6px;">{{ $textAlasan }}</span>
-                    </div>
-                    <a href="{{ route('vehicles.show', $v->id) }}" class="btn btn-xs btn-outline-danger px-2.5 py-1 align-self-start" style="font-size:0.75rem; border-radius: 6px;">Detail</a>
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </div>
-</div>
-@endif
+
 {{-- STATISTIK KARTU UTAMA (Multi-Role & Quick Stats Support) --}}
 @if (in_array(auth()->user()->role, ['superadmin', 'admin', 'pimpinan']))
 <div class="row g-3 mb-4">
@@ -707,6 +1072,7 @@
             </div>
         </div>
     </div>
+</div>
 
     <!-- Row 2: Keuangan & Kepatuhan Dokumen (Horizontal Minimalis) -->
     <div class="card border-0 shadow-sm rounded-4 mb-4" style="border: 1px solid rgba(0,0,0,0.05) !important;">
@@ -969,38 +1335,112 @@
                 </div>
             </div>
         </div>
-    @endif   </div>
+    </div>
+@endif
 
-{{-- WIDGET PETA PEMANTAUAN ARMADA REAL-TIME --}}
+{{-- MODUL KHUSUS ADMIN & PIMPINAN (Persetujuan & Keluhan Baru) --}}
+@if (in_array(auth()->user()->role, ['superadmin', 'admin', 'pimpinan']))
 <div class="row g-4 mb-4">
-    <div class="col-12">
-        <div class="card dashboard-card">
+    <div class="col-md-6">
+        <div class="card dashboard-card card-border-grad-orange h-100">
             <div class="card-header d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-2">
-                    <div class="bg-primary-subtle text-primary rounded p-1.5"><i class="bi bi-map-fill fs-5"></i></div>
+                    <div class="bg-warning-subtle text-warning-emphasis rounded p-1.5"><i class="bi bi-clock-history fs-5"></i></div>
+                    <span class="fw-bold">Pengajuan Anggaran Perlu Persetujuan</span>
+                </div>
+                <span class="badge bg-warning-subtle text-warning-emphasis fw-bold">{{ $menungguPersetujuan->count() }} Menunggu</span>
+            </div>
+            <div class="card-body p-4 d-flex flex-column justify-content-start" style="min-height: 280px;">
+                @forelse ($menungguPersetujuan as $e)
+                <div class="p-3 rounded-4 mb-3 bg-white border border-slate-100 shadow-xs hover-lift transition-all d-flex justify-content-between align-items-center" style="border-left: 4px solid #f59e0b !important;">
                     <div>
-                        <span class="fw-bold d-block">Peta Pemantauan Posisi &amp; Status Armada</span>
-                        <small class="text-muted" style="font-size:0.75rem;">Lokasi real-time dan indikator kondisi armada kendaraan</small>
+                        <div class="d-flex align-items-center gap-2 mb-1">
+                            <span class="badge bg-dark text-white font-monospace" style="letter-spacing: 0.5px; border-radius: 6px; font-size: 0.72rem; padding: 4px 8px;">{{ $e->vehicle->plat_nomor ?? 'N/A' }}</span>
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size:0.7rem; padding: 4px 8px; border-radius: 6px;">{{ $e->jenis_pengeluaran }}</span>
+                        </div>
+                        <h6 class="fw-bold text-dark mb-1" style="font-size:0.875rem;">{{ $e->keterangan ?? 'Tanpa keterangan' }}</h6>
+                        <small class="text-secondary" style="font-size:0.75rem;"><i class="bi bi-calendar3 me-1"></i> {{ $e->tanggal->format('d M Y') }}</small>
+                    </div>
+                    <div class="text-end ms-3">
+                        <div class="fw-extrabold text-dark fs-5 mb-2 font-monospace">Rp {{ number_format($e->jumlah_biaya, 0, ',', '.') }}</div>
+                        <form action="{{ route('expenses.approve', $e) }}" method="POST" class="d-flex gap-2 justify-content-end">
+                            @csrf @method('PUT')
+                            <button type="submit" name="status_approval" value="Disetujui" class="btn btn-sm btn-success d-inline-flex align-items-center gap-1 shadow-sm px-3" style="font-size:0.75rem; border-radius:8px; font-weight: 600;">
+                                <i class="bi bi-check-lg"></i> Setuju
+                            </button>
+                            <button type="submit" name="status_approval" value="Ditolak" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 px-3" style="font-size:0.75rem; border-radius:8px; font-weight: 600;">
+                                <i class="bi bi-x-lg"></i> Tolak
+                            </button>
+                        </form>
                     </div>
                 </div>
-                <span class="badge bg-primary-subtle text-primary border fw-bold d-inline-flex align-items-center gap-1.5 py-1 px-2.5" style="border-radius: 8px;">
-                    <span class="pulse-dot-green" style="width:6px; height:6px; box-shadow:none; animation: pulse-green 2s infinite;"></span>
-                    Live GPS
-                </span>
+                @empty
+                <div class="text-center py-5 my-auto">
+                    <div class="premium-pulse-success mb-3 mx-auto">
+                        <i class="bi bi-check-lg text-success" style="font-size: 1.8rem;"></i>
+                    </div>
+                    <h6 class="fw-extrabold text-dark mb-1">Semua Anggaran Disetujui</h6>
+                    <p class="text-muted mb-0" style="font-size: 0.8rem;">Tidak ada klaim biaya yang tertunda.</p>
+                </div>
+                @endforelse
             </div>
-            <div class="card-body p-0" style="position: relative; overflow: hidden; border-radius: 0 0 16px 16px;">
-                <div id="fleetMap" style="height: 380px; width: 100%;"></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card dashboard-card card-border-grad-red h-100">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-danger-subtle text-danger rounded p-1.5"><i class="bi bi-exclamation-square-fill fs-5"></i></div>
+                    <span class="fw-bold">Laporan Keluhan Baru Dari Pengemudi</span>
+                </div>
+                <a href="{{ route('complaints.index') }}" class="btn btn-xs btn-outline-primary px-2.5 py-1" style="font-size:0.78rem;">Lihat Semua</a>
+            </div>
+            <div class="card-body p-4 d-flex flex-column justify-content-start" style="min-height: 280px;">
+                @forelse ($keluhanBaru as $k)
+                <div class="p-3 rounded-4 mb-3 bg-white border border-slate-100 shadow-xs hover-lift transition-all" style="border-left: 4px solid #ef4444 !important;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-dark text-white font-monospace" style="letter-spacing: 0.5px; border-radius: 6px; font-size: 0.72rem; padding: 4px 8px;">{{ $k->vehicle->plat_nomor ?? 'N/A' }}</span>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="font-size:0.68rem; padding: 3px 6px; border-radius: 5px;">Baru</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-1.5 text-muted" style="font-size:0.75rem;">
+                            <div class="rounded-circle overflow-hidden bg-slate-100 d-flex align-items-center justify-content-center border" style="width: 22px; height: 22px; font-size: 0.65rem; font-weight: 700;">
+                                {{ strtoupper(substr($k->user->name ?? 'D', 0, 2)) }}
+                            </div>
+                            <span class="fw-semibold text-dark" style="font-size: 0.78rem;">{{ $k->user->name ?? 'Driver' }}</span>
+                        </div>
+                    </div>
+                    <div class="p-2.5 rounded-3 bg-light text-dark mb-2" style="font-size:0.825rem; line-height:1.4;">
+                        "{{ Str::limit($k->keluhan, 120) }}"
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <small class="text-secondary" style="font-size:0.72rem;"><i class="bi bi-clock me-1"></i>{{ $k->created_at ? $k->created_at->diffForHumans() : '-' }}</small>
+                        <a href="{{ route('complaints.index') }}" class="btn btn-xs btn-outline-primary px-3 py-1 d-inline-flex align-items-center gap-1" style="font-size: 0.72rem; border-radius: 6px; font-weight: 600;">
+                            Proses <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+                @empty
+                <div class="text-center py-5 my-auto">
+                    <div class="premium-pulse-success mb-3 mx-auto">
+                        <i class="bi bi-shield-check text-success" style="font-size: 1.8rem;"></i>
+                    </div>
+                    <h6 class="fw-extrabold text-dark mb-1">Armada Bebas Masalah</h6>
+                    <p class="text-muted mb-0" style="font-size: 0.8rem;">Belum ada keluhan baru hari ini.</p>
+                </div>
+                @endforelse
             </div>
         </div>
     </div>
 </div>
+@endif
 
 {{-- WIDGET AGENDA KALENDER & EXPORTER LAPORAN --}}
 <div class="row g-4 mb-4">
     <!-- Col 1: Agenda Kalender Servis & KIR -->
-    <div class="col-lg-8">
-        <div class="card dashboard-card h-100">
-            <div class="card-header d-flex align-items-center justify-content-between">
+    <div class="col-lg-12">
+        <div class="card calendar-card-custom h-100 overflow-hidden" id="calendarSection">
+            <div class="card-header d-flex align-items-center justify-content-between" style="background-color: transparent !important; border-bottom: 1px solid rgba(79, 70, 229, 0.15) !important;">
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-primary-subtle text-primary rounded p-1.5"><i class="bi bi-calendar3 fs-5"></i></div>
                     <div>
@@ -1026,34 +1466,6 @@
                     <div class="calendar-day-header">Sab</div>
                     <!-- Cells will be generated dynamically by JS -->
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Col 2: Exporter Laporan Cepat -->
-    <div class="col-lg-4">
-        <div class="card dashboard-card h-100">
-            <div class="card-header">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="bg-indigo-subtle text-indigo rounded p-1.5" style="background:#e0e7ff; color:#4f46e5;"><i class="bi bi-file-earmark-spreadsheet-fill fs-5"></i></div>
-                    <div>
-                        <span class="fw-bold d-block">Pusat Ekspor Laporan</span>
-                        <small class="text-muted" style="font-size:0.75rem;">Download ringkasan data format CSV</small>
-                    </div>
-                </div>
-            </div>
-            <div class="card-body p-4 d-flex flex-column justify-content-between">
-                <div>
-                    <label class="form-label fw-bold text-dark mb-1" style="font-size:0.8rem;">Pilih Kategori Laporan</label>
-                    <select class="form-select mb-3 py-2" id="exporterSelectType" style="font-size: 0.85rem; border-radius: 8px;">
-                        <option value="expenses">Laporan Biaya &amp; Pengeluaran</option>
-                        <option value="complaints">Laporan Keluhan Kendaraan</option>
-                    </select>
-                    <p class="text-muted mb-3" style="font-size:0.78rem;">Ekspor data ini langsung menghasilkan berkas spreadsheet (.csv) siap pakai tanpa menunggu proses server.</p>
-                </div>
-                <button type="button" class="btn btn-primary w-100 py-2.5 fw-bold d-flex align-items-center justify-content-center gap-2" id="btnExportCSV" style="border-radius:10px;">
-                    <i class="bi bi-download"></i> Unduh File CSV
-                </button>
             </div>
         </div>
     </div>
@@ -1114,81 +1526,7 @@
 </div>
 @endif
 
-{{-- MODUL KHUSUS ADMIN & PIMPINAN (Persetujuan & Keluhan Baru) --}}
-@if (in_array(auth()->user()->role, ['superadmin', 'admin', 'pimpinan']))
-<div class="row g-4 mb-4">
-    <div class="col-md-6">
-        <div class="card dashboard-card h-100">
-            <div class="card-header d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="bg-warning-subtle text-warning-emphasis rounded p-1.5"><i class="bi bi-clock-history fs-5"></i></div>
-                    <span class="fw-bold">Pengajuan Anggaran Perlu Persetujuan</span>
-                </div>
-                <span class="badge bg-warning-subtle text-warning-emphasis fw-bold">{{ $menungguPersetujuan->count() }} Menunggu</span>
-            </div>
-            <div class="card-body p-4">
-                @forelse ($menungguPersetujuan as $e)
-                <div class="p-3 rounded-3 mb-2 bg-light border d-flex justify-content-between align-items-center">
-                    <div>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-primary-subtle text-primary font-monospace">{{ $e->vehicle->plat_nomor ?? 'N/A' }}</span>
-                            <span class="fw-bold text-dark" style="font-size:0.875rem;">{{ $e->jenis_pengeluaran }}</span>
-                        </div>
-                        <small class="text-muted mt-1 d-block" style="font-size:0.8rem;">{{ $e->keterangan ?? 'Tanpa keterangan' }}</small>
-                    </div>
-                    <div class="text-end">
-                        <div class="fw-extrabold text-primary fs-6 mb-1">Rp {{ number_format($e->jumlah_biaya, 0, ',', '.') }}</div>
-                        <form action="{{ route('expenses.approve', $e) }}" method="POST" class="d-flex gap-1 justify-content-end">
-                            @csrf @method('PUT')
-                            <button type="submit" name="status_approval" value="Disetujui" class="btn btn-sm btn-success px-2.5 py-1" style="font-size:0.75rem; border-radius:6px;">Setujui</button>
-                            <button type="submit" name="status_approval" value="Ditolak" class="btn btn-sm btn-outline-danger px-2.5 py-1" style="font-size:0.75rem; border-radius:6px;">Tolak</button>
-                        </form>
-                    </div>
-                </div>
-                @empty
-                <div class="text-center py-5">
-                    <div class="bg-success-subtle text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width:52px; height:52px;">
-                        <i class="bi bi-check-all fs-3"></i>
-                    </div>
-                    <h6 class="fw-bold text-dark mb-0">Semua Anggaran Disetujui</h6>
-                    <small class="text-muted">Tidak ada klaim biaya yang tertunda.</small>
-                </div>
-                @endforelse
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card dashboard-card h-100">
-            <div class="card-header d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="bg-danger-subtle text-danger rounded p-1.5"><i class="bi bi-exclamation-square-fill fs-5"></i></div>
-                    <span class="fw-bold">Laporan Keluhan Baru Dari Pengemudi</span>
-                </div>
-                <a href="{{ route('complaints.index') }}" class="btn btn-xs btn-outline-primary px-2.5 py-1" style="font-size:0.78rem;">Lihat Semua</a>
-            </div>
-            <div class="card-body p-4">
-                @forelse ($keluhanBaru as $k)
-                <div class="p-3 rounded-3 mb-2 bg-light border">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="badge bg-danger-subtle text-danger font-monospace">{{ $k->vehicle->plat_nomor ?? 'N/A' }}</span>
-                        <small class="text-muted" style="font-size:0.75rem;"><i class="bi bi-person me-1"></i>{{ $k->user->name }}</small>
-                    </div>
-                    <div class="text-dark" style="font-size:0.85rem; line-height:1.4;">{{ Str::limit($k->keluhan, 90) }}</div>
-                </div>
-                @empty
-                <div class="text-center py-5">
-                    <div class="bg-success-subtle text-success rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width:52px; height:52px;">
-                        <i class="bi bi-shield-check fs-3"></i>
-                    </div>
-                    <h6 class="fw-bold text-dark mb-0">Armada Bebas Masalah</h6>
-                    <small class="text-muted">Belum ada keluhan baru dari pengemudi hari ini.</small>
-                </div>
-                @endforelse
-            </div>
-        </div>
-    </div>
-</div>
-@endif
+
 
 {{-- MODUL KHUSUS TEKNISI --}}
 @if (auth()->user()->role === 'teknisi')
@@ -1208,7 +1546,7 @@
         </div>
     </div>
     <div class="col-md-8">
-        <div class="card dashboard-card h-100">
+        <div class="card dashboard-card card-border-grad-orange h-100">
             <div class="card-header d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-warning-subtle text-warning-emphasis rounded p-1.5"><i class="bi bi-tools fs-5"></i></div>
@@ -1253,8 +1591,16 @@
         </div>
     </div>
     @forelse ($kendaraanSaya as $v)
+    @php
+        $gradClass = 'card-border-grad-green';
+        if ($v->status_kir === 'merah') {
+            $gradClass = 'card-border-grad-red';
+        } elseif ($v->status_kir === 'kuning') {
+            $gradClass = 'card-border-grad-orange';
+        }
+    @endphp
     <div class="col-md-6">
-        <div class="p-3 rounded-4 bg-white border shadow-xs d-flex align-items-center justify-content-between">
+        <div class="p-3 rounded-4 bg-white border shadow-xs d-flex align-items-center justify-content-between position-relative overflow-hidden {{ $gradClass }}">
             <div class="d-flex align-items-center gap-3">
                 <img src="{{ $v->foto_url }}" alt="{{ $v->plat_nomor }}" class="rounded-3 border object-fit-cover shadow-xs" style="width: 64px; height: 48px;">
                 <div>
@@ -1284,197 +1630,7 @@
 </div>
 @endif
 
-{{-- TABEL STATUS KENDARAAN (KIR & DOKUMEN) --}}
-<div class="mb-5">
-    <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
-        <div class="d-flex align-items-center gap-2">
-            <div class="p-2 bg-primary-subtle text-primary rounded-3"><i class="bi bi-file-earmark-text-fill fs-5"></i></div>
-            <div>
-                <h5 class="fw-extrabold text-dark mb-0">Status Dokumen &amp; Uji KIR Seluruh Armada</h5>
-                <small class="text-muted">Monitoring masa aktif dokumen KIR kendaraan real-time</small>
-            </div>
-        </div>
-        <a href="{{ route('vehicles.index') }}" class="btn btn-sm btn-outline-primary px-3 py-2 fw-semibold" style="border-radius:10px;">
-            <i class="bi bi-gear-fill me-1"></i> Kelola Data Master
-        </a>
-    </div>
 
-    <!-- Search & Filter Controls -->
-    <div class="row g-3 mb-4 align-items-center">
-        <div class="col-md-6 col-lg-4">
-            <div class="input-group shadow-sm rounded-3 overflow-hidden">
-                <span class="input-group-text bg-white border-end-0 text-muted" style="border-color: rgba(0,0,0,0.08);"><i class="bi bi-search"></i></span>
-                <input type="text" id="searchVehicleInput" class="form-control border-start-0 ps-0 py-2.5" placeholder="Cari Plat Nomor / Merk / Tipe..." style="box-shadow: none; border-color: rgba(0,0,0,0.08); font-size: 0.9rem;">
-            </div>
-        </div>
-        <div class="col-md-6 col-lg-8">
-            <div class="d-flex gap-2 justify-content-md-end flex-wrap" id="statusFilterButtons">
-                <button class="btn btn-sm btn-dark rounded-3 px-3 py-2.5 active font-semibold" data-status="all">Semua</button>
-                <button class="btn btn-sm btn-outline-success rounded-3 px-3 py-2.5 font-semibold" data-status="hijau"><i class="bi bi-check-circle-fill me-1"></i>Aman &amp; Valid</button>
-                <button class="btn btn-sm btn-outline-warning rounded-3 px-3 py-2.5 font-semibold text-dark" data-status="kuning"><i class="bi bi-exclamation-triangle-fill me-1"></i>Mendekati</button>
-                <button class="btn btn-sm btn-outline-danger rounded-3 px-3 py-2.5 font-semibold" data-status="merah"><i class="bi bi-x-circle-fill me-1"></i>Lewat Tempo</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="row g-4" id="kirStatusGrid">
-        @forelse ($vehicles as $v)
-        @php
-            $diffDays = null;
-            $progressPct = 0;
-            $progressBarColor = 'bg-secondary';
-            if ($v->jatuh_tempo_kir) {
-                $diffDays = now()->startOfDay()->diffInDays($v->jatuh_tempo_kir->startOfDay(), false);
-                $progressPct = max(0, min(100, round(($diffDays / 180) * 100)));
-                if ($v->status_kir === 'hijau') {
-                    $progressBarColor = 'bg-success';
-                } elseif ($v->status_kir === 'kuning') {
-                    $progressBarColor = 'bg-warning';
-                } else {
-                    $progressBarColor = 'bg-danger';
-                }
-            }
-
-            // Servis status calculations
-            $tglServis = isset($v->tanggal_servis_berikutnya) && $v->tanggal_servis_berikutnya ? \Carbon\Carbon::parse($v->tanggal_servis_berikutnya) : null;
-            $kmTarget = $v->km_servis_berikutnya ?? 0;
-            $kmSekarang = $v->odometer_terkini ?? 0;
-
-            $isTerlambatTgl = $tglServis && $tglServis->isPast();
-            $isMendekatiTgl = $tglServis && !$isTerlambatTgl && now()->diffInDays($tglServis, false) <= 7;
-            $isTerlambatKm = $kmTarget > 0 && $kmSekarang >= $kmTarget;
-        @endphp
-        <div class="col-md-6 col-lg-4 vehicle-card-wrapper" data-status-kir="{{ $v->status_kir }}" data-search="{{ $v->plat_nomor }} {{ $v->merek }} {{ $v->tipe }} {{ $v->jenis_kendaraan }}">
-            <div class="card h-100 border border-slate-100 rounded-4 overflow-hidden shadow-xs hover-card transition-all" style="transition: all 0.25s ease; border-radius: 16px; background-color: #ffffff;">
-                <!-- Vehicle Image -->
-                <div class="position-relative" style="height: 180px; overflow: hidden; background: #f8fafc;">
-                    <img src="{{ $v->foto_url }}" alt="{{ $v->plat_nomor }}" class="w-100 h-100 object-fit-cover transition-img" style="transition: transform 0.3s ease;">
-                    <!-- Floating Plate Badge -->
-                    <span class="position-absolute badge bg-dark text-white font-monospace px-3 py-2 fs-6 border border-secondary shadow-sm" style="border-radius: 10px; letter-spacing: 0.8px; top: 12px; left: 12px; z-index: 5;">
-                        {{ $v->plat_nomor }}
-                    </span>
-                    <!-- Floating Status Badge -->
-                    <div class="position-absolute" style="top: 12px; right: 12px; z-index: 5;">
-                        @if ($v->status === 'Siap Pakai')
-                            <span class="badge bg-success px-3 py-2 fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm" style="border-radius: 10px;">
-                                <span class="bg-white rounded-circle" style="width: 6px; height: 6px; display: inline-block;"></span> Siap Pakai
-                            </span>
-                        @elseif ($v->status === 'Sedang Diservis')
-                            <span class="badge bg-warning text-dark px-3 py-2 fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm" style="border-radius: 10px;">
-                                <span class="bg-dark rounded-circle" style="width: 6px; height: 6px; display: inline-block;"></span> Sedang Diservis
-                            </span>
-                        @else
-                            <span class="badge bg-secondary text-white px-3 py-2 fw-bold shadow-sm" style="border-radius: 10px;">{{ $v->status ?? 'Non-Aktif' }}</span>
-                        @endif
-                    </div>
-                </div>
-                
-                <!-- Card Body -->
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-start mb-2">
-                        <div>
-                            <span class="text-uppercase text-primary fw-bold font-monospace" style="font-size: 0.72rem; letter-spacing: 0.8px;">{{ $v->jenis_kendaraan }}</span>
-                            <h5 class="card-title fw-extrabold text-dark mb-0 mt-1">{{ $v->merek }}</h5>
-                            <small class="text-muted">{{ $v->tipe }} ({{ $v->tahun ?? 2024 }})</small>
-                        </div>
-                    </div>
-
-                    <!-- Details Grid -->
-                    <div class="row g-2 my-3 py-2 border-top border-bottom" style="font-size: 0.82rem;">
-                        <div class="col-6">
-                            <span class="text-muted d-block" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Jatuh Tempo KIR</span>
-                            <span class="fw-semibold text-dark"><i class="bi bi-shield-check text-secondary me-1"></i>{{ $v->jatuh_tempo_kir ? $v->jatuh_tempo_kir->format('d M Y') : 'Belum diset' }}</span>
-                        </div>
-                        <div class="col-6">
-                            <span class="text-muted d-block" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Jadwal Servis</span>
-                            <span class="fw-semibold text-dark"><i class="bi bi-calendar3 text-secondary me-1"></i>{{ $v->tanggal_servis_berikutnya ? \Carbon\Carbon::parse($v->tanggal_servis_berikutnya)->format('d M Y') : 'Belum diset' }}</span>
-                        </div>
-                        <div class="col-6 mt-2">
-                            <span class="text-muted d-block" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Supir Utama</span>
-                            <span class="fw-semibold text-dark"><i class="bi bi-person-fill text-secondary me-1"></i>{{ $v->supir_utama ?? '-' }}</span>
-                        </div>
-                        <div class="col-6 mt-2">
-                            <span class="text-muted d-block" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Odometer</span>
-                            <span class="fw-semibold text-dark font-monospace"><i class="bi bi-speedometer2 text-secondary me-1"></i>{{ number_format($v->odometer_terkini ?? 0, 0, ',', '.') }} km</span>
-                        </div>
-                    </div>
-
-                    <!-- Warning Statuses -->
-                    <div class="d-flex flex-column gap-2 mb-3">
-                        <!-- Status KIR -->
-                        @if ($v->status_kir === 'merah')
-                            <div class="alert alert-danger py-1.5 px-3 mb-0 d-flex align-items-center gap-2" style="font-size: 0.75rem; border-radius: 8px; border: 1px solid #fecaca; background: #fef2f2;">
-                                <i class="bi bi-x-circle-fill text-danger fs-6"></i>
-                                <span class="fw-bold text-danger">KIR Lewat Tempo! (Terlewat {{ abs($diffDays) }} hari)</span>
-                            </div>
-                        @elseif ($v->status_kir === 'kuning')
-                            <div class="alert alert-warning py-1.5 px-3 mb-0 d-flex align-items-center gap-2 text-dark" style="font-size: 0.75rem; border-radius: 8px; border: 1px solid #fde68a; background: #fffbeb;">
-                                <i class="bi bi-exclamation-triangle-fill text-warning fs-6"></i>
-                                <span class="fw-bold" style="color: #92400e;">KIR Mendekati Tempo (Sisa {{ $diffDays }} hari)</span>
-                            </div>
-                        @else
-                            <div class="alert alert-success py-1.5 px-3 mb-0 d-flex align-items-center gap-2" style="font-size: 0.75rem; border-radius: 8px; border: 1px solid #a7f3d0; background: #ecfdf5;">
-                                <i class="bi bi-check-circle-fill text-success fs-6"></i>
-                                <span class="fw-bold text-success">Dokumen KIR Valid</span>
-                            </div>
-                        @endif
-
-                        <!-- Status Servis -->
-                        @if($isTerlambatTgl || $isTerlambatKm)
-                            <div class="alert alert-danger py-1.5 px-3 mb-0 d-flex align-items-center gap-2" style="font-size: 0.75rem; border-radius: 8px; border: 1px solid #fecaca; background: #fef2f2;">
-                                <i class="bi bi-exclamation-triangle-fill text-danger fs-6"></i>
-                                <span class="fw-bold text-danger">Terlambat Servis!</span>
-                            </div>
-                        @elseif($isMendekatiTgl)
-                            <div class="alert alert-warning py-1.5 px-3 mb-0 d-flex align-items-center gap-2 text-dark" style="font-size: 0.75rem; border-radius: 8px; border: 1px solid #fde68a; background: #fffbeb;">
-                                <i class="bi bi-clock-history text-warning fs-6"></i>
-                                <span class="fw-bold" style="color: #92400e;">Servis &lt; 7 Hari</span>
-                            </div>
-                        @else
-                            <div class="alert alert-success py-1.5 px-3 mb-0 d-flex align-items-center gap-2" style="font-size: 0.75rem; border-radius: 8px; border: 1px solid #a7f3d0; background: #ecfdf5;">
-                                <i class="bi bi-check-circle-fill text-success fs-6"></i>
-                                <span class="fw-bold text-success">Jadwal Servis Aman</span>
-                            </div>
-                        @endif
-                    </div>
-
-                    <!-- Action Controls -->
-                    <div class="d-flex justify-content-between align-items-center gap-2 mt-3 pt-2 border-top">
-                        <!-- Quick status updater for Admin & Technician -->
-                        @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
-                            <form action="{{ route('vehicles.updateStatus', $v) }}" method="POST" class="d-inline-block">
-                                @csrf 
-                                @method('PUT')
-                                <select name="status" class="form-select form-select-sm shadow-none border" style="font-size: 0.78rem; font-weight: 600; border-radius: 8px; background-color: #f8fafc; padding: 6px 12px; width: 130px;" onchange="this.form.submit()">
-                                    <option value="Siap Pakai" @selected($v->status === 'Siap Pakai')>Siap Pakai</option>
-                                    <option value="Sedang Diservis" @selected($v->status === 'Sedang Diservis')>Sedang Diservis</option>
-                                    <option value="Selesai" @selected($v->status === 'Selesai')>Selesai</option>
-                                </select>
-                            </form>
-                        @else
-                            <div></div>
-                        @endif
-
-                        <!-- General Actions -->
-                        <div class="d-flex align-items-center gap-1.5">
-                            <a href="{{ route('vehicles.show', $v) }}" class="btn btn-sm btn-outline-primary px-3 py-1.5 d-inline-flex align-items-center gap-1" style="border-radius: 8px;">
-                                <i class="bi bi-eye-fill"></i> Detail
-                            </a>
-                            @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin']))
-                                <a href="{{ route('vehicles.edit', $v) }}" class="btn btn-sm btn-outline-warning p-1.5 d-inline-flex align-items-center" style="border-radius: 8px;" title="Edit">
-                                    <i class="bi bi-pencil-fill"></i>
-                                </a>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        @empty
-        <div class="col-12 text-center py-5 text-muted">Belum ada data kendaraan.</div>
-        @endforelse
-    </div>
-</div>
 
 <script type="application/json" id="dashboard-chart-data">
 {
@@ -1646,15 +1802,34 @@
 
     const currentColors = getThemeColors();
 
-    const chartStatus = new Chart(document.getElementById('chartStatus'), {
+    // 1. Status Chart (Doughnut) with premium gradients
+    const ctxStatus = document.getElementById('chartStatus').getContext('2d');
+    
+    // Emerald Green to Mint Green for "Siap Pakai"
+    const gradSiap = ctxStatus.createLinearGradient(0, 0, 0, 200);
+    gradSiap.addColorStop(0, '#10b981');
+    gradSiap.addColorStop(1, '#34d399');
+
+    // Amber to Soft Orange for "Sedang Diservis"
+    const gradServis = ctxStatus.createLinearGradient(0, 0, 0, 200);
+    gradServis.addColorStop(0, '#f97316');
+    gradServis.addColorStop(1, '#fbbf24');
+
+    // Indigo to Electric Blue for "Selesai" (or general resolved state)
+    const gradSelesai = ctxStatus.createLinearGradient(0, 0, 0, 200);
+    gradSelesai.addColorStop(0, '#6366f1');
+    gradSelesai.addColorStop(1, '#818cf8');
+
+    const chartStatus = new Chart(ctxStatus, {
         type: 'doughnut',
         data: {
             labels: chartPayload.status.labels,
             datasets: [{
                 data: chartPayload.status.data,
-                backgroundColor: ['#10b981', '#f59e0b', '#64748b'],
+                backgroundColor: [gradSiap, gradServis, gradSelesai],
                 borderWidth: 3,
-                borderColor: currentColors.border
+                borderColor: currentColors.border,
+                hoverOffset: 6
             }]
         },
         options: {
@@ -1676,11 +1851,21 @@
     });
     chartInstances.push(chartStatus);
 
+    // 2. Tren Biaya Chart (Line) with glowing X-axis gradient and smooth filling
     if (chartPayload.tren) {
         const ctxTren = document.getElementById('chartTren').getContext('2d');
+        
+        // Multi-color path gradient (Blue -> Indigo -> Violet)
+        const lineGradient = ctxTren.createLinearGradient(0, 0, ctxTren.canvas.clientWidth || 600, 0);
+        lineGradient.addColorStop(0, '#3b82f6');
+        lineGradient.addColorStop(0.5, '#6366f1');
+        lineGradient.addColorStop(1, '#a855f7');
+
+        // Smooth fading area fill
         const gradientTren = ctxTren.createLinearGradient(0, 0, 0, 300);
-        gradientTren.addColorStop(0, 'rgba(79, 70, 229, 0.45)');
-        gradientTren.addColorStop(1, 'rgba(79, 70, 229, 0.01)');
+        gradientTren.addColorStop(0, 'rgba(99, 102, 241, 0.35)');
+        gradientTren.addColorStop(0.5, 'rgba(168, 85, 247, 0.1)');
+        gradientTren.addColorStop(1, 'rgba(168, 85, 247, 0.0)');
 
         const chartTren = new Chart(ctxTren, {
             type: 'line',
@@ -1689,22 +1874,32 @@
                 datasets: [{
                     label: 'Biaya (Rp)',
                     data: chartPayload.tren.data,
-                    borderColor: '#4f46e5',
+                    borderColor: lineGradient,
                     backgroundColor: gradientTren,
                     fill: true,
                     tension: 0.4,
                     pointRadius: 5,
                     pointHoverRadius: 8,
                     pointBackgroundColor: '#fff',
-                    pointBorderColor: '#4f46e5',
+                    pointBorderColor: '#6366f1',
                     pointBorderWidth: 3,
-                    borderWidth: 3
+                    borderWidth: 3.5
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false }, tooltip: { padding: 12, cornerRadius: 8, titleFont: { size: 14 }, bodyFont: { size: 14 } } },
+                plugins: { 
+                    legend: { display: false }, 
+                    tooltip: { 
+                        padding: 12, 
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        titleFont: { family: 'Inter', size: 13, weight: 'bold' },
+                        bodyFont: { family: 'Inter', size: 13 },
+                        cornerRadius: 8,
+                        displayColors: false
+                    } 
+                },
                 scales: {
                     y: {
                         beginAtZero: true,
@@ -1724,11 +1919,14 @@
         chartInstances.push(chartTren);
     }
 
+    // 3. Top 5 Expense Vehicles Chart (Bar) with modern warning gradient (Purple -> Rose -> Coral)
     if (chartPayload.boros) {
         const ctxBoros = document.getElementById('chartBoros').getContext('2d');
-        const gradientBoros = ctxBoros.createLinearGradient(0, 0, 400, 0);
-        gradientBoros.addColorStop(0, '#f97316');
-        gradientBoros.addColorStop(1, '#ea580c');
+        
+        const gradientBoros = ctxBoros.createLinearGradient(0, 0, 500, 0);
+        gradientBoros.addColorStop(0, '#8b5cf6'); // Violet
+        gradientBoros.addColorStop(0.5, '#ec4899'); // Rose Pink
+        gradientBoros.addColorStop(1, '#f97316'); // Coral Orange
 
         const chartBoros = new Chart(ctxBoros, {
             type: 'bar',
@@ -1739,24 +1937,34 @@
                     data: chartPayload.boros.data,
                     backgroundColor: gradientBoros,
                     borderRadius: 8,
-                    maxBarThickness: 36
+                    maxBarThickness: 32
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 indexAxis: 'y',
-                plugins: { legend: { display: false }, tooltip: { padding: 12, cornerRadius: 8, titleFont: { size: 14 }, bodyFont: { size: 14 } } },
+                plugins: { 
+                    legend: { display: false }, 
+                    tooltip: { 
+                        padding: 12, 
+                        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                        titleFont: { family: 'Inter', size: 13, weight: 'bold' },
+                        bodyFont: { family: 'Inter', size: 13 },
+                        cornerRadius: 8,
+                        displayColors: false
+                    } 
+                },
                 scales: {
                     x: {
                         beginAtZero: true,
                         grid: { color: currentColors.grid, drawBorder: false },
-                        ticks: { callback: function (v) { return 'Rp ' + v.toLocaleString('id-ID'); }, color: currentColors.text },
+                        ticks: { callback: function (v) { return 'Rp ' + v.toLocaleString('id-ID'); }, color: currentColors.text, font: { family: 'Inter', size: 11 } },
                         border: { display: false }
                     },
                     y: { 
                         grid: { display: false }, 
-                        ticks: { color: currentColors.textBold, font: { weight: '600' } }, 
+                        ticks: { color: currentColors.textBold, font: { family: 'Inter', weight: '600', size: 12 } }, 
                         border: { display: false } 
                     }
                 }
@@ -1786,13 +1994,8 @@
             chart.update();
         });
     });
-    // Client-side search and status filter for KIR Grid
+    // Initialize Bootstrap tooltips with theme check
     document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('searchVehicleInput');
-        const filterButtons = document.querySelectorAll('#statusFilterButtons button');
-        const vehicleCards = document.querySelectorAll('#kirStatusGrid .vehicle-card-wrapper');
-
-        // Initialize Bootstrap tooltips with theme check
         if (typeof bootstrap !== 'undefined') {
             const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
             const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
@@ -1845,88 +2048,7 @@
         createSparkline('sparklineServis', spServis, 'rgba(255, 255, 255, 0.85)');
         createSparkline('sparklineSiap', spSiap, 'rgba(255, 255, 255, 0.85)');
 
-        function filterVehicles() {
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            const activeBtn = document.querySelector('#statusFilterButtons button.active');
-            const selectedStatus = activeBtn ? activeBtn.getAttribute('data-status') : 'all';
 
-            vehicleCards.forEach(card => {
-                const searchData = card.getAttribute('data-search').toLowerCase();
-                const cardStatus = card.getAttribute('data-status-kir');
-
-                const matchesSearch = searchData.includes(searchTerm);
-                const matchesStatus = (selectedStatus === 'all' || cardStatus === selectedStatus);
-
-                if (matchesSearch && matchesStatus) {
-                    card.style.setProperty('display', 'block', 'important');
-                    // Trigger reflow for transition effect
-                    card.offsetHeight;
-                    card.style.opacity = '1';
-                    card.style.transform = 'scale(1)';
-                } else {
-                    card.style.opacity = '0';
-                    card.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        if (card.style.opacity === '0') {
-                            card.style.setProperty('display', 'none', 'important');
-                        }
-                    }, 350);
-                }
-            });
-
-            // Handle empty state visual feedback
-            setTimeout(() => {
-                const visibleCards = Array.from(vehicleCards).filter(card => card.style.display !== 'none');
-                const gridContainer = document.getElementById('kirStatusGrid');
-                let emptyState = document.getElementById('emptySearchState');
-
-                if (visibleCards.length === 0) {
-                    if (!emptyState) {
-                        const noDataHTML = `
-                            <div class="col-12 text-center py-5 text-muted" id="emptySearchState" style="animation: fadeIn 0.4s ease;">
-                                <i class="bi bi-search fs-2 d-block mb-2 opacity-50"></i>
-                                <span>Tidak ditemukan kendaraan yang cocok dengan pencarian / filter Anda.</span>
-                            </div>
-                        `;
-                        gridContainer.insertAdjacentHTML('beforeend', noDataHTML);
-                    }
-                } else {
-                    if (emptyState) {
-                        emptyState.remove();
-                    }
-                }
-            }, 360);
-        }
-
-        if (searchInput) {
-            searchInput.addEventListener('input', filterVehicles);
-        }
-
-        filterButtons.forEach(btn => {
-            btn.addEventListener('click', function() {
-                // Remove active classes
-                filterButtons.forEach(b => {
-                    b.classList.remove('active', 'btn-dark', 'btn-success', 'btn-warning', 'btn-danger');
-                    const s = b.getAttribute('data-status');
-                    if (s === 'all') b.classList.add('btn-outline-dark');
-                    else if (s === 'hijau') b.classList.add('btn-outline-success');
-                    else if (s === 'kuning') b.classList.add('btn-outline-warning');
-                    else if (s === 'merah') b.classList.add('btn-outline-danger');
-                });
-                
-                // Add active state to clicked button
-                this.classList.remove('btn-outline-dark', 'btn-outline-success', 'btn-outline-warning', 'btn-outline-danger');
-                this.classList.add('active');
-                
-                const status = this.getAttribute('data-status');
-                if (status === 'all') this.classList.add('btn-dark');
-                else if (status === 'hijau') this.classList.add('btn-success');
-                else if (status === 'kuning') this.classList.add('btn-warning');
-                else if (status === 'merah') this.classList.add('btn-danger');
-
-                filterVehicles();
-            });
-        });
 
         // --- 📅 SERVICE CALENDAR BUILDER ---
         var currentDate = new Date();
@@ -1958,7 +2080,7 @@
             // Render empty cells for offset
             for (let i = 0; i < firstDay; i++) {
                 var emptyCell = document.createElement('div');
-                emptyCell.className = 'calendar-cell opacity-25 bg-transparent border-0';
+                emptyCell.className = 'calendar-cell-empty';
                 calendarContainer.appendChild(emptyCell);
             }
 
@@ -2003,6 +2125,16 @@
                 }
 
                 calendarContainer.appendChild(cell);
+            }
+
+            // Render empty cells at the end to complete the grid layout
+            var totalCells = firstDay + daysInMonth;
+            var nextMultipleOf7 = Math.ceil(totalCells / 7) * 7;
+            var emptyCellsAtEnd = nextMultipleOf7 - totalCells;
+            for (let i = 0; i < emptyCellsAtEnd; i++) {
+                var emptyCell = document.createElement('div');
+                emptyCell.className = 'calendar-cell-empty';
+                calendarContainer.appendChild(emptyCell);
             }
 
             // Re-initialize Bootstrap tooltips for new dots
@@ -2081,6 +2213,19 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        });
+
+
+
+        // Smooth scroll for any link pointing to # with header offset
+        $('a[href^="#"]').on('click', function(event) {
+            var target = $(this.getAttribute('href'));
+            if (target.length) {
+                event.preventDefault();
+                $('html, body').stop().animate({
+                    scrollTop: target.offset().top - 90
+                }, 400);
+            }
         });
     });
 

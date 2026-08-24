@@ -209,12 +209,46 @@ Dokumen ini menyajikan analisis mendalam dari kode sumber (*source code*) aplika
 
 ---
 
+### 8. Module: Riwayat Kendaraan (Vehicle History)
+*   **Tujuan Module:** Melacak dan mendokumentasikan setiap riwayat servis/perbaikan dari kendaraan secara kronologis. Riwayat ini dapat ditambahkan secara manual oleh admin/teknisi, atau otomatis tercatat ketika laporan keluhan ditandai selesai (`Selesai`).
+*   **Alur Bisnis:**
+    1. **Admin/Teknisi** dapat menginput data riwayat servis manual.
+    2. Sistem otomatis membuat data riwayat baru saat status keluhan diselesaikan (`Selesai`).
+    3. Halaman detail kendaraan (`vehicles.show`) memuat dan menampilkan timeline riwayat ini dari tanggal terbaru.
+*   **Route yang Digunakan:**
+    *   `GET /vehicle-histories` (Name: `vehicle-histories.index`)
+    *   `GET /vehicle-histories/create` (Name: `vehicle-histories.create`)
+    *   `POST /vehicle-histories` (Name: `vehicle-histories.store`)
+    *   `GET /vehicle-histories/{vehicle_history}/edit` (Name: `vehicle-histories.edit`)
+    *   `PUT /vehicle-histories/{vehicle_history}` (Name: `vehicle-histories.update`)
+    *   `DELETE /vehicle-histories/{vehicle_history}` (Name: `vehicle-histories.destroy`)
+*   **Controller yang Menangani:** [VehicleHistoryController](file:///c:/xampppp/htdocs/belajar-laravel/app/Http/Controllers/VehicleHistoryController.php)
+*   **Request Validation:**
+    *   `vehicle_id` (Wajib, exists di `vehicles.id`)
+    *   `tanggal` (Wajib, Date)
+    *   `teknisi_id` (Opsional, exists di `users.id`)
+    *   `jenis_pekerjaan` (Wajib, String, max:255)
+    *   `sparepart_digunakan` (Opsional, String, max:500)
+    *   `biaya` (Wajib, Numeric, min:0)
+    *   `keterangan` (Opsional, String, max:1000)
+*   **Repository atau Model yang Digunakan:** [VehicleHistory](file:///c:/xampppp/htdocs/belajar-laravel/app/Models/VehicleHistory.php), [Vehicle](file:///c:/xampppp/htdocs/belajar-laravel/app/Models/Vehicle.php), [User](file:///c:/xampppp/htdocs/belajar-laravel/app/Models/User.php)
+*   **Tabel Database yang Diakses:** `vehicle_histories`, `vehicles`, `users`
+*   **Relasi antar Tabel:**
+    *   `VehicleHistory` belongsTo `Vehicle`
+    *   `VehicleHistory` belongsTo `User` (sebagai `teknisi`)
+*   **Response yang Dikembalikan:**
+    *   View: `vehicle_histories.index`, `vehicle_histories.create`, `vehicle_histories.edit`.
+    *   Redirect ke index riwayat dengan message `success`.
+
+---
+
 ## RINGKASAN FITUR UTAMA
 1.  **Dashboard Analytics & Metrics:** Panel modern Bootstrap 5 dengan status KIR, jatuh tempo servis berkala otomatis (H-7 dan sisa KM), chart pengeluaran terboros, tren bulanan, leaderboard kepatuhan, dan kalender acara.
 2.  **Manajemen Armada & Pelacakan Odometer:** Sinkronisasi dinamis antara data odometer di checklist harian dengan data odometer utama kendaraan.
 3.  **Sistem Approval Anggaran:** Penyaringan otomatis biaya operasional besar (> Rp 1.000.000) yang memerlukan persetujuan Manager/Pimpinan secara bertingkat.
 4.  **Tindak Lanjut Laporan Keluhan Terintegrasi:** Flow otomatis saat Teknisi menyelesaikan perbaikan keluhan, sistem langsung membuat data pengeluaran "Bengkel" dan mereset status kesiapan armada.
 5.  **Multi-role Access Control:** Proteksi akses berdasarkan peran pengguna (`superadmin`, `admin`, `teknisi`, `pimpinan`, `user`).
+6.  **Timeline Riwayat Servis & Perbaikan:** Pelacakan menyeluruh perbaikan unit secara kronologis pada detail kendaraan, terintegrasi otomatis dengan sistem penyelesaian keluhan driver.
 
 ---
 
@@ -246,6 +280,7 @@ sequenceDiagram
     participant CC as ComplaintController
     participant VC as Vehicle
     participant EC as Expense
+    participant VH as VehicleHistory
     
     Driver->>CC: store() Keluhan Baru (Status: Baru)
     CC->>VC: Status kendaraan tetap 'Siap Pakai'
@@ -256,6 +291,7 @@ sequenceDiagram
     Teknisi->>CC: updateStatus() menjadi 'Selesai' + Input Biaya (misal: 1.5jt)
     CC->>VC: update() Status kendaraan menjadi 'Siap Pakai'
     CC->>EC: create() Pengeluaran Bengkel (Status: Menunggu Persetujuan)
+    CC->>VH: create() Riwayat Kendaraan (Otomatis)
     Note over CC,EC: Karena biaya > 1.000.000
 ```
 
@@ -358,10 +394,23 @@ erDiagram
         string catatan_penyelesaian
     }
 
+    vehicle_histories {
+        int id PK
+        int vehicle_id FK
+        date tanggal
+        int teknisi_id FK
+        string jenis_pekerjaan
+        string sparepart_digunakan
+        decimal biaya
+        text keterangan
+    }
+
     users ||--o{ complaints : "melaporkan"
     vehicles ||--o{ daily_checklists : "diperiksa"
     vehicles ||--o{ expenses : "memakan biaya"
     vehicles ||--o{ complaints : "memiliki kendala"
+    vehicles ||--o{ vehicle_histories : "memiliki riwayat"
+    users ||--o{ vehicle_histories : "mengerjakan"
 ```
 
 ---

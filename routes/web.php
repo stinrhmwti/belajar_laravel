@@ -40,23 +40,27 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // ============ DAILY CHECKLIST ============
-    Route::get('/checklist', [DailyChecklistController::class, 'index'])->name('checklist.index');
-    Route::get('/checklist/{checklist}', [DailyChecklistController::class, 'show'])->name('checklist.show');
-
     Route::middleware(['role:superadmin,admin,teknisi'])->group(function () {
+        Route::get('/checklist', [DailyChecklistController::class, 'index'])->name('checklist.index');
+        Route::get('/checklist/{checklist}', [DailyChecklistController::class, 'show'])->name('checklist.show');
         Route::get('/checklist-create', [DailyChecklistController::class, 'create'])->name('checklist.create');
         Route::post('/checklist', [DailyChecklistController::class, 'store'])->name('checklist.store');
         // Rute untuk menghapus checklist harian ditambahkan di sini
         Route::delete('/checklist/{checklist}', [DailyChecklistController::class, 'destroy'])->name('checklist.destroy');
+        Route::put('/checklist/{checklist}/odometer', [DailyChecklistController::class, 'updateOdometer'])->name('checklist.updateOdometer');
     });
 
     // ============ EXPENSES (REKAP BIAYA) ============
-    Route::get('/expenses', [ExpenseController::class, 'index'])->name('expenses.index');
-
     Route::middleware(['role:superadmin,admin,teknisi'])->group(function () {
+        Route::get('/expenses', [ExpenseController::class, 'index'])->name('expenses.index');
         Route::get('/expenses-create', [ExpenseController::class, 'create'])->name('expenses.create');
         Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
         Route::delete('/expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
+    });
+
+    // ============ VEHICLE HISTORIES (RIWAYAT SERVIS) ============
+    Route::middleware(['role:superadmin,admin,teknisi'])->group(function () {
+        Route::resource('vehicle-histories', \App\Http\Controllers\VehicleHistoryController::class);
     });
 
     // Hanya Admin, Super Admin, dan Pimpinan (Manager) yang boleh menyetujui/menolak anggaran perbaikan besar
@@ -71,7 +75,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/complaints', [ComplaintController::class, 'store'])->name('complaints.store');
     Route::post('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
 
-    Route::middleware(['role:superadmin,admin,teknisi'])->group(function () {
+    Route::middleware(['role:superadmin,teknisi'])->group(function () {
         Route::put('/complaints/{complaint}/status', [ComplaintController::class, 'updateStatus'])->name('complaints.updateStatus');
     });
 

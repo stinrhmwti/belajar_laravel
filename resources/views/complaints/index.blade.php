@@ -85,6 +85,58 @@
     body.dark-theme .icon-box.bg-danger-subtle { background-color: #7f1d1d !important; color: #f87171 !important; }
     body.dark-theme .icon-box.bg-warning-subtle { background-color: #78350f !important; color: #fbbf24 !important; }
     body.dark-theme .icon-box.bg-success-subtle { background-color: #064e3b !important; color: #34d399 !important; }
+
+    #complaintSearch {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+    #complaintSearch::placeholder {
+        color: #64748b !important;
+        opacity: 1 !important;
+    }
+    body.dark-theme #complaintSearch {
+        background-color: #1e293b !important;
+        border-color: #334155 !important;
+        color: #f8fafc !important;
+    }
+    body.dark-theme #complaintSearch::placeholder {
+        color: #94a3b8 !important;
+    }
+
+    /* ===== TEKNISI CONTROL PANEL STYLING ===== */
+    .teknisi-panel {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1rem;
+        margin-top: 1rem;
+        transition: all 0.2s ease;
+    }
+    body.dark-theme .teknisi-panel {
+        background-color: #1e293b;
+        border-color: #334155;
+    }
+    .teknisi-panel-title {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #475569;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    body.dark-theme .teknisi-panel-title {
+        color: #cbd5e1;
+    }
+    .dark-adaptive-bg {
+        background-color: #ffffff;
+    }
+    body.dark-theme .dark-adaptive-bg {
+        background-color: #0f172a !important;
+    }
 </style>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -152,34 +204,38 @@
         $diffDays = now()->startOfDay()->diffInDays($targetDate->startOfDay(), false);
     @endphp
     <div class="col-md-4 complaint-card-col" data-search="{{ strtolower($c->vehicle->plat_nomor . ' ' . ($c->user->name ?? '') . ' ' . $c->vehicle->merek . ' ' . $c->vehicle->tipe . ' ' . $c->keluhan . ' ' . $c->tanggal->format('d/m/Y')) }}">
-        <div class="card h-100 border border-slate-100 rounded-4 overflow-hidden shadow-xs hover-card transition-all" style="transition: all 0.25s ease; border-radius: 16px;">
-            <!-- Vehicle Image -->
-            <div class="position-relative" style="height: 160px; overflow: hidden; background: #f8fafc;">
-                <img src="{{ $c->vehicle->foto_url }}" alt="{{ $c->vehicle->plat_nomor }}" class="w-100 h-100 object-fit-cover transition-img" style="transition: transform 0.3s ease;">
-                <!-- Floating Plate Badge -->
-                <span class="position-absolute badge bg-dark text-white font-monospace px-3 py-2 fs-6 border border-secondary shadow-sm" style="border-radius: 10px; letter-spacing: 0.8px; top: 12px; left: 12px; z-index: 5;">
+        <div class="card h-100 border border-slate-100 rounded-4 overflow-hidden shadow-xs hover-card transition-all p-3" style="transition: all 0.25s ease; border-radius: 16px;">
+            <!-- Plate & Status Header (Above Image) -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <!-- Plate Badge -->
+                <span class="badge bg-dark text-white font-monospace px-3 py-2 fs-6 border border-secondary shadow-sm" style="border-radius: 10px; letter-spacing: 0.8px;">
                     {{ $c->vehicle->plat_nomor }}
                 </span>
-                <!-- Floating Status Badge -->
-                <div class="position-absolute" style="top: 12px; right: 12px; z-index: 5;">
+                <!-- Status Badge -->
+                <div>
                     @if ($c->status === 'Baru')
-                        <span class="badge bg-danger text-white px-3 py-2 fw-bold shadow-sm d-inline-flex align-items-center gap-1.5" style="border-radius: 10px;">
-                            <span class="bg-white rounded-circle" style="width: 5px; height: 5px; display: inline-block;"></span> 🔴 Baru
+                        <span class="badge bg-danger text-white px-3 py-2 fw-bold shadow-sm d-inline-flex align-items-center gap-2" style="border-radius: 10px;">
+                            <span class="bg-white rounded-circle" style="width: 5px; height: 5px; display: inline-block;"></span> Baru
                         </span>
                     @elseif ($c->status === 'Diproses')
-                        <span class="badge bg-warning text-dark px-3 py-2 fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm" style="border-radius: 10px;">
-                            <span class="bg-dark rounded-circle" style="width: 5px; height: 5px; display: inline-block;"></span> 🟡 Diproses
+                        <span class="badge bg-warning text-dark px-3 py-2 fw-bold d-inline-flex align-items-center gap-2 shadow-sm" style="border-radius: 10px;">
+                            <span class="bg-dark rounded-circle" style="width: 5px; height: 5px; display: inline-block;"></span> Diproses
                         </span>
                     @else
-                        <span class="badge bg-success text-white px-3 py-2 fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm" style="border-radius: 10px;">
-                            <span class="bg-white rounded-circle" style="width: 5px; height: 5px; display: inline-block;"></span> 🟢 Selesai
+                        <span class="badge bg-success text-white px-3 py-2 fw-bold d-inline-flex align-items-center gap-2 shadow-sm" style="border-radius: 10px;">
+                            <span class="bg-white rounded-circle" style="width: 5px; height: 5px; display: inline-block;"></span> Selesai
                         </span>
                     @endif
                 </div>
             </div>
 
+            <!-- Vehicle Image -->
+            <div class="position-relative vehicle-image-wrapper rounded-3" style="height: 230px; overflow: hidden; background: #f8fafc;">
+                <img src="{{ $c->vehicle->foto_url }}" alt="{{ $c->vehicle->plat_nomor }}" class="w-100 h-100 object-fit-cover transition-img" style="transition: transform 0.3s ease;">
+            </div>
+
             <!-- Card Body -->
-            <div class="card-body p-4">
+            <div class="card-body px-0 pt-3 pb-0">
                 <!-- SLA (Target Waktu) Badge -->
                 <div class="mb-2">
                     @if ($c->status === 'Selesai')
@@ -263,66 +319,81 @@
                     <i class="bi bi-clock-history"></i> Detail &amp; Timeline
                 </button>
 
-                <!-- Action Form for Technician & Admin -->
-                @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
-                <div class="pt-3 border-top">
-                    <h6 class="fw-bold text-dark mb-2" style="font-size: 0.8rem;"><i class="bi bi-tools text-primary"></i> Teknisi Control Panel</h6>
-                    <form action="{{ route('complaints.updateStatus', $c) }}" method="POST" class="d-flex flex-column gap-2">
+                <!-- Action Form for Technician & Super Admin -->
+                @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'teknisi']))
+                <div class="teknisi-panel">
+                    <h6 class="teknisi-panel-title">
+                        <i class="bi bi-tools text-primary"></i> Teknisi Control Panel
+                    </h6>
+                    <form action="{{ route('complaints.updateStatus', $c) }}" method="POST" class="d-flex flex-column gap-2.5">
                         @csrf @method('PUT')
                         
-                        <!-- Status & Update Button -->
+                        <!-- Status Select & Update Button -->
                         <div class="row g-2">
                             <div class="col-8">
-                                <select name="status" class="form-select form-select-sm shadow-none" style="border-radius: 8px; font-size: 0.78rem;"
-                                        onchange="var prog = document.getElementById('progressContainer_{{ $c->id }}'); var dateSelesai = document.getElementById('dateSelesai_{{ $c->id }}'); var biaya = document.getElementById('biayaContainer_{{ $c->id }}'); if(this.value === 'Diproses') { prog.style.setProperty('display', 'block', 'important'); dateSelesai.style.setProperty('display', 'none', 'important'); biaya.style.setProperty('display', 'none', 'important'); } else if(this.value === 'Selesai') { prog.style.setProperty('display', 'none', 'important'); dateSelesai.style.setProperty('display', 'block', 'important'); biaya.style.setProperty('display', 'block', 'important'); } else { prog.style.setProperty('display', 'none', 'important'); dateSelesai.style.setProperty('display', 'none', 'important'); biaya.style.setProperty('display', 'none', 'important'); }">
+                                <select name="status" class="form-select form-select-sm shadow-none border-slate-200" style="border-radius: 8px; font-size: 0.78rem; height: 34px;"
+                                        onchange="toggleComplaintFields(this, '{{ $c->id }}')">
                                     <option value="Baru" @selected($c->status === 'Baru')>Baru</option>
                                     <option value="Diproses" @selected($c->status === 'Diproses')>Diproses (Sedang Diperbaiki)</option>
                                     <option value="Selesai" @selected($c->status === 'Selesai')>Selesai</option>
                                 </select>
                             </div>
-                            <div class="col-4 text-end">
-                                <button class="btn btn-sm btn-primary w-100 px-2 d-inline-flex align-items-center justify-content-center gap-1" style="border-radius: 8px; font-size: 0.78rem; white-space: nowrap;">
+                            <div class="col-4">
+                                <button class="btn btn-sm btn-primary w-100 d-inline-flex align-items-center justify-content-center gap-1 shadow-sm" style="border-radius: 8px; font-size: 0.78rem; height: 34px; font-weight: 600;">
                                     <i class="bi bi-arrow-repeat"></i> Update
                                 </button>
                             </div>
                         </div>
 
                         <!-- Progress Slider -->
-                        <div class="mb-1 bg-light p-2 rounded-3 border" id="progressContainer_{{ $c->id }}" style="display: {{ $c->status === 'Diproses' ? 'block' : 'none' }};">
-                            <label class="form-label text-muted fw-bold mb-1" style="font-size: 0.7rem;">Set Progres Perbaikan: <span id="progressVal_{{ $c->id }}" class="text-primary">{{ $c->progress_perbaikan }}</span>%</label>
+                        <div class="bg-white dark-adaptive-bg p-2.5 rounded-3 border border-slate-100 shadow-sm" id="progressContainer_{{ $c->id }}" style="display: {{ $c->status === 'Diproses' ? 'block' : 'none' }} !important;">
+                            <label class="form-label text-secondary fw-semibold mb-1 d-flex justify-content-between" style="font-size: 0.72rem;">
+                                <span>Set Progres Perbaikan:</span>
+                                <span class="text-primary font-monospace fw-bold"><span id="progressVal_{{ $c->id }}">{{ $c->progress_perbaikan }}</span>%</span>
+                            </label>
                             <input type="range" name="progress_perbaikan" class="form-range" min="0" max="100" step="5" value="{{ $c->progress_perbaikan }}" oninput="document.getElementById('progressVal_{{ $c->id }}').innerText = this.value">
                         </div>
 
                         <!-- Collapse Button for Timeline Dates -->
-                        <button class="btn btn-sm btn-link text-decoration-none text-start p-0 fw-semibold text-secondary mb-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDates_{{ $c->id }}" aria-expanded="false" style="font-size: 0.72rem; outline: none; box-shadow: none;">
-                            <i class="bi bi-chevron-down"></i> Atur Manual Tanggal &amp; Waktu
+                        <button class="btn btn-sm btn-link text-decoration-none text-start p-0 fw-semibold text-secondary d-flex align-items-center gap-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDates_{{ $c->id }}" aria-expanded="false" style="font-size: 0.72rem; outline: none; box-shadow: none;">
+                            <i class="bi bi-calendar-date text-primary"></i> Atur Manual Tanggal &amp; Waktu
                         </button>
                         
                         <!-- Collapsible Date Inputs -->
                         <div class="collapse" id="collapseDates_{{ $c->id }}">
-                            <div class="bg-light p-2 rounded-3 border d-flex flex-column gap-2 mb-1" style="font-size: 0.75rem;">
+                            <div class="bg-white dark-adaptive-bg p-2.5 rounded-3 border border-slate-100 d-flex flex-column gap-2 shadow-sm" style="font-size: 0.75rem;">
                                 <div>
-                                    <label class="form-label text-muted mb-0.5" style="font-size: 0.68rem;">1. Tanggal Diterima Admin/Teknisi</label>
-                                    <input type="datetime-local" name="diterima_at" class="form-control form-control-sm" value="{{ $c->diterima_at ? $c->diterima_at->format('Y-m-d\TH:i') : '' }}" style="font-size: 0.75rem; border-radius: 6px;">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.68rem; font-weight: 600;">1. Tanggal Diterima Admin/Teknisi</label>
+                                    <input type="datetime-local" name="diterima_at" class="form-control form-control-sm border-slate-200" value="{{ $c->diterima_at ? $c->diterima_at->format('Y-m-d\TH:i') : '' }}" style="font-size: 0.75rem; border-radius: 6px;">
                                 </div>
                                 <div>
-                                    <label class="form-label text-muted mb-0.5" style="font-size: 0.68rem;">2. Tanggal Mulai Perbaikan</label>
-                                    <input type="datetime-local" name="diperbaiki_at" class="form-control form-control-sm" value="{{ $c->diperbaiki_at ? $c->diperbaiki_at->format('Y-m-d\TH:i') : '' }}" style="font-size: 0.75rem; border-radius: 6px;">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.68rem; font-weight: 600;">2. Tanggal Mulai Perbaikan</label>
+                                    <input type="datetime-local" name="diperbaiki_at" class="form-control form-control-sm border-slate-200" value="{{ $c->diperbaiki_at ? $c->diperbaiki_at->format('Y-m-d\TH:i') : '' }}" style="font-size: 0.75rem; border-radius: 6px;">
                                 </div>
-                                <div id="dateSelesai_{{ $c->id }}" style="display: {{ $c->status === 'Selesai' ? 'block' : 'none' }};">
-                                    <label class="form-label text-muted mb-0.5" style="font-size: 0.68rem;">3. Tanggal Selesai Perbaikan</label>
-                                    <input type="datetime-local" name="selesai_at" class="form-control form-control-sm" value="{{ $c->selesai_at ? $c->selesai_at->format('Y-m-d\TH:i') : '' }}" style="font-size: 0.75rem; border-radius: 6px;">
+                                <div id="dateSelesai_{{ $c->id }}" style="display: {{ $c->status === 'Selesai' ? 'block' : 'none' }} !important;">
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.68rem; font-weight: 600;">3. Tanggal Selesai Perbaikan</label>
+                                    <input type="datetime-local" name="selesai_at" class="form-control form-control-sm border-slate-200" value="{{ $c->selesai_at ? $c->selesai_at->format('Y-m-d\TH:i') : '' }}" style="font-size: 0.75rem; border-radius: 6px;">
                                 </div>
                             </div>
                         </div>
 
                         <!-- Biaya Perbaikan Bengkel -->
-                        <div class="mb-1" id="biayaContainer_{{ $c->id }}" style="display: {{ $c->status === 'Selesai' ? 'block' : 'none' }};">
-                            <input type="number" name="jumlah_biaya" class="form-control form-control-sm shadow-none" placeholder="Masukkan biaya bengkel (Rp)..." style="border-radius: 8px; font-size: 0.78rem;">
+                        <div id="biayaContainer_{{ $c->id }}" style="display: {{ $c->status === 'Selesai' ? 'block' : 'none' }} !important;">
+                            <label class="form-label text-secondary mb-1 fw-semibold" style="font-size: 0.72rem;">Biaya Bengkel (Rp):</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text border-slate-200 text-secondary bg-slate-50" style="border-top-left-radius: 8px; border-bottom-left-radius: 8px; font-size: 0.75rem; font-weight: 600;">Rp</span>
+                                <input type="number" name="jumlah_biaya" class="form-control form-control-sm border-slate-200 shadow-none" placeholder="Contoh: 150000" style="border-top-right-radius: 8px; border-bottom-right-radius: 8px; font-size: 0.78rem;">
+                            </div>
                         </div>
 
                         <!-- Catatan Solusi / Penyelesaian -->
-                        <input type="text" name="catatan_penyelesaian" class="form-control form-control-sm shadow-none" placeholder="Tulis catatan solusi / perbaikan..." value="{{ $c->catatan_penyelesaian }}" style="border-radius: 8px; font-size: 0.78rem;">
+                        <div>
+                            <label class="form-label text-secondary mb-1 fw-semibold" style="font-size: 0.72rem;">Catatan Solusi / Tindakan:</label>
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text border-slate-200 text-secondary bg-slate-50" style="border-top-left-radius: 8px; border-bottom-left-radius: 8px;"><i class="bi bi-chat-left-dots"></i></span>
+                                <input type="text" name="catatan_penyelesaian" class="form-control form-control-sm border-slate-200 shadow-none" placeholder="Tulis tindakan perbaikan..." value="{{ $c->catatan_penyelesaian }}" style="border-top-right-radius: 8px; border-bottom-right-radius: 8px; font-size: 0.78rem;">
+                            </div>
+                        </div>
                     </form>
                 </div>
                 @endif
@@ -436,8 +507,36 @@
     </div>
 </div>
 
+<!-- Floating Action Button (FAB) to Report Complaint -->
+<div class="fab-container">
+    <a href="{{ route('complaints.create') }}" class="fab-btn" title="Lapor Keluhan Baru">
+        <i class="bi bi-megaphone-fill" style="font-size: 1.25rem;"></i>
+    </a>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
+    function toggleComplaintFields(select, complaintId) {
+        var val = select.value;
+        var prog = document.getElementById('progressContainer_' + complaintId);
+        var dateSelesai = document.getElementById('dateSelesai_' + complaintId);
+        var biaya = document.getElementById('biayaContainer_' + complaintId);
+
+        if (val === 'Diproses') {
+            if (prog) prog.style.setProperty('display', 'block', 'important');
+            if (dateSelesai) dateSelesai.style.setProperty('display', 'none', 'important');
+            if (biaya) biaya.style.setProperty('display', 'none', 'important');
+        } else if (val === 'Selesai') {
+            if (prog) prog.style.setProperty('display', 'none', 'important');
+            if (dateSelesai) dateSelesai.style.setProperty('display', 'block', 'important');
+            if (biaya) biaya.style.setProperty('display', 'block', 'important');
+        } else {
+            if (prog) prog.style.setProperty('display', 'none', 'important');
+            if (dateSelesai) dateSelesai.style.setProperty('display', 'none', 'important');
+            if (biaya) biaya.style.setProperty('display', 'none', 'important');
+        }
+    }
+
     $(document).ready(function () {
         // Search text handler with Loading Skeleton
         var complaintSearchTimeout;
@@ -590,13 +689,6 @@
             $('#detailComplaintModal').on('hidden.bs.modal', function () {
                 $('#modalVideoPlayer').attr('src', '');
             });
-<!-- Floating Action Button (FAB) to Report Complaint -->
-<div class="fab-container">
-    <a href="{{ route('complaints.create') }}" class="fab-btn" title="Lapor Keluhan Baru">
-        <i class="bi bi-megaphone-fill" style="font-size: 1.25rem;"></i>
-    </a>
-</div>
-
         });
     });
 </script>

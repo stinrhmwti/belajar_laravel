@@ -27,6 +27,14 @@ class ExpenseController extends Controller
             $query->whereMonth('tanggal', $request->bulan);
         }
 
+        if ($request->filled('tanggal_mulai')) {
+            $query->whereDate('tanggal', '>=', $request->tanggal_mulai);
+        }
+
+        if ($request->filled('tanggal_selesai')) {
+            $query->whereDate('tanggal', '<=', $request->tanggal_selesai);
+        }
+
         $expenses = $query->get();
 
         $rekapPerKendaraan = Expense::selectRaw('vehicle_id, SUM(jumlah_biaya) as total')

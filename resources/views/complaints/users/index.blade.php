@@ -9,12 +9,12 @@
 
 <div class="card">
     <div class="table-responsive">
-        <table id="tabelKeluhan" class="table table-hover mb-0 w-100" data-count="{{ $complaints->count() }}" data-lastcol="{{ in_array(auth()->user()->role, ['admin', 'teknisi']) ? 5 : -1 }}">
+        <table id="tabelKeluhan" class="table table-hover mb-0 w-100" data-count="{{ $complaints->count() }}" data-lastcol="{{ in_array(auth()->user()->role, ['superadmin', 'teknisi']) ? 5 : -1 }}">
             <thead>
                 <tr>
                     <th>Tanggal</th><th>Plat Nomor</th>
                     <th>Pelapor</th><th>Keluhan</th><th>Status</th>
-                    @if (in_array(auth()->user()->role, ['admin', 'teknisi']))<th data-orderable="false">Aksi</th>@endif
+                    @if (in_array(auth()->user()->role, ['superadmin', 'teknisi']))<th data-orderable="false">Aksi</th>@endif
                 </tr>
             </thead>
             <tbody>
@@ -33,7 +33,7 @@
                             <span class="badge bg-success">Selesai</span>
                         @endif
                     </td>
-                    @if (in_array(auth()->user()->role, ['admin', 'teknisi']))
+                    @if (in_array(auth()->user()->role, ['superadmin', 'teknisi']))
                     <td>
                         <form action="{{ route('complaints.updateStatus', $c) }}" method="POST" class="d-flex gap-1">
                             @csrf @method('PUT')

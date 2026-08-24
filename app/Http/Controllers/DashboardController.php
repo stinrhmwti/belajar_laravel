@@ -32,19 +32,8 @@ class DashboardController extends Controller
 
         // Logika untuk mendeteksi mobil yang lewat jatuh tempo servis atau memiliki keluhan terlambat
         $perluServis = $vehicles->filter(function ($vehicle) {
-            // 1. Cek servis berdasarkan tanggal servis terakhir (3 bulan)
-            $lastService = $vehicle->expenses()
-                ->where('jenis_pengeluaran', 'like', '%Servis%')
-                ->latest('tanggal')
-                ->first();
-
-            $telatServis = false;
-            if ($lastService) {
-                $nextServiceDate = Carbon::parse($lastService->tanggal)->addMonths(3);
-                if (now()->greaterThan($nextServiceDate)) {
-                    $telatServis = true;
-                }
-            }
+            // 1. Cek servis berkala (apakah statusnya merah, yang berarti lewat jadwal servis baik manual, KM, atau estimasi waktu)
+            $telatServis = $vehicle->status_servis_berkala === 'merah';
 
             // 2. Cek apakah ada keluhan aktif yang terlambat (status != Selesai dan tanggal + 2 hari < hari ini)
             $telatKeluhan = false;

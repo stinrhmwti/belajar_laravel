@@ -30,7 +30,7 @@ class VehicleExpenseSeeder extends Seeder
                 'vehicle_id' => $vehicle->id,
                 'tanggal' => $tanggalServis->toDateString(),
                 'jenis_pengeluaran' => 'Bengkel',
-                'deskripsi' => 'Servis berkala rutin (ganti oli & filter)',
+                'keterangan' => 'Servis berkala rutin (ganti oli & filter)',
                 'jumlah_biaya' => 750000,
                 'status_approval' => 'Disetujui',
             ]);

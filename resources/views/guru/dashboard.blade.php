@@ -165,8 +165,9 @@
                     <h5 class="mb-0"><i class="bi bi-bar-chart-fill"></i> Soal per Mata Pelajaran</h5>
                 </div>
                 <div class="card-body p-0">
-                    <table class="table table-hover mb-0">
-                        <thead style="background:#667eea; color:white">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead style="background:#667eea; color:white">
                             <tr><th>Mata Pelajaran</th><th class="text-center">Jumlah Soal</th></tr>
                         </thead>
                         <tbody>
@@ -181,7 +182,8 @@
                             <tr><td colspan="2" class="text-center text-muted py-3">Belum ada soal</td></tr>
                             @endforelse
                         </tbody>
-                    </table>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -195,9 +197,10 @@
                     @if($ujian_terbaru->isEmpty())
                     <p class="text-center text-muted py-4">Belum ada ujian yang dikerjakan</p>
                     @else
-                    <table class="table table-hover mb-0">
-                        <thead style="background:#198754; color:white">
-                            <tr>
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead style="background:#198754; color:white">
+                                <tr>
                                 <th>Siswa</th>
                                 <th>Mapel</th>
                                 <th class="text-center">Nilai</th>
@@ -217,7 +220,8 @@
                             </tr>
                             @endforeach
                         </tbody>
-                    </table>
+                        </table>
+                    </div>
                     @endif
                 </div>
             </div>

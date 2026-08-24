@@ -22,6 +22,7 @@ class ComplaintSeeder extends Seeder
         $driverAgus = User::where('email', 'agus.driver@fleet.com')->first();
         $driverRudi = User::where('email', 'rudi.driver@fleet.com')->first();
         $driverSlamet = User::where('email', 'slamet.driver@fleet.com')->first();
+        $driverUtama = User::where('email', 'user@fleet.com')->first();
 
         // Default fallback users if not found
         $fallbackUser = User::where('role', 'user')->first() ?? User::first();
@@ -42,7 +43,7 @@ class ComplaintSeeder extends Seeder
             ],
             [
                 'vehicle_id' => $b1234 ? $b1234->id : $fallbackVehicle->id,
-                'user_id' => $fallbackUser->id,
+                'user_id' => $driverUtama ? $driverUtama->id : $fallbackUser->id,
                 'tanggal' => '2026-08-02',
                 'keluhan' => 'AC bagian kabin panas dan terdengar bunyi mendengung saat blower dinyalakan.',
                 'status' => 'Selesai',
@@ -87,6 +88,18 @@ class ComplaintSeeder extends Seeder
                 'diperbaiki_at' => null,
                 'selesai_at' => null,
                 'catatan_penyelesaian' => null,
+            ],
+            [
+                'vehicle_id' => $b1234 ? $b1234->id : $fallbackVehicle->id,
+                'user_id' => $driverUtama ? $driverUtama->id : $fallbackUser->id,
+                'tanggal' => '2026-08-05',
+                'keluhan' => 'Kopling terasa agak keras saat masuk gigi mundur.',
+                'status' => 'Diproses',
+                'progress_perbaikan' => 40,
+                'diterima_at' => '2026-08-05 09:30:00',
+                'diperbaiki_at' => null,
+                'selesai_at' => null,
+                'catatan_penyelesaian' => 'Pengecekan kabel kopling dan pedal kopling.',
             ],
         ];
 

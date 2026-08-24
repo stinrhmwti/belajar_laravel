@@ -11,26 +11,28 @@
         @endif
         <h2>Daftar Armada Kendaraan</h2>
         <a href="{{ route('vehicles.create') }}" class="btn btn-primary mb-3">Tambah Kendaraan</a>
-        <table class="table table-bordered bg-white">
-            <thead class="table-dark">
-                <tr>
-                    <th>Nopol</th>
-                    <th>Merek</th>
-                    <th>Tipe</th>
-                    <th>Odometer</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($vehicles as $v)
-                <tr>
-                    <td>{{ $v->nopol }}</td>
-                    <td>{{ $v->merek }}</td>
-                    <td>{{ $v->tipe }}</td>
-                    <td>{{ $v->odometer_terakhir }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-bordered bg-white">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Nopol</th>
+                        <th>Merek</th>
+                        <th>Tipe</th>
+                        <th>Odometer</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($vehicles as $v)
+                    <tr>
+                        <td>{{ $v->nopol }}</td>
+                        <td>{{ $v->merek }}</td>
+                        <td>{{ $v->tipe }}</td>
+                        <td>{{ $v->odometer_terakhir }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
     </div>
 </body>
 </html>

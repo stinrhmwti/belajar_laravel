@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             DailyChecklistSeeder::class,
             ExpenseSeeder::class,
             ComplaintSeeder::class,
+            UjianSeeder::class,
         ]);
     }
 }

@@ -25,7 +25,7 @@
         margin: 0;
     }
     .btn-input-checklist {
-        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+        background: linear-gradient(135deg, #0e3054 0%, #0891b2 100%);
         border: none;
         color: #fff;
         font-weight: 600;
@@ -35,14 +35,15 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+        box-shadow: 0 4px 12px rgba(8, 145, 178, 0.25);
         transition: all 0.2s ease;
         text-decoration: none;
         white-space: nowrap;
     }
     .btn-input-checklist:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.45);
+        box-shadow: 0 6px 18px rgba(8, 145, 178, 0.35);
+        background: linear-gradient(135deg, #0f172a 0%, #0e7490 100%);
         color: #fff;
     }
     .btn-input-checklist i {
@@ -80,7 +81,7 @@
         font-size: 1.3rem;
         flex-shrink: 0;
     }
-    .summary-icon.blue   { background: #eff6ff; color: #2563eb; }
+    .summary-icon.blue   { background: rgba(8, 145, 178, 0.08); color: #0891b2; }
     .summary-icon.green  { background: #f0fdf4; color: #16a34a; }
     .summary-icon.red    { background: #fef2f2; color: #dc2626; }
     .summary-card-body .label {
@@ -117,6 +118,51 @@
     body.dark-theme .summary-icon.blue { background: #1e293b !important; color: #60a5fa !important; }
     body.dark-theme .summary-icon.green { background: #064e3b !important; color: #34d399 !important; }
     body.dark-theme .summary-icon.red { background: #7f1d1d !important; color: #f87171 !important; }
+    body.dark-theme .vehicle-image-wrapper { background-color: #0f172a !important; }
+
+    /* Custom Input Group & Dropdown Styles */
+    .custom-input-group {
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        background-color: #ffffff !important;
+    }
+    .custom-input-group input {
+        box-shadow: none !important;
+        color: #0f172a !important;
+    }
+    .custom-input-group input::placeholder {
+        color: #64748b !important;
+        opacity: 1 !important;
+    }
+    .custom-input-group .input-group-text {
+        color: #64748b !important;
+    }
+    #checklistFilterDropdown {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 8px;
+    }
+
+    /* Pendukung tema gelap (dark theme) */
+    body.dark-theme .custom-input-group {
+        background-color: #1e293b !important;
+        border-color: #334155 !important;
+    }
+    body.dark-theme .custom-input-group input {
+        color: #f8fafc !important;
+    }
+    body.dark-theme .custom-input-group input::placeholder {
+        color: #94a3b8 !important;
+    }
+    body.dark-theme .custom-input-group .input-group-text {
+        color: #94a3b8 !important;
+    }
+    body.dark-theme #checklistFilterDropdown {
+        background-color: #1e293b !important;
+        border-color: #334155 !important;
+        color: #f8fafc !important;
+    }
 
     /* ===== TABLE CARD ===== */
     .table-card {
@@ -141,7 +187,7 @@
         gap: 8px;
     }
     .table-card-title i {
-        color: #2563eb;
+        color: #dc2626;
     }
 
     /* ===== CUSTOM TABLE ===== */
@@ -258,7 +304,7 @@
         width: 28px;
         height: 28px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        background: #dc2626;
         color: #fff;
         display: inline-flex;
         align-items: center;
@@ -345,7 +391,7 @@
         transition: border-color 0.2s;
     }
     .dataTables_wrapper .dataTables_filter input:focus {
-        border-color: #2563eb;
+        border-color: #dc2626;
     }
     .dataTables_wrapper .dataTables_filter label {
         font-size: 0.85rem;
@@ -375,10 +421,10 @@
         color: #0f172a !important;
     }
     .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-        background: linear-gradient(135deg, #2563eb, #7c3aed) !important;
+        background: #dc2626 !important;
         border-color: transparent !important;
         color: #fff !important;
-        box-shadow: 0 3px 8px rgba(37,99,235,0.3) !important;
+        box-shadow: none !important;
     }
     .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
         color: #fff !important;
@@ -408,17 +454,17 @@
         color: #0f172a;
     }
     .nav-pills .nav-link.active {
-        background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%) !important;
+        background: #dc2626 !important;
         color: #fff !important;
         border-color: transparent !important;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        box-shadow: none;
     }
 </style>
 
 {{-- Page Header --}}
 <div class="page-header">
     <div class="page-header-left">
-        <h3><i class="bi bi-clipboard2-check-fill me-2" style="color:#2563eb;"></i>Checklist Harian</h3>
+        <h3><i class="bi bi-clipboard2-check-fill me-2" style="color:#0891b2;"></i>Checklist Harian</h3>
         <p>Pantau &amp; rekap kondisi harian seluruh armada kendaraan.</p>
     </div>
     @if (in_array(auth()->user()->role, ['admin', 'teknisi']))
@@ -451,7 +497,7 @@
         </div>
     </div>
     <div class="summary-card">
-        <div class="summary-icon green"><i class="bi bi-shield-check-fill"></i></div>
+        <div class="summary-icon green"><i class="bi bi-shield-fill-check"></i></div>
         <div class="summary-card-body">
             <div class="label">Kondisi Baik</div>
             <div class="value">{{ $totalBaik }}</div>
@@ -466,26 +512,17 @@
     </div>
 </div>
 
-{{-- Table Card / Grid Filter & Search --}}
-<div class="card border-0 bg-transparent mb-4">
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-        <div class="nav nav-pills gap-2" id="filterTabs" role="tablist">
-            <button class="nav-link active px-4 py-2 fw-bold d-flex align-items-center gap-2" data-filter="all" style="border-radius: 10px; transition: all 0.2s;">
-                <i class="bi bi-grid-fill"></i> Semua 
-                <span class="badge bg-secondary-subtle text-secondary ms-1" style="font-size: 0.75rem;">{{ $totalChecklist }}</span>
-            </button>
-            <button class="nav-link px-4 py-2 fw-bold d-flex align-items-center gap-2" data-filter="baik" style="border-radius: 10px; transition: all 0.2s;">
-                <i class="bi bi-shield-check-fill text-success"></i> Kondisi Baik
-                <span class="badge bg-success-subtle text-success ms-1" style="font-size: 0.75rem;">{{ $totalBaik }}</span>
-            </button>
-            <button class="nav-link px-4 py-2 fw-bold d-flex align-items-center gap-2" data-filter="masalah" style="border-radius: 10px; transition: all 0.2s;">
-                <i class="bi bi-exclamation-octagon-fill text-danger"></i> Ada Masalah
-                <span class="badge bg-danger-subtle text-danger ms-1" style="font-size: 0.75rem;">{{ $totalBermasalah }}</span>
-            </button>
+<div class="mb-4">
+    <div class="d-flex align-items-center gap-3 justify-content-start">
+        <div class="input-group custom-input-group" style="width: 380px !important; flex-shrink: 0;">
+            <span class="input-group-text bg-transparent border-0 text-muted" style="padding-right: 0;"><i class="bi bi-search"></i></span>
+            <input type="text" id="checklistSearch" class="form-control bg-transparent border-0 shadow-none" placeholder="Cari berdasarkan Plat, Driver, Merk, atau Catatan..." style="font-size: 0.88rem; padding-left: 8px;">
         </div>
-        <div class="d-flex align-items-center gap-2">
-            <input type="text" id="checklistSearch" class="form-control" placeholder="🔍 Cari plat, nama, catatan..." style="width: 280px; border-radius: 10px; box-shadow: none; border: 1px solid #e2e8f0; padding: 8px 16px; font-size: 0.88rem;">
-        </div>
+        <select id="checklistFilterDropdown" class="form-select border shadow-none" style="width: 175px !important; min-width: 175px !important; font-size: 0.88rem; flex-shrink: 0;">
+            <option value="all">Semua Status ({{ $totalChecklist }})</option>
+            <option value="baik">Kondisi Baik ({{ $totalBaik }})</option>
+            <option value="masalah">Ada Masalah ({{ $totalBermasalah }})</option>
+        </select>
     </div>
 </div>
 
@@ -496,6 +533,8 @@
         $persen  = round(($totalOk / 6) * 100);
     @endphp
     <div class="col-md-4 checklist-card-col" 
+         data-id="{{ $c->id }}"
+         data-odometer-raw="{{ $c->odometer }}"
          data-search="{{ strtolower($c->vehicle->plat_nomor . ' ' . $c->nama_teknisi . ' ' . $c->tanggal->format('d/m/Y') . ' ' . $c->catatan_tambahan) }}"
          data-plat="{{ $c->vehicle->plat_nomor }}"
          data-merek="{{ $c->vehicle->merek }} {{ $c->vehicle->tipe }}"
@@ -512,16 +551,15 @@
          data-kebersihan="{{ $c->kebersihan }}"
          data-catatan="{{ $c->catatan_tambahan ?? 'Tidak ada catatan tambahan.' }}"
          data-masalah="{{ $c->ada_masalah ? 1 : 0 }}">
-        <div class="card h-100 border border-slate-100 rounded-4 overflow-hidden shadow-xs hover-card transition-all {{ $c->ada_masalah ? 'border-warning' : '' }}" style="transition: all 0.25s ease; border-radius: 16px;">
-            <!-- Vehicle Image -->
-            <div class="position-relative" style="height: 160px; overflow: hidden; background: #f8fafc;">
-                <img src="{{ $c->vehicle->foto_url }}" alt="{{ $c->vehicle->plat_nomor }}" class="w-100 h-100 object-fit-cover transition-img" style="transition: transform 0.3s ease;">
-                <!-- Floating Plate Badge -->
-                <span class="position-absolute badge bg-dark text-white font-monospace px-3 py-2 fs-6 border border-secondary shadow-sm" style="border-radius: 10px; letter-spacing: 0.8px; top: 12px; left: 12px; z-index: 5;">
+        <div class="card h-100 border border-slate-100 rounded-4 overflow-hidden shadow-xs hover-card transition-all p-3 {{ $c->ada_masalah ? 'border-warning' : '' }}" style="transition: all 0.25s ease; border-radius: 16px;">
+            <!-- Plate & Status Header (Above Image) -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <!-- Plate Badge -->
+                <span class="badge bg-dark text-white font-monospace px-3 py-2 fs-6 border border-secondary shadow-sm" style="border-radius: 10px; letter-spacing: 0.8px;">
                     {{ $c->vehicle->plat_nomor }}
                 </span>
-                <!-- Floating Status Score -->
-                <div class="position-absolute" style="top: 12px; right: 12px; z-index: 5;">
+                <!-- Status Score -->
+                <div>
                     @if ($totalOk === 6)
                         <span class="badge bg-success text-white px-3 py-2 fw-bold shadow-sm" style="border-radius: 10px;">
                             <i class="bi bi-check-circle-fill"></i> 6/6 Baik
@@ -538,8 +576,13 @@
                 </div>
             </div>
 
+            <!-- Vehicle Image -->
+            <div class="position-relative vehicle-image-wrapper rounded-3" style="height: 230px; overflow: hidden; background: #f8fafc;">
+                <img src="{{ $c->vehicle->foto_url }}" alt="{{ $c->vehicle->plat_nomor }}" class="w-100 h-100 object-fit-cover transition-img" style="transition: transform 0.3s ease;">
+            </div>
+
             <!-- Card Body -->
-            <div class="card-body p-4">
+            <div class="card-body px-0 pt-3 pb-0">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <span class="tgl-cell text-muted fw-bold font-monospace" style="font-size: 0.82rem;">
                         <i class="bi bi-calendar3 me-1"></i> {{ $c->tanggal->format('d M Y') }}
@@ -564,7 +607,7 @@
                             @endif
                         @endforeach
                         @if (!$adaMasalah)
-                            <span class="text-success fw-bold d-inline-flex align-items-center gap-1.5" style="font-size: 0.82rem;">
+                            <span class="text-success fw-bold d-inline-flex align-items-center gap-2" style="font-size: 0.82rem;">
                                 <i class="bi bi-patch-check-fill fs-5"></i> Semua Sistem Aman
                             </span>
                         @endif
@@ -583,10 +626,10 @@
 
                 <!-- Action Buttons -->
                 <div class="d-flex justify-content-end align-items-center gap-2 pt-2 border-top">
-                    <button class="btn btn-sm btn-outline-primary px-3 py-1.5 d-inline-flex align-items-center gap-1 btn-detail-checklist" style="font-size: 0.78rem; border-radius: 8px;">
+                    <button class="btn btn-sm btn-outline-primary px-3 py-1.5 d-inline-flex align-items-center gap-1 btn-detail-checklist me-2" style="font-size: 0.78rem; border-radius: 8px;">
                         <i class="bi bi-info-circle-fill"></i> Detail
                     </button>
-                    <form action="{{ route('checklist.destroy', $c->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus data checklist ini?');" class="d-inline">
+                    <form action="{{ route('checklist.destroy', $c->id) }}" method="POST" class="d-inline form-confirm-delete" data-text="Data checklist harian ini akan dihapus secara permanen dari sistem!">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-sm btn-outline-danger px-3 py-1.5 d-inline-flex align-items-center gap-1" style="font-size: 0.78rem; border-radius: 8px;">
@@ -644,13 +687,20 @@
                         </div>
                     </div>
                     <div class="col-12">
-                        <div class="p-2.5 border rounded-3 bg-white d-flex justify-content-between align-items-center">
-                            <div>
-                                <small class="text-muted d-block" style="font-size: 0.75rem;">Odometer Saat Inspeksi</small>
-                                <span class="fw-bold text-dark" id="modalOdometer" style="font-size: 0.95rem;"></span>
+                        <form id="updateOdometerForm" action="" method="POST" class="p-3 border rounded-3 bg-white d-flex flex-column gap-2">
+                            @csrf
+                            @method('PUT')
+                            <div class="d-flex align-items-center justify-content-between">
+                                <label class="text-muted mb-0 fw-semibold" style="font-size: 0.75rem;">Odometer Saat Inspeksi (km)</label>
+                                <i class="bi bi-speedometer2 text-secondary fs-5"></i>
                             </div>
-                            <i class="bi bi-speedometer2 text-secondary fs-4"></i>
-                        </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="number" name="odometer" id="modalOdometerInput" class="form-control form-control-sm fw-bold text-dark shadow-none border" style="font-size: 0.95rem; padding: 6px 12px; border-radius: 8px;" required>
+                                <button type="submit" class="btn btn-sm btn-primary fw-bold px-3 py-2" style="border-radius: 8px; font-size: 0.8rem; flex-shrink: 0;">
+                                    <i class="bi bi-save me-1"></i> Simpan
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 
@@ -676,10 +726,8 @@
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
     $(document).ready(function () {
-        // Tab filter handler
-        $('#filterTabs button').on('click', function () {
-            $('#filterTabs button').removeClass('active');
-            $(this).addClass('active');
+        // Dropdown filter handler
+        $('#checklistFilterDropdown').on('change', function () {
             applyFilters();
         });
 
@@ -689,7 +737,7 @@
         });
 
         function applyFilters() {
-            var filter = $('#filterTabs button.active').data('filter');
+            var filter = $('#checklistFilterDropdown').val();
             var searchVal = $('#checklistSearch').val().toLowerCase().trim();
 
             $('.checklist-card-col').each(function () {
@@ -713,13 +761,14 @@
         // Modal detail trigger handler
         $('.btn-detail-checklist').on('click', function () {
             var card = $(this).closest('.checklist-card-col');
+            var id = card.data('id');
             var plat = card.data('plat');
             var merek = card.data('merek');
             var jenis = card.data('jenis');
             var foto = card.data('foto');
             var teknisi = card.data('teknisi');
             var tanggal = card.data('tanggal');
-            var odometer = card.data('odometer');
+            var odometerRaw = card.data('odometer-raw');
             var catatan = card.data('catatan');
 
             $('#modalPlat').text(plat);
@@ -728,7 +777,8 @@
             $('#modalFoto').attr('src', foto);
             $('#modalTeknisi').text(teknisi);
             $('#modalTanggal').text(tanggal);
-            $('#modalOdometer').text(odometer);
+            $('#modalOdometerInput').val(odometerRaw);
+            $('#updateOdometerForm').attr('action', '/checklist/' + id + '/odometer');
             $('#modalCatatan').text(catatan);
 
             // Populate parameters list with beautiful badges
@@ -751,7 +801,7 @@
                 var col = $('<div class="col-6"></div>');
                 var pCard = $(`
                     <div class="d-flex align-items-center justify-content-between p-2.5 border rounded-3 ${bg}" style="border: 1px solid; font-size: 0.8rem;">
-                        <span class="d-flex align-items-center gap-1.5 fw-semibold">
+                        <span class="d-flex align-items-center gap-2 fw-semibold">
                             <i class="bi ${p.icon}"></i> ${p.name}
                         </span>
                         <span class="fw-bold d-flex align-items-center gap-1" style="font-size: 0.72rem;">

@@ -22,7 +22,8 @@
             <h5 class="mb-0"><i class="bi bi-file-earmark-medical"></i> Raport Nilai - {{ Auth::user()->nama }}</h5>
         </div>
         <div class="card-body p-0">
-            <table class="table table-hover mb-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
                 <thead><tr><th>No</th><th>Mata Pelajaran</th><th>Kategori</th><th class="text-center">Benar</th><th class="text-center">Salah</th><th class="text-center">Nilai</th><th class="text-center">Predikat</th><th>Tanggal</th></tr></thead>
                 <tbody>
                     @forelse($hasil as $i => $h)
@@ -54,6 +55,7 @@
                 </tfoot>
                 @endif
             </table>
+            </div>
         </div>
     </div>
 </div>

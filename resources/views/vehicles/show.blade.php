@@ -31,11 +31,11 @@
                         {{ $vehicle->plat_nomor }}
                     </span>
                     @if ($vehicle->status === 'Siap Pakai')
-                        <span class="badge bg-success text-white px-3 py-2 fw-bold d-inline-flex align-items-center gap-1.5" style="border-radius: 10px;">
+                        <span class="badge bg-success text-white px-3 py-2 fw-bold d-inline-flex align-items-center gap-2" style="border-radius: 10px;">
                             <span class="bg-white rounded-circle" style="width: 6px; height: 6px; display: inline-block;"></span> Siap Pakai
                         </span>
                     @elseif ($vehicle->status === 'Sedang Diservis')
-                        <span class="badge bg-warning text-dark px-3 py-2 fw-bold d-inline-flex align-items-center gap-1.5" style="border-radius: 10px;">
+                        <span class="badge bg-warning text-dark px-3 py-2 fw-bold d-inline-flex align-items-center gap-2" style="border-radius: 10px;">
                             <span class="bg-dark rounded-circle" style="width: 6px; height: 6px; display: inline-block;"></span> Sedang Diservis
                         </span>
                     @else
@@ -106,7 +106,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <style>
         #gpsMap {
-            height: 350px;
+            height: 400px;
             width: 100%;
         }
         .custom-vehicle-marker {
@@ -160,6 +160,26 @@
                 opacity: 0;
             }
         }
+        .timeline-v {
+            position: relative;
+            padding-left: 5px;
+        }
+        .timeline-v-item {
+            position: relative;
+        }
+        .timeline-v-item::before {
+            content: '';
+            position: absolute;
+            top: 36px;
+            left: 17px;
+            bottom: -32px;
+            width: 2px;
+            background-color: var(--border-color, #e4e4e7);
+            z-index: 1;
+        }
+        .timeline-v-item:last-child::before {
+            display: none;
+        }
     </style>
 @endpush
 
@@ -185,7 +205,7 @@
             </div>
         </div>
         @if ($vehicle->latitude && $vehicle->longitude)
-            <a href="https://www.google.com/maps/search/?api=1&query={{ $vehicle->latitude }},{{ $vehicle->longitude }}" target="_blank" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1.5" style="border-radius: 8px; font-size: 0.8rem; padding: 6px 12px;">
+            <a href="https://www.google.com/maps/search/?api=1&query={{ $vehicle->latitude }},{{ $vehicle->longitude }}" target="_blank" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2" style="border-radius: 8px; font-size: 0.8rem; padding: 6px 12px;">
                 <i class="bi bi-map-fill"></i> Buka Google Maps
             </a>
         @endif
@@ -217,10 +237,10 @@
                         tap: true
                     });
                     
-                    // Load OpenStreetMap tiles
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    // Load CartoDB Voyager premium tiles (clean, Google Maps-like styling)
+                    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                         maxZoom: 19,
-                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
                     }).addTo(map);
                     
                     // Custom premium vehicle marker icon based on vehicle type
@@ -254,37 +274,97 @@
 </div>
 
 <div class="row">
-    <div class="col-md-6">
-        <div class="card mb-4">
-            <div class="card-header bg-white fw-bold">Riwayat Servis (7 Hari Terakhir)</div>
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead><tr><th>Tanggal</th><th>Biaya</th><th>Keterangan</th></tr></thead>
-                    <tbody>
-                        @forelse ($expenseSeminggu as $e)
-                        <tr>
-                            <td>{{ $e->tanggal->format('d/m/Y') }}</td>
-                            <td>Rp {{ number_format($e->jumlah_biaya, 0, ',', '.') }}</td>
-                            <td>{{ $e->keterangan }}</td>
-                        </tr>
-                        @empty
-                        <tr><td colspan="3" class="text-center py-3">Tidak ada data servis 7 hari terakhir.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
+    <div class="col-md-8 col-sm-12">
+        <div class="card mb-4 border-0 shadow-sm overflow-hidden" style="border-radius: 16px;">
+            <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="p-2 rounded-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                        <i class="bi bi-clock-history fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold mb-0 text-dark">Timeline Riwayat Servis &amp; Perbaikan</h6>
+                        <small class="text-muted" style="font-size: 0.78rem;">Catatan perawatan unit secara kronologis</small>
+                    </div>
+                </div>
+                @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
+                    <a href="{{ route('vehicle-histories.create', ['vehicle_id' => $vehicle->id]) }}" class="btn btn-xs btn-primary py-1.5 px-3 d-inline-flex align-items-center gap-1" style="border-radius: 8px; font-size: 0.75rem; font-weight: 600;">
+                        <i class="bi bi-plus-circle"></i> Catat Servis
+                    </a>
+                @endif
+            </div>
+            <div class="card-body p-4" style="max-height: 480px; overflow-y: auto;">
+                @if ($vehicle->histories->count() > 0)
+                    <div class="timeline-v">
+                        @foreach ($vehicle->histories as $history)
+                            <div class="timeline-v-item d-flex gap-3 mb-4 position-relative">
+                                <div class="timeline-v-badge bg-primary text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; border-radius: 50%; z-index: 2; flex-shrink: 0; box-shadow: 0 0 0 4px #ffffff; border: 2px solid #ffffff;">
+                                    <i class="bi bi-tools" style="font-size: 0.85rem;"></i>
+                                </div>
+                                <div class="timeline-v-content bg-light p-3 w-100 border border-slate-100" style="border-radius: 12px;">
+                                    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-1.5">
+                                        <div>
+                                            <h6 class="fw-bold text-dark mb-0" style="font-size: 0.88rem;">{{ $history->jenis_pekerjaan }}</h6>
+                                            <small class="text-muted d-block mt-0.5" style="font-size: 0.75rem;">
+                                                <i class="bi bi-calendar3 me-1"></i>{{ $history->tanggal->translatedFormat('d M Y') }}
+                                                @if ($history->teknisi)
+                                                    <span class="mx-1.5 text-secondary opacity-50">|</span>
+                                                    <i class="bi bi-person me-1"></i>Teknisi: {{ $history->teknisi->name }}
+                                                @endif
+                                            </small>
+                                        </div>
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1.5 fw-bold" style="font-size: 0.78rem; border-radius: 8px;">
+                                            Rp {{ number_format($history->biaya, 0, ',', '.') }}
+                                        </span>
+                                    </div>
+                                    
+                                    @if ($history->sparepart_digunakan)
+                                        <div class="mt-2 pt-2 border-top border-slate-200">
+                                            <small class="text-muted fw-bold d-block text-uppercase mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">Sparepart / Suku Cadang:</small>
+                                            <span class="text-dark bg-white border border-slate-200 px-2 py-0.5 rounded d-inline-block fw-medium" style="font-size: 0.8rem; border-radius: 6px;">{{ $history->sparepart_digunakan }}</span>
+                                        </div>
+                                    @endif
+
+                                    @if ($history->keterangan)
+                                        <div class="mt-2">
+                                            <small class="text-muted fw-bold d-block text-uppercase mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">Keterangan:</small>
+                                            <p class="text-secondary mb-0" style="font-size: 0.82rem; line-height: 1.45;">{{ $history->keterangan }}</p>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="text-center py-4 text-muted">
+                        <i class="bi bi-clock-history fs-2 d-block mb-2 text-secondary opacity-50"></i>
+                        <span>Belum ada riwayat perawatan/servis untuk unit ini.</span>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
 
-    <div class="col-md-6">
-        <div class="card mb-4">
-            <div class="card-header bg-white fw-bold">Estimasi Servis Berikutnya</div>
-            <div class="card-body">
-                @if($nextServiceDate)
-                    <h4 class="text-primary fw-bold">{{ $nextServiceDate->format('d F Y') }}</h4>
-                    <p class="text-muted"><small>Estimasi berdasarkan interval 3 bulan dari servis terakhir.</small></p>
+    <div class="col-md-4 col-sm-12">
+        <div class="card mb-4 border-0 shadow-sm overflow-hidden" style="border-radius: 16px;">
+            <div class="card-header bg-white py-3 border-bottom d-flex align-items-center gap-2">
+                <div class="p-2 rounded-3 bg-success-subtle text-success d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                    <i class="bi bi-calendar-event fs-5"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0 text-dark">Estimasi Servis</h6>
+                    <small class="text-muted" style="font-size: 0.78rem;">Prediksi jadwal servis berikutnya</small>
+                </div>
+            </div>
+            <div class="card-body p-4 text-center">
+                @if($vehicle->tanggal_servis_manual)
+                    <h4 class="text-primary fw-extrabold mb-1" style="font-size: 1.25rem;">{{ $vehicle->tanggal_servis_manual->translatedFormat('d F Y') }}</h4>
+                    <span class="badge bg-info text-white px-2.5 py-1.5 mb-2" style="font-size: 0.72rem; border-radius: 6px;">Jadwal Manual</span>
+                    <p class="text-muted small mb-0">Ditetapkan secara manual oleh Admin/Teknisi.</p>
+                @elseif($nextServiceDate)
+                    <h4 class="text-primary fw-extrabold mb-1" style="font-size: 1.25rem;">{{ $nextServiceDate->translatedFormat('d F Y') }}</h4>
+                    <p class="text-muted small mb-0">Estimasi berdasarkan interval 3 bulan dari servis terakhir.</p>
                 @else
-                    <p class="text-muted">Data servis belum tersedia untuk estimasi.</p>
+                    <p class="text-muted small mb-0">Data servis belum tersedia untuk estimasi.</p>
                 @endif
             </div>
         </div>

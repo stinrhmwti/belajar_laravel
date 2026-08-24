@@ -27,35 +27,47 @@
         overflow: hidden;
     }
     
-    .card-grad-1 { background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%) !important; border: none !important; box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.3) !important; }
-    .card-grad-2 { background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important; border: none !important; box-shadow: 0 10px 25px -5px rgba(5, 150, 105, 0.3) !important; }
-    .card-grad-3 { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important; border: none !important; box-shadow: 0 10px 25px -5px rgba(217, 119, 6, 0.3) !important; }
-    .card-grad-4 { background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%) !important; border: none !important; box-shadow: 0 10px 25px -5px rgba(225, 29, 72, 0.3) !important; }
+    .card-grad-1 { background: #0f172a !important; color: #ffffff !important; border: none !important; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15) !important; }
+    .card-grad-2 { background: #0f2742 !important; color: #ffffff !important; border: none !important; box-shadow: 0 4px 12px rgba(15, 39, 66, 0.15) !important; }
+    .card-grad-3 { background: #0e7490 !important; color: #ffffff !important; border: none !important; box-shadow: 0 4px 12px rgba(14, 116, 144, 0.15) !important; }
+    .card-grad-4 { background: #0891b2 !important; color: #ffffff !important; border: none !important; box-shadow: 0 4px 12px rgba(8, 145, 178, 0.15) !important; }
     
-    .stat-card.card-grad-1:hover { transform: translateY(-5px); box-shadow: 0 20px 30px -5px rgba(59, 130, 246, 0.4) !important; }
-    .stat-card.card-grad-2:hover { transform: translateY(-5px); box-shadow: 0 20px 30px -5px rgba(5, 150, 105, 0.4) !important; }
-    .stat-card.card-grad-3:hover { transform: translateY(-5px); box-shadow: 0 20px 30px -5px rgba(217, 119, 6, 0.4) !important; }
-    .stat-card.card-grad-4:hover { transform: translateY(-5px); box-shadow: 0 20px 30px -5px rgba(225, 29, 72, 0.4) !important; }
+    .stat-card.card-grad-1:hover, .stat-card.card-grad-2:hover, .stat-card.card-grad-3:hover, .stat-card.card-grad-4:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+    }
 
-    /* Glassmorphic Gradient Spheres */
-    .stat-card::after {
-        content: ''; position: absolute; right: -15px; bottom: -15px;
-        width: 130px; height: 130px; border-radius: 50%;
-        background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 70%); pointer-events: none;
-        filter: blur(5px);
-    }
-    .stat-card::before {
-        content: ''; position: absolute; left: -20px; top: -20px;
-        width: 100px; height: 100px; border-radius: 50%;
-        background: radial-gradient(circle, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 70%); pointer-events: none;
-        filter: blur(5px);
+    /* Glassmorphic Gradient Spheres disabled for flat design */
+    .stat-card::after, .stat-card::before {
+        display: none !important;
     }
     
+    .stat-card.card-grad-1 h3, .stat-card.card-grad-2 h3, .stat-card.card-grad-3 h3, .stat-card.card-grad-4 h3 {
+        color: #ffffff !important;
+    }
+    .stat-card.card-grad-1 span, .stat-card.card-grad-2 span, .stat-card.card-grad-3 span, .stat-card.card-grad-4 span {
+        color: #ffffff !important;
+    }
+    .stat-card.card-grad-1 .text-white-50, .stat-card.card-grad-2 .text-white-50, .stat-card.card-grad-3 .text-white-50, .stat-card.card-grad-4 .text-white-50 {
+        color: rgba(255, 255, 255, 0.7) !important;
+    }
+    .stat-card.card-grad-1 .progress, .stat-card.card-grad-2 .progress, .stat-card.card-grad-3 .progress, .stat-card.card-grad-4 .progress {
+        background: rgba(255, 255, 255, 0.25) !important;
+    }
+    .stat-card.card-grad-1 .progress-bar, .stat-card.card-grad-2 .progress-bar, .stat-card.card-grad-3 .progress-bar, .stat-card.card-grad-4 .progress-bar {
+        background-color: #ffffff !important;
+    }
+
     .stat-icon-grad {
-        background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(4px); border-radius: 12px;
-        width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #fff; border: 1px solid rgba(255,255,255,0.2);
+        background: rgba(255, 255, 255, 0.18) !important;
+        border-radius: 12px;
+        width: 52px; height: 52px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.6rem; color: #fff !important;
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
         position: relative; z-index: 2;
     }
+
     .stat-card:hover {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
     }
@@ -71,10 +83,48 @@
     .custom-input-group {
         border-radius: 8px;
         border: 1px solid var(--border-color);
-        background-color: #ffffff;
+        background-color: #ffffff !important;
     }
     .custom-input-group input {
         box-shadow: none !important;
+        color: #0f172a !important;
+    }
+    .custom-input-group input::placeholder {
+        color: #64748b !important;
+        opacity: 1 !important;
+    }
+    .custom-input-group .input-group-text {
+        color: #64748b !important;
+    }
+    #customStatusFilter {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 8px;
+    }
+
+    /* Pendukung tema gelap (dark theme) */
+    body.dark-theme .custom-input-group {
+        background-color: #1e293b !important;
+        border-color: #334155 !important;
+    }
+    body.dark-theme .custom-input-group input {
+        color: #f8fafc !important;
+    }
+    body.dark-theme .custom-input-group input::placeholder {
+        color: #94a3b8 !important;
+    }
+    body.dark-theme .custom-input-group .input-group-text {
+        color: #94a3b8 !important;
+    }
+    body.dark-theme #customStatusFilter,
+    body.dark-theme #customTempoFilter {
+        background-color: #1e293b !important;
+        border-color: #334155 !important;
+        color: #f8fafc !important;
+    }
+    body.dark-theme .vehicle-image-wrapper {
+        background-color: #0f172a !important;
     }
     
     .badge-soft-success {
@@ -281,24 +331,24 @@
     </div>
 </div>
 
-<div class="aesthetic-card mb-4">
-    <div class="card-body p-4">
-        <div class="row g-3 align-items-center justify-content-between">
-            <div class="col-md-6">
-                <div class="input-group custom-input-group">
-                    <span class="input-group-text bg-transparent border-0 text-muted"><i class="bi bi-search"></i></span>
-                    <input type="text" id="customLiveSearch" class="form-control bg-transparent border-0 shadow-none" placeholder="Cari berdasarkan Plat, Driver, Merk, Tipe, atau Pool...">
-                </div>
-            </div>
-            <div class="col-md-3">
-                <select id="customStatusFilter" class="form-select border shadow-none">
-                    <option value="">Semua Status Operasional</option>
-                    <option value="Siap Pakai" @selected(request('status') === 'Siap Pakai')>Siap Pakai</option>
-                    <option value="Sedang Diservis" @selected(request('status') === 'Sedang Diservis')>Sedang Diservis</option>
-                    <option value="Selesai" @selected(request('status') === 'Selesai')>Selesai</option>
-                </select>
-            </div>
+<div class="mb-4">
+    <div class="d-flex align-items-center gap-3 justify-content-start">
+        <div class="input-group custom-input-group" style="width: 410px !important; flex-shrink: 0;">
+            <span class="input-group-text bg-transparent border-0 text-muted" style="padding-right: 0;"><i class="bi bi-search"></i></span>
+            <input type="text" id="customLiveSearch" class="form-control bg-transparent border-0 shadow-none" placeholder="Cari berdasarkan Plat, Driver, Merk, Tipe, atau Pool..." style="font-size: 0.88rem; padding-left: 8px;">
         </div>
+        <select id="customStatusFilter" class="form-select border shadow-none" style="width: 240px !important; min-width: 240px !important; font-size: 0.88rem; flex-shrink: 0;">
+            <option value="">Semua Status Operasional</option>
+            <option value="Siap Pakai" @selected(request('status') === 'Siap Pakai')>Siap Pakai</option>
+            <option value="Sedang Diservis" @selected(request('status') === 'Sedang Diservis')>Sedang Diservis</option>
+            <option value="Selesai" @selected(request('status') === 'Selesai')>Selesai</option>
+        </select>
+        <select id="customTempoFilter" class="form-select border shadow-none" style="width: 285px !important; min-width: 285px !important; font-size: 0.88rem; flex-shrink: 0;">
+            <option value="">Semua Status Dokumen/Servis</option>
+            <option value="aman">Aman & Valid</option>
+            <option value="mendekati">Mendekati</option>
+            <option value="lewat">Lewat Tempo</option>
+        </select>
     </div>
 </div>
 
@@ -317,34 +367,47 @@
             if ($v->jatuh_tempo_kir) {
                 $diffDays = now()->startOfDay()->diffInDays($v->jatuh_tempo_kir->startOfDay(), false);
             }
+
+            $isLewatTempo = ($v->status_kir === 'merah') || $isTerlambatTgl || $isTerlambatKm;
+            $isMendekati = !$isLewatTempo && (($v->status_kir === 'kuning') || $isMendekatiTgl);
+            $tempoStatus = 'aman';
+            if ($isLewatTempo) {
+                $tempoStatus = 'lewat';
+            } elseif ($isMendekati) {
+                $tempoStatus = 'mendekati';
+            }
         @endphp
-        <div class="col-md-4 vehicle-card-col" data-status="{{ $v->status }}" data-search="{{ strtolower($v->plat_nomor . ' ' . $v->merek . ' ' . $v->tipe . ' ' . $v->jenis_kendaraan . ' ' . $v->lokasi_pool . ' ' . $v->supir_utama) }}">
-            <div class="card h-100 border border-slate-100 rounded-4 overflow-hidden shadow-xs hover-card transition-all" style="transition: all 0.25s ease; border-radius: 16px;">
-                <!-- Vehicle Image -->
-                <div class="position-relative" style="height: 180px; overflow: hidden; background: #f8fafc;">
-                    <img src="{{ $v->foto_url }}" alt="{{ $v->plat_nomor }}" class="w-100 h-100 object-fit-cover transition-img" style="transition: transform 0.3s ease;">
-                    <!-- Floating Plate Badge -->
-                    <span class="position-absolute badge bg-dark text-white font-monospace px-3 py-2 fs-6 border border-secondary shadow-sm" onclick="navigator.clipboard.writeText('{{ $v->plat_nomor }}'); alert('Plat nomor {{ $v->plat_nomor }} berhasil disalin!');" style="cursor: pointer; border-radius: 10px; letter-spacing: 0.8px; top: 12px; left: 12px; z-index: 5;">
+        <div class="col-md-4 vehicle-card-col" data-status="{{ $v->status }}" data-tempo="{{ $tempoStatus }}" data-search="{{ strtolower($v->plat_nomor . ' ' . $v->merek . ' ' . $v->tipe . ' ' . $v->jenis_kendaraan . ' ' . $v->lokasi_pool . ' ' . $v->supir_utama) }}">
+            <div class="card h-100 border border-slate-100 rounded-4 overflow-hidden shadow-xs hover-card transition-all p-3" style="transition: all 0.25s ease; border-radius: 16px;">
+                <!-- Plate & Status Header (Above Image) -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <!-- Plate Badge -->
+                    <span class="badge bg-dark text-white font-monospace px-3 py-2 fs-6 border border-secondary shadow-sm" onclick="navigator.clipboard.writeText('{{ $v->plat_nomor }}'); alert('Plat nomor {{ $v->plat_nomor }} berhasil disalin!');" style="cursor: pointer; border-radius: 10px; letter-spacing: 0.8px;">
                         {{ $v->plat_nomor }} <i class="bi bi-clipboard ms-1 text-white-50" style="font-size: 0.75rem;"></i>
                     </span>
-                    <!-- Floating Status Badge -->
-                    <div class="position-absolute" style="top: 12px; right: 12px; z-index: 5;">
+                    <!-- Status Badge -->
+                    <div>
                         @if ($v->status === 'Siap Pakai')
-                            <span class="badge bg-success px-3 py-2 fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm" style="border-radius: 10px;">
-                                <span class="bg-white rounded-circle" style="width: 6px; height: 6px; display: inline-block;"></span> Siap Pakai
+                            <span class="badge bg-success px-3 py-2 fw-bold d-inline-flex align-items-center gap-2 shadow-sm" style="border-radius: 10px;">
+                                Siap Pakai
                             </span>
                         @elseif ($v->status === 'Sedang Diservis')
-                            <span class="badge bg-warning text-dark px-3 py-2 fw-bold d-inline-flex align-items-center gap-1.5 shadow-sm" style="border-radius: 10px;">
-                                <span class="bg-dark rounded-circle" style="width: 6px; height: 6px; display: inline-block;"></span> Sedang Diservis
+                            <span class="badge bg-warning text-dark px-3 py-2 fw-bold d-inline-flex align-items-center gap-2 shadow-sm" style="border-radius: 10px;">
+                                Sedang Diservis
                             </span>
                         @else
                             <span class="badge bg-secondary text-white px-3 py-2 fw-bold shadow-sm" style="border-radius: 10px;">{{ $v->status ?? 'Non-Aktif' }}</span>
                         @endif
                     </div>
                 </div>
+
+                <!-- Vehicle Image -->
+                <div class="position-relative vehicle-image-wrapper rounded-3" style="height: 230px; overflow: hidden; background: #f8fafc;">
+                    <img src="{{ $v->foto_url }}" alt="{{ $v->plat_nomor }}" class="w-100 h-100 object-fit-cover transition-img" style="transition: transform 0.3s ease;">
+                </div>
                 
                 <!-- Card Body -->
-                <div class="card-body p-4">
+                <div class="card-body px-0 pt-3 pb-0">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div>
                             <span class="text-uppercase text-primary fw-bold font-monospace" style="font-size: 0.72rem; letter-spacing: 0.8px;">{{ $v->jenis_kendaraan }}</span>
@@ -413,7 +476,7 @@
                     </div>
 
                     <!-- Action Controls -->
-                    <div class="d-flex flex-column gap-2.5 mt-3 pt-2.5 border-top">
+                    <div class="d-flex flex-column gap-3 border-top" style="margin-top: 24px !important; padding-top: 20px !important;">
                         <!-- Quick status updater for Admin & Technician -->
                         @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
                             <div class="d-flex align-items-center justify-content-between">
@@ -429,9 +492,9 @@
                                 </form>
                             </div>
                         @endif
-
+ 
                         <!-- General Actions -->
-                        <div class="d-flex align-items-center justify-content-end gap-2 mt-1">
+                        <div class="d-flex align-items-center justify-content-end gap-2 mt-2">
                             <button type="button" class="btn btn-sm btn-outline-primary px-3 py-1.5 d-inline-flex align-items-center gap-1 btn-detail-vehicle" 
                                     data-plat="{{ $v->plat_nomor }}"
                                     data-merek="{{ $v->merek }}"
@@ -443,14 +506,14 @@
                                     data-status="{{ $v->status }}"
                                     data-foto="{{ $v->foto_url }}"
                                     data-show-url="{{ route('vehicles.show', $v) }}"
-                                    style="border-radius: 8px; font-size: 0.78rem; font-weight: 600;">
+                                    style="border-radius: 8px; font-size: 0.78rem; font-weight: 600; margin-right: 8px !important;">
                                 <i class="bi bi-eye-fill"></i> Detail
                             </button>
                             @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin']))
-                                <a href="{{ route('vehicles.edit', $v) }}" class="btn btn-sm btn-outline-warning d-inline-flex align-items-center justify-content-center" style="border-radius: 8px; width: 32px; height: 32px; padding: 0;" title="Edit">
+                                <a href="{{ route('vehicles.edit', $v) }}" class="btn btn-sm btn-outline-warning d-inline-flex align-items-center justify-content-center" style="border-radius: 8px; width: 32px; height: 32px; padding: 0; margin-right: 8px !important;" title="Edit">
                                     <i class="bi bi-pencil-fill"></i>
                                 </a>
-                                <form action="{{ route('vehicles.destroy', $v) }}" method="POST" class="d-inline m-0" onsubmit="return confirm('Yakin ingin menghapus data kendaraan ini? Data tidak dapat dikembalikan.')">
+                                <form action="{{ route('vehicles.destroy', $v) }}" method="POST" class="d-inline m-0 form-confirm-delete" data-text="Data kendaraan ini beserta seluruh riwayat terkait akan dihapus secara permanen dari sistem!">
                                     @csrf 
                                     @method('DELETE')
                                     <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center justify-content-center" style="border-radius: 8px; width: 32px; height: 32px; padding: 0;" title="Hapus">
@@ -556,15 +619,18 @@
         function filterVehicles() {
             var searchVal = $('#customLiveSearch').val().toLowerCase().trim();
             var filterStatus = $('#customStatusFilter').val();
+            var filterTempo = $('#customTempoFilter').val();
 
             $('.vehicle-card-col').each(function () {
                 var cardSearch = $(this).data('search');
                 var cardStatus = $(this).data('status');
+                var cardTempo = $(this).data('tempo');
 
                 var matchesSearch = cardSearch.indexOf(searchVal) > -1;
                 var matchesStatus = !filterStatus || cardStatus === filterStatus;
+                var matchesTempo = !filterTempo || cardTempo === filterTempo;
 
-                if (matchesSearch && matchesStatus) {
+                if (matchesSearch && matchesStatus && matchesTempo) {
                     $(this).show();
                 } else {
                     $(this).hide();
@@ -611,6 +677,7 @@
         });
 
         $('#customStatusFilter').on('change', filterVehicles);
+        $('#customTempoFilter').on('change', filterVehicles);
 
         // Vehicle Detail Modal population handler
         $('.btn-detail-vehicle').on('click', function () {

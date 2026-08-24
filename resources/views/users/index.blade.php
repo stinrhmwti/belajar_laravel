@@ -265,13 +265,13 @@
                         <span class="font-monospace fw-semibold text-secondary" style="font-size:0.85rem;">@<span>{{ $u->username }}</span></span>
                     </td>
                     <td>
-                        <div class="d-flex align-items-center gap-1.5 text-secondary" style="font-size:0.875rem;">
+                        <div class="d-flex align-items-center gap-2 text-secondary" style="font-size:0.875rem;">
                             <i class="bi bi-envelope text-muted"></i>
                             <span>{{ $u->email }}</span>
                         </div>
                     </td>
                     <td>
-                        <span class="badge {{ $roleBadge }} px-3 py-1.5 d-inline-flex align-items-center gap-1.5 fw-semibold" style="font-size: 0.78rem;">
+                        <span class="badge {{ $roleBadge }} px-3 py-1.5 d-inline-flex align-items-center gap-2 fw-semibold" style="font-size: 0.78rem;">
                             <i class="bi {{ $roleIcon }}"></i>
                             {{ $roleLabel }}
                         </span>
@@ -282,12 +282,12 @@
                                 <i class="bi bi-pencil-square"></i> Edit
                             </a>
                             @if($u->id !== auth()->id())
-                            <form action="{{ route('users.destroy', $u) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus pengguna {{ $u->name }}?')">
-                                @csrf @method('DELETE')
-                                <button class="btn btn-sm btn-outline-danger px-2.5 py-1" style="border-radius: 8px;" title="Hapus Pengguna">
-                                    <i class="bi bi-trash3"></i> Hapus
-                                </button>
-                            </form>
+                             <form action="{{ route('users.destroy', $u) }}" method="POST" class="d-inline form-confirm-delete" data-text="Pengguna {{ $u->name }} beserta seluruh hak aksesnya akan dihapus secara permanen dari sistem!">
+                                 @csrf @method('DELETE')
+                                 <button class="btn btn-sm btn-outline-danger px-2.5 py-1" style="border-radius: 8px;" title="Hapus Pengguna">
+                                     <i class="bi bi-trash3"></i> Hapus
+                                 </button>
+                             </form>
                             @endif
                         </div>
                     </td>

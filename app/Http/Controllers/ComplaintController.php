@@ -108,19 +108,32 @@ class ComplaintController extends Controller
 
         $complaint->update($validated);
 
-        // Jika status selesai dan dimasukkan biaya, catat otomatis ke rekap pengeluaran (Expenses)
-        if ($status === 'Selesai' && $biaya && $biaya > 0) {
-            $batasAnggaranBesar = 1000000;
-            $statusApproval = ($biaya > $batasAnggaranBesar) ? 'Menunggu Persetujuan' : 'Disetujui';
+        // Jika status selesai, catat otomatis ke rekap pengeluaran (Expenses) dan riwayat kendaraan (VehicleHistory)
+        if ($status === 'Selesai') {
+            if ($biaya && $biaya > 0) {
+                $batasAnggaranBesar = 1000000;
+                $statusApproval = ($biaya > $batasAnggaranBesar) ? 'Menunggu Persetujuan' : 'Disetujui';
 
-            Expense::create([
+                Expense::create([
+                    'vehicle_id' => $complaint->vehicle_id,
+                    'tanggal' => now()->toDateString(),
+                    'jenis_pengeluaran' => 'Bengkel',
+                    'jumlah_biaya' => $biaya,
+                    'keterangan' => 'Biaya perbaikan keluhan: "'.$complaint->keluhan.'"'.
+                                           ($complaint->catatan_penyelesaian ? ' - '.$complaint->catatan_penyelesaian : ''),
+                    'status_approval' => $statusApproval,
+                ]);
+            }
+
+            // Catat otomatis ke Riwayat Kendaraan (VehicleHistory)
+            \App\Models\VehicleHistory::create([
                 'vehicle_id' => $complaint->vehicle_id,
-                'tanggal' => now()->toDateString(),
-                'jenis_pengeluaran' => 'Bengkel',
-                'jumlah_biaya' => $biaya,
-                'keterangan' => 'Biaya perbaikan keluhan: "'.$complaint->keluhan.'"'.
-                                       ($complaint->catatan_penyelesaian ? ' - '.$complaint->catatan_penyelesaian : ''),
-                'status_approval' => $statusApproval,
+                'tanggal' => $complaint->selesai_at ?: now()->toDateString(),
+                'teknisi_id' => Auth::id(),
+                'jenis_pekerjaan' => 'Perbaikan Keluhan: ' . $complaint->keluhan,
+                'sparepart_digunakan' => '-',
+                'biaya' => $biaya ?? 0,
+                'keterangan' => $complaint->catatan_penyelesaian ?? 'Keluhan diselesaikan oleh teknisi.',
             ]);
         }
 

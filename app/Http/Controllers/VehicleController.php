@@ -22,6 +22,8 @@ class VehicleController extends Controller
             $q->latest('tanggal')->take(10);
         }, 'expenses' => function ($q) {
             $q->latest('tanggal')->take(10);
+        }, 'histories' => function ($q) {
+            $q->with('teknisi')->orderByDesc('tanggal');
         }]);
 
         // Riwayat 7 hari terakhir
@@ -41,14 +43,18 @@ class VehicleController extends Controller
             ->get();
 
         // Logika untuk menampilkan Jadwal Servis Berikutnya
-        // Mengambil data servis terakhir untuk dijadikan acuan
-        $lastService = $vehicle->expenses()
-            ->where('jenis_pengeluaran', 'like', '%Servis%')
-            ->latest('tanggal')
-            ->first();
+        if ($vehicle->tanggal_servis_manual) {
+            $nextServiceDate = Carbon::parse($vehicle->tanggal_servis_manual);
+        } else {
+            // Mengambil data servis terakhir untuk dijadikan acuan
+            $lastService = $vehicle->expenses()
+                ->where('jenis_pengeluaran', 'like', '%Servis%')
+                ->latest('tanggal')
+                ->first();
 
-        // Menentukan estimasi 3 bulan setelah servis terakhir
-        $nextServiceDate = $lastService ? Carbon::parse($lastService->tanggal)->addMonths(3) : null;
+            // Menentukan estimasi 3 bulan setelah servis terakhir
+            $nextServiceDate = $lastService ? Carbon::parse($lastService->tanggal)->addMonths(3) : null;
+        }
 
         return view('vehicles.show', compact(
             'vehicle',

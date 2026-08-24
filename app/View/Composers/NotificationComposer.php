@@ -76,25 +76,52 @@ class NotificationComposer
                 ->whereIn('status', ['Diproses', 'Selesai'])
                 ->with('vehicle')->latest('tanggal')->take(5)->get();
             foreach ($keluhanSaya as $k) {
+                $statusKeluhan = $k->status === 'Selesai' ? 'Selesai Diperbaiki' : 'Sedang Diproses';
                 $items[] = [
-                    'icon' => 'bi-check2-circle text-success',
-                    'text' => "Keluhan Anda untuk {$k->vehicle->plat_nomor} berstatus: {$k->status}",
+                    'icon' => $k->status === 'Selesai' ? 'bi-check2-circle text-success' : 'bi-tools text-warning',
+                    'text' => "Laporan keluhan Anda untuk {$k->vehicle->plat_nomor} {$statusKeluhan}!",
                     'link' => route('complaints.index'),
                 ];
             }
 
             $kendaraanSaya = $vehicles->filter(fn ($v) => $v->supir_utama === $user->name);
             foreach ($kendaraanSaya as $v) {
+                // Notifikasi KIR
                 if ($v->status_kir === 'merah') {
                     $items[] = [
                         'icon' => 'bi-exclamation-octagon-fill text-danger',
-                        'text' => "Dokumen KIR {$v->plat_nomor} sudah lewat jatuh tempo!",
+                        'text' => "Dokumen KIR kendaraan Anda ({$v->plat_nomor}) sudah lewat jatuh tempo!",
                         'link' => route('vehicles.show', $v),
                     ];
                 } elseif ($v->status_kir === 'kuning') {
                     $items[] = [
                         'icon' => 'bi-hourglass-split text-warning',
-                        'text' => "Dokumen KIR {$v->plat_nomor} akan segera jatuh tempo",
+                        'text' => "Dokumen KIR kendaraan Anda ({$v->plat_nomor}) akan segera jatuh tempo",
+                        'link' => route('vehicles.show', $v),
+                    ];
+                }
+
+                // Notifikasi Servis Berkala
+                if ($v->status_servis_berkala === 'merah') {
+                    $items[] = [
+                        'icon' => 'bi-wrench-adjustable-circle-fill text-danger',
+                        'text' => "Kendaraan Anda ({$v->plat_nomor}) sudah LEWAT jadwal servis berkala!",
+                        'link' => route('vehicles.show', $v),
+                    ];
+                } elseif ($v->status_servis_berkala === 'kuning') {
+                    $items[] = [
+                        'icon' => 'bi-wrench-adjustable-circle-fill text-warning',
+                        'text' => "Kendaraan Anda ({$v->plat_nomor}) mendekati jadwal servis berkala",
+                        'link' => route('vehicles.show', $v),
+                    ];
+                }
+
+                // Notifikasi Checklist Harian Bermasalah
+                $lastChecklist = $v->checklists()->latest('tanggal')->first();
+                if ($lastChecklist && $lastChecklist->ada_masalah) {
+                    $items[] = [
+                        'icon' => 'bi-exclamation-triangle-fill text-danger',
+                        'text' => "Ada parameter 'Not OK' pada pemeriksaan harian kendaraan Anda ({$v->plat_nomor})!",
                         'link' => route('vehicles.show', $v),
                     ];
                 }
