@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Data Kendaraan & Servis')
+@section('title', __('Data Kendaraan & Servis'))
 
 @section('content')
 <style>
@@ -199,16 +199,19 @@
 
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
     <div>
-        <h3 class="fw-bold text-dark mb-1 page-header-title">Data Kendaraan & Servis</h3>
-        <p class="text-secondary mb-0" style="font-size: 0.95rem;">Kelola armada perusahaan, pantau odometer real-time, dan jadwalkan pemeliharaan terpadu.</p>
+        <h3 class="fw-bold text-dark mb-1 page-header-title">{{ __('Data Kendaraan & Servis') }}</h3>
+        <p class="text-secondary mb-0" style="font-size: 0.95rem;">{{ __('Kelola armada perusahaan, pantau odometer real-time, dan jadwalkan pemeliharaan terpadu.') }}</p>
     </div>
-    @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin']))
-        <div>
-            <a href="{{ route('vehicles.create') }}" class="btn btn-primary d-inline-flex align-items-center gap-2 px-4 py-2">
-                <i class="bi bi-plus-circle"></i> Tambah Kendaraan Baru
+    <div class="d-flex align-items-center gap-2">
+        <a href="{{ route('tracking.index') }}" class="btn btn-outline-primary d-inline-flex align-items-center gap-2 px-3 py-2" style="border-radius: 8px; font-weight: 600;">
+            <i class="bi bi-geo-alt-fill"></i> {{ __('Peta Pelacakan Armada') }}
+        </a>
+        @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin']))
+            <a href="{{ route('vehicles.create') }}" class="btn btn-primary d-inline-flex align-items-center gap-2 px-3 py-2" style="border-radius: 8px; font-weight: 600;">
+                <i class="bi bi-plus-circle"></i> {{ __('Tambah Kendaraan') }}
             </a>
-        </div>
-    @endif
+        @endif
+    </div>
 </div>
 
 @php
@@ -248,13 +251,13 @@
                     </svg>
                 </div>
                 <div>
-                    <span class="text-white d-block mb-1" style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;">Total Armada</span>
+                    <span class="text-white d-block mb-1" style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;">{{ __('Total Armada') }}</span>
                     <h3 class="fw-bold text-white mb-0" style="font-size: 1.8rem;">{{ $totalKendaraan }}</h3>
                 </div>
             </div>
             <div class="mt-3">
                 <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
-                    <span class="text-white-50">Kondisi Aktif</span>
+                    <span class="text-white-50">{{ __('Kondisi Aktif') }}</span>
                     <span class="fw-bold text-white">100%</span>
                 </div>
                 <div class="progress" style="height: 4px; border-radius: 10px; background: rgba(255, 255, 255, 0.22);">
@@ -270,13 +273,13 @@
                     <i class="bi bi-check-circle"></i>
                 </div>
                 <div>
-                    <span class="text-white d-block mb-1" style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;">Siap Pakai</span>
+                    <span class="text-white d-block mb-1" style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;">{{ __('Siap Pakai') }}</span>
                     <h3 class="fw-bold text-white mb-0" style="font-size: 1.8rem;">{{ $siapPakai }}</h3>
                 </div>
             </div>
             <div class="mt-3">
                 <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
-                    <span class="text-white-50">Rasio Siap Jalan</span>
+                    <span class="text-white-50">{{ __('Rasio Siap Jalan') }}</span>
                     <span class="fw-bold text-white">{{ $pctSiap }}%</span>
                 </div>
                 <div class="progress" style="height: 4px; border-radius: 10px; background: rgba(255, 255, 255, 0.22);">
@@ -292,13 +295,13 @@
                     <i class="bi bi-tools"></i>
                 </div>
                 <div>
-                    <span class="text-white d-block mb-1" style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;">Sedang Diservis</span>
+                    <span class="text-white d-block mb-1" style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;">{{ __('Sedang Diservis') }}</span>
                     <h3 class="fw-bold text-white mb-0" style="font-size: 1.8rem;">{{ $sedangDiservis }}</h3>
                 </div>
             </div>
             <div class="mt-3">
                 <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
-                    <span class="text-white-50">Rasio Perbaikan</span>
+                    <span class="text-white-50">{{ __('Rasio Perbaikan') }}</span>
                     <span class="fw-bold text-white">{{ $pctServis }}%</span>
                 </div>
                 <div class="progress" style="height: 4px; border-radius: 10px; background: rgba(255, 255, 255, 0.22);">
@@ -314,13 +317,13 @@
                     <i class="bi bi-exclamation-triangle"></i>
                 </div>
                 <div>
-                    <span class="text-white d-block mb-1" style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;">Peringatan Servis</span>
+                    <span class="text-white d-block mb-1" style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;">{{ __('Peringatan') }} {{ __('Servis') }}</span>
                     <h3 class="fw-bold text-white mb-0" style="font-size: 1.8rem;">{{ $butuhServis }}</h3>
                 </div>
             </div>
             <div class="mt-3">
                 <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
-                    <span class="text-white-50">Rasio Butuh Servis</span>
+                    <span class="text-white-50">{{ __('Rasio') }} {{ __('Butuh Servis') }}</span>
                     <span class="fw-bold text-white">{{ $pctButuh }}%</span>
                 </div>
                 <div class="progress" style="height: 4px; border-radius: 10px; background: rgba(255, 255, 255, 0.22);">
@@ -332,22 +335,27 @@
 </div>
 
 <div class="mb-4">
-    <div class="d-flex align-items-center gap-3 justify-content-start">
+    <div class="d-flex align-items-center gap-3 justify-content-start flex-wrap">
         <div class="input-group custom-input-group" style="width: 410px !important; flex-shrink: 0;">
             <span class="input-group-text bg-transparent border-0 text-muted" style="padding-right: 0;"><i class="bi bi-search"></i></span>
-            <input type="text" id="customLiveSearch" class="form-control bg-transparent border-0 shadow-none" placeholder="Cari berdasarkan Plat, Driver, Merk, Tipe, atau Pool..." style="font-size: 0.88rem; padding-left: 8px;">
+            <input type="text" id="customLiveSearch" class="form-control bg-transparent border-0 shadow-none" placeholder="{{ __('Cari berdasarkan Plat, Driver, Merk, Tipe, atau Pool...') }}" style="font-size: 0.88rem; padding-left: 8px;">
         </div>
+        <select id="customKategoriFilter" class="form-select border shadow-none" style="width: 220px !important; min-width: 220px !important; font-size: 0.88rem; flex-shrink: 0;">
+            <option value="">{{ __('Semua Kategori Kendaraan') }}</option>
+            <option value="mobil">{{ __('Mobil') }}</option>
+            <option value="motor">{{ __('Motor') }}</option>
+        </select>
         <select id="customStatusFilter" class="form-select border shadow-none" style="width: 240px !important; min-width: 240px !important; font-size: 0.88rem; flex-shrink: 0;">
-            <option value="">Semua Status Operasional</option>
-            <option value="Siap Pakai" @selected(request('status') === 'Siap Pakai')>Siap Pakai</option>
-            <option value="Sedang Diservis" @selected(request('status') === 'Sedang Diservis')>Sedang Diservis</option>
-            <option value="Selesai" @selected(request('status') === 'Selesai')>Selesai</option>
+            <option value="">{{ __('Semua Status Operasional') }}</option>
+            <option value="Siap Pakai" @selected(request('status') === 'Siap Pakai')>{{ __('Siap Pakai') }}</option>
+            <option value="Sedang Diservis" @selected(request('status') === 'Sedang Diservis')>{{ __('Sedang Diservis') }}</option>
+            <option value="Selesai" @selected(request('status') === 'Selesai')>{{ __('Selesai') }}</option>
         </select>
         <select id="customTempoFilter" class="form-select border shadow-none" style="width: 285px !important; min-width: 285px !important; font-size: 0.88rem; flex-shrink: 0;">
-            <option value="">Semua Status Dokumen/Servis</option>
-            <option value="aman">Aman & Valid</option>
-            <option value="mendekati">Mendekati</option>
-            <option value="lewat">Lewat Tempo</option>
+            <option value="">{{ __('Semua Status Dokumen/Servis') }}</option>
+            <option value="aman">{{ __('Aman & Valid') }}</option>
+            <option value="mendekati">{{ __('Mendekati') }}</option>
+            <option value="lewat">{{ __('Lewat Tempo') }}</option>
         </select>
     </div>
 </div>
@@ -376,8 +384,9 @@
             } elseif ($isMendekati) {
                 $tempoStatus = 'mendekati';
             }
+            $kategori = strpos(strtolower($v->jenis_kendaraan), 'motor') !== false ? 'motor' : 'mobil';
         @endphp
-        <div class="col-md-4 vehicle-card-col" data-status="{{ $v->status }}" data-tempo="{{ $tempoStatus }}" data-search="{{ strtolower($v->plat_nomor . ' ' . $v->merek . ' ' . $v->tipe . ' ' . $v->jenis_kendaraan . ' ' . $v->lokasi_pool . ' ' . $v->supir_utama) }}">
+        <div class="col-md-4 vehicle-card-col" data-status="{{ $v->status }}" data-tempo="{{ $tempoStatus }}" data-kategori="{{ $kategori }}" data-search="{{ strtolower($v->plat_nomor . ' ' . $v->merek . ' ' . $v->tipe . ' ' . $v->jenis_kendaraan . ' ' . $v->lokasi_pool . ' ' . $v->supir_utama) }}">
             <div class="card h-100 border border-slate-100 rounded-4 overflow-hidden shadow-xs hover-card transition-all p-3" style="transition: all 0.25s ease; border-radius: 16px;">
                 <!-- Plate & Status Header (Above Image) -->
                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -389,14 +398,14 @@
                     <div>
                         @if ($v->status === 'Siap Pakai')
                             <span class="badge bg-success px-3 py-2 fw-bold d-inline-flex align-items-center gap-2 shadow-sm" style="border-radius: 10px;">
-                                Siap Pakai
+                                {{ __('Siap Pakai') }}
                             </span>
                         @elseif ($v->status === 'Sedang Diservis')
                             <span class="badge bg-warning text-dark px-3 py-2 fw-bold d-inline-flex align-items-center gap-2 shadow-sm" style="border-radius: 10px;">
-                                Sedang Diservis
+                                {{ __('Sedang Diservis') }}
                             </span>
                         @else
-                            <span class="badge bg-secondary text-white px-3 py-2 fw-bold shadow-sm" style="border-radius: 10px;">{{ $v->status ?? 'Non-Aktif' }}</span>
+                            <span class="badge bg-secondary text-white px-3 py-2 fw-bold shadow-sm" style="border-radius: 10px;">{{ __($v->status ?? 'Non-Aktif') }}</span>
                         @endif
                     </div>
                 </div>
@@ -410,7 +419,7 @@
                 <div class="card-body px-0 pt-3 pb-0">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div>
-                            <span class="text-uppercase text-primary fw-bold font-monospace" style="font-size: 0.72rem; letter-spacing: 0.8px;">{{ $v->jenis_kendaraan }}</span>
+                            <span class="text-uppercase text-primary fw-bold font-monospace" style="font-size: 0.72rem; letter-spacing: 0.8px;">{{ __($v->jenis_kendaraan) }}</span>
                             <h5 class="card-title fw-extrabold text-dark mb-0 mt-1">{{ $v->merek }}</h5>
                             <small class="text-muted">{{ $v->tipe }} ({{ $v->tahun ?? 2024 }})</small>
                         </div>
@@ -419,19 +428,19 @@
                     <!-- Details Grid -->
                     <div class="row g-2 my-3 py-2 border-top border-bottom" style="font-size: 0.82rem;">
                         <div class="col-6">
-                            <span class="text-muted d-block" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Jatuh Tempo KIR</span>
-                            <span class="fw-semibold text-dark"><i class="bi bi-shield-check text-secondary me-1"></i>{{ $v->jatuh_tempo_kir ? $v->jatuh_tempo_kir->format('d M Y') : 'Belum diset' }}</span>
+                            <span class="text-muted d-block" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">{{ __('Jatuh Tempo KIR') }}</span>
+                            <span class="fw-semibold text-dark"><i class="bi bi-shield-check text-secondary me-1"></i>{{ $v->jatuh_tempo_kir ? $v->jatuh_tempo_kir->translatedFormat('d M Y') : __('Belum diset') }}</span>
                         </div>
                         <div class="col-6">
-                            <span class="text-muted d-block" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Jadwal Servis</span>
-                            <span class="fw-semibold text-dark"><i class="bi bi-calendar3 text-secondary me-1"></i>{{ $v->tanggal_servis_berikutnya ? \Carbon\Carbon::parse($v->tanggal_servis_berikutnya)->format('d M Y') : 'Belum diset' }}</span>
+                            <span class="text-muted d-block" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">{{ __('Jadwal') }} {{ __('Servis') }}</span>
+                            <span class="fw-semibold text-dark"><i class="bi bi-calendar3 text-secondary me-1"></i>{{ $v->tanggal_servis_berikutnya ? \Carbon\Carbon::parse($v->tanggal_servis_berikutnya)->translatedFormat('d M Y') : __('Belum diset') }}</span>
                         </div>
                         <div class="col-6 mt-2">
-                            <span class="text-muted d-block" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Supir Utama</span>
+                            <span class="text-muted d-block" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">{{ __('Supir Utama') }}</span>
                             <span class="fw-semibold text-dark"><i class="bi bi-person-fill text-secondary me-1"></i>{{ $v->supir_utama ?? '-' }}</span>
                         </div>
                         <div class="col-6 mt-2">
-                            <span class="text-muted d-block" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">Odometer</span>
+                            <span class="text-muted d-block" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px;">{{ __('Odometer') }}</span>
                             <span class="fw-semibold text-dark font-monospace"><i class="bi bi-speedometer2 text-secondary me-1"></i>{{ number_format($v->odometer_terkini ?? 0, 0, ',', '.') }} km</span>
                         </div>
                     </div>
@@ -442,17 +451,17 @@
                         @if ($v->status_kir === 'merah')
                             <div class="alert alert-danger py-1.5 px-3 mb-0 d-flex align-items-center gap-2" style="font-size: 0.75rem; border-radius: 8px; border: 1px solid #fecaca; background: #fef2f2;">
                                 <i class="bi bi-x-circle-fill text-danger fs-6"></i>
-                                <span class="fw-bold text-danger">KIR Lewat Tempo! (Terlewat {{ $diffDays !== null ? abs($diffDays) : 0 }} hari)</span>
+                                <span class="fw-bold text-danger">{{ __('KIR Lewat Tempo!') }} ({{ __('Terlewat') }} {{ $diffDays !== null ? abs($diffDays) : 0 }} {{ __('hari') }})</span>
                             </div>
                         @elseif ($v->status_kir === 'kuning')
                             <div class="alert alert-warning py-1.5 px-3 mb-0 d-flex align-items-center gap-2 text-dark" style="font-size: 0.75rem; border-radius: 8px; border: 1px solid #fde68a; background: #fffbeb;">
                                 <i class="bi bi-exclamation-triangle-fill text-warning fs-6"></i>
-                                <span class="fw-bold" style="color: #92400e;">KIR Mendekati Tempo (Sisa {{ $diffDays }} hari)</span>
+                                <span class="fw-bold" style="color: #92400e;">{{ __('KIR Mendekati Tempo') }} ({{ __('Sisa') }} {{ $diffDays }} {{ __('hari') }})</span>
                             </div>
                         @else
                             <div class="alert alert-success py-1.5 px-3 mb-0 d-flex align-items-center gap-2" style="font-size: 0.75rem; border-radius: 8px; border: 1px solid #a7f3d0; background: #ecfdf5;">
                                 <i class="bi bi-check-circle-fill text-success fs-6"></i>
-                                <span class="fw-bold text-success">Dokumen KIR Valid</span>
+                                <span class="fw-bold text-success">{{ __('Dokumen KIR Valid') }}</span>
                             </div>
                         @endif
 
@@ -460,17 +469,17 @@
                         @if($isTerlambatTgl || $isTerlambatKm)
                             <div class="alert alert-danger py-1.5 px-3 mb-0 d-flex align-items-center gap-2" style="font-size: 0.75rem; border-radius: 8px; border: 1px solid #fecaca; background: #fef2f2;">
                                 <i class="bi bi-exclamation-triangle-fill text-danger fs-6"></i>
-                                <span class="fw-bold text-danger">Terlambat Servis!</span>
+                                <span class="fw-bold text-danger">{{ __('Terlambat Servis!') }}</span>
                             </div>
                         @elseif($isMendekatiTgl)
                             <div class="alert alert-warning py-1.5 px-3 mb-0 d-flex align-items-center gap-2 text-dark" style="font-size: 0.75rem; border-radius: 8px; border: 1px solid #fde68a; background: #fffbeb;">
                                 <i class="bi bi-clock-history text-warning fs-6"></i>
-                                <span class="fw-bold" style="color: #92400e;">Servis &lt; 7 Hari</span>
+                                <span class="fw-bold" style="color: #92400e;">{{ __('Servis < 7 Hari') }}</span>
                             </div>
                         @else
                             <div class="alert alert-success py-1.5 px-3 mb-0 d-flex align-items-center gap-2" style="font-size: 0.75rem; border-radius: 8px; border: 1px solid #a7f3d0; background: #ecfdf5;">
                                 <i class="bi bi-check-circle-fill text-success fs-6"></i>
-                                <span class="fw-bold text-success">Jadwal Servis Aman</span>
+                                <span class="fw-bold text-success">{{ __('Jadwal Servis Aman') }}</span>
                             </div>
                         @endif
                     </div>
@@ -480,47 +489,66 @@
                         <!-- Quick status updater for Admin & Technician -->
                         @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
                             <div class="d-flex align-items-center justify-content-between">
-                                <span class="text-muted small fw-semibold">Ubah Status:</span>
+                                <span class="text-muted small fw-semibold">{{ __('Ubah Status:') }}</span>
                                 <form action="{{ route('vehicles.updateStatus', $v) }}" method="POST" class="d-inline-block m-0">
                                     @csrf 
                                     @method('PUT')
                                     <select name="status" class="form-select form-select-sm shadow-none border" style="font-size: 0.78rem; font-weight: 600; border-radius: 8px; background-color: #f8fafc; padding: 6px 12px; width: 135px;" onchange="this.form.submit()">
-                                        <option value="Siap Pakai" @selected($v->status === 'Siap Pakai')>Siap Pakai</option>
-                                        <option value="Sedang Diservis" @selected($v->status === 'Sedang Diservis')>Sedang Diservis</option>
-                                        <option value="Selesai" @selected($v->status === 'Selesai')>Selesai</option>
+                                        <option value="Siap Pakai" @selected($v->status === 'Siap Pakai')>{{ __('Siap Pakai') }}</option>
+                                        <option value="Sedang Diservis" @selected($v->status === 'Sedang Diservis')>{{ __('Sedang Diservis') }}</option>
+                                        <option value="Selesai" @selected($v->status === 'Selesai')>{{ __('Selesai') }}</option>
                                     </select>
                                 </form>
                             </div>
                         @endif
  
                         <!-- General Actions -->
-                        <div class="d-flex align-items-center justify-content-end gap-2 mt-2">
-                            <button type="button" class="btn btn-sm btn-outline-primary px-3 py-1.5 d-inline-flex align-items-center gap-1 btn-detail-vehicle" 
-                                    data-plat="{{ $v->plat_nomor }}"
-                                    data-merek="{{ $v->merek }}"
-                                    data-tipe="{{ $v->tipe }}"
-                                    data-tahun="{{ $v->tahun ?? 2024 }}"
-                                    data-km="{{ number_format($v->odometer_terkini ?? 0, 0, ',', '.') }} km"
-                                    data-driver="{{ $v->supir_utama ?? 'Belum diset' }}"
-                                    data-pool="{{ $v->lokasi_pool ?? '-' }}"
-                                    data-status="{{ $v->status }}"
-                                    data-foto="{{ $v->foto_url }}"
-                                    data-show-url="{{ route('vehicles.show', $v) }}"
-                                    style="border-radius: 8px; font-size: 0.78rem; font-weight: 600; margin-right: 8px !important;">
-                                <i class="bi bi-eye-fill"></i> Detail
-                            </button>
-                            @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin']))
-                                <a href="{{ route('vehicles.edit', $v) }}" class="btn btn-sm btn-outline-warning d-inline-flex align-items-center justify-content-center" style="border-radius: 8px; width: 32px; height: 32px; padding: 0; margin-right: 8px !important;" title="Edit">
-                                    <i class="bi bi-pencil-fill"></i>
+                        <div class="d-flex align-items-center justify-content-between gap-2 mt-2 pt-2 border-top">
+                            @php
+                                $cardWa = "🔔 *Pemberitahuan Servis & Pemeliharaan Armada*\n\n"
+                                    . "Kepada Yth: " . ($v->supir_utama ?: "Pengemudi/Petugas") . "\n"
+                                    . "Kendaraan: " . $v->merek . " " . $v->tipe . " (" . $v->plat_nomor . ")\n"
+                                    . "Lokasi Pool: " . ($v->lokasi_pool ?: "Pool Pusat") . "\n"
+                                    . "Odometer Terkini: " . number_format($v->odometer_terkini ?? 0, 0, ',', '.') . " km\n"
+                                    . "Status: " . $v->status . "\n\n"
+                                    . "Mohon lakukan koordinasi dan perawatan berkala di bengkel. Terima kasih.\n- Sistem FleetMaintenance";
+                            @endphp
+                            <div class="d-flex align-items-center gap-2" style="gap: 8px;">
+                                <a href="https://wa.me/?text={{ urlencode($cardWa) }}" target="_blank" class="btn btn-sm btn-outline-success d-inline-flex align-items-center justify-content-center shadow-xs" style="border-radius: 8px; width: 34px; height: 34px; padding: 0;" title="{{ __('Kirim Pengingat via WhatsApp') }}">
+                                    <i class="bi bi-whatsapp"></i>
                                 </a>
-                                <form action="{{ route('vehicles.destroy', $v) }}" method="POST" class="d-inline m-0 form-confirm-delete" data-text="Data kendaraan ini beserta seluruh riwayat terkait akan dihapus secara permanen dari sistem!">
-                                    @csrf 
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center justify-content-center" style="border-radius: 8px; width: 32px; height: 32px; padding: 0;" title="Hapus">
-                                        <i class="bi bi-trash-fill"></i>
-                                    </button>
-                                </form>
-                            @endif
+                                <a href="{{ route('tracking.index', ['vehicle_id' => $v->id]) }}" class="btn btn-sm btn-outline-info d-inline-flex align-items-center justify-content-center shadow-xs" style="border-radius: 8px; width: 34px; height: 34px; padding: 0;" title="{{ __('Lacak lokasi armada di peta') }}">
+                                    <i class="bi bi-geo-alt-fill"></i>
+                                </a>
+                                @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin']))
+                                    <a href="{{ route('vehicles.edit', $v) }}" class="btn btn-sm btn-outline-warning d-inline-flex align-items-center justify-content-center shadow-xs" style="border-radius: 8px; width: 34px; height: 34px; padding: 0;" title="{{ __('Edit Kendaraan') }}">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </a>
+                                    <form action="{{ route('vehicles.destroy', $v) }}" method="POST" class="d-inline m-0 form-confirm-delete" data-text="{{ __('Data kendaraan ini beserta seluruh riwayat terkait akan dihapus secara permanen dari sistem!') }}">
+                                        @csrf 
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center justify-content-center shadow-xs" style="border-radius: 8px; width: 34px; height: 34px; padding: 0;" title="{{ __('Hapus Kendaraan') }}">
+                                            <i class="bi bi-trash-fill"></i>
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-sm btn-outline-primary px-3 d-inline-flex align-items-center gap-1 btn-detail-vehicle" 
+                                        data-plat="{{ $v->plat_nomor }}"
+                                        data-merek="{{ $v->merek }}"
+                                        data-tipe="{{ $v->tipe }}"
+                                        data-tahun="{{ $v->tahun ?? 2024 }}"
+                                        data-km="{{ number_format($v->odometer_terkini ?? 0, 0, ',', '.') }} km"
+                                        data-driver="{{ $v->supir_utama ?? __('Belum diset') }}"
+                                        data-pool="{{ $v->lokasi_pool ?? '-' }}"
+                                        data-status="{{ __($v->status) }}"
+                                        data-foto="{{ $v->foto_url }}"
+                                        data-show-url="{{ route('vehicles.show', $v) }}"
+                                        style="border-radius: 8px; font-size: 0.8rem; font-weight: 600; height: 34px;">
+                                    <i class="bi bi-eye-fill"></i> {{ __('Detail') }}
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -534,8 +562,8 @@
                     <i class="bi bi-car-front fs-1 text-primary" style="color: #0284c7 !important;"></i>
                 </div>
             </div>
-            <h5 class="fw-bold text-dark mb-1">Tidak ada data kendaraan</h5>
-            <p class="text-secondary mb-0" style="font-size: 0.9rem;">Belum ada data armada kendaraan yang terdaftar di dalam sistem.</p>
+            <h5 class="fw-bold text-dark mb-1">{{ __('Tidak ada data kendaraan') }}</h5>
+            <p class="text-secondary mb-0" style="font-size: 0.9rem;">{{ __('Belum ada data armada kendaraan yang terdaftar di dalam sistem.') }}</p>
         </div>
     @endforelse
 </div>
@@ -545,7 +573,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
             <div class="modal-header border-bottom py-3">
-                <h5 class="modal-title fw-bold text-dark mb-0"><i class="bi bi-car-front-fill text-primary me-2"></i> Informasi Detail Kendaraan</h5>
+                <h5 class="modal-title fw-bold text-dark mb-0"><i class="bi bi-car-front-fill text-primary me-2"></i> {{ __('Informasi Detail Kendaraan') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
@@ -562,25 +590,25 @@
                 <div class="row g-3">
                     <div class="col-6">
                         <div class="p-2.5 border rounded-3 bg-light bg-opacity-50">
-                            <span class="text-muted d-block mb-0.5" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;">Nomor Polisi</span>
+                            <span class="text-muted d-block mb-0.5" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;">{{ __('Nomor Polisi') }}</span>
                             <strong class="text-dark fs-6" id="modalVehiclePlatDetail"></strong>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="p-2.5 border rounded-3 bg-light bg-opacity-50">
-                            <span class="text-muted d-block mb-0.5" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;">Tahun Pembuatan</span>
+                            <span class="text-muted d-block mb-0.5" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;">{{ __('Tahun Pembuatan') }}</span>
                             <strong class="text-dark fs-6" id="modalVehicleTahun"></strong>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="p-2.5 border rounded-3 bg-light bg-opacity-50">
-                            <span class="text-muted d-block mb-0.5" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;">Odometer Terkini</span>
+                            <span class="text-muted d-block mb-0.5" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;">{{ __('Odometer Terkini') }}</span>
                             <strong class="text-dark fs-6" id="modalVehicleKM"></strong>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="p-2.5 border rounded-3 bg-light bg-opacity-50">
-                            <span class="text-muted d-block mb-0.5" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;">Driver / Supir</span>
+                            <span class="text-muted d-block mb-0.5" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;">{{ __('Driver / Supir') }}</span>
                             <strong class="text-dark fs-6" id="modalVehicleDriver"></strong>
                         </div>
                     </div>
@@ -588,16 +616,21 @@
 
                 <!-- QR Code Section -->
                 <div class="mt-4 pt-3 border-top text-center">
-                    <span class="text-muted text-uppercase fw-bold d-block mb-2" style="font-size: 0.72rem; letter-spacing: 0.5px;">QR Code Kendaraan</span>
+                    <span class="text-muted text-uppercase fw-bold d-block mb-2" style="font-size: 0.72rem; letter-spacing: 0.5px;">{{ __('QR Code Kendaraan') }}</span>
                     <div class="d-inline-block border rounded-4 p-2 bg-white shadow-sm mb-2">
                         <img id="modalVehicleQR" src="" alt="QR Code" style="width: 140px; height: 140px;">
                     </div>
-                    <p class="text-muted mb-0" style="font-size: 0.75rem;">Tempel QR di kendaraan untuk scan &amp; melacak riwayat servis langsung.</p>
+                    <p class="text-muted mb-0" style="font-size: 0.75rem;">{{ __('Tempel QR di kendaraan untuk scan & melacak riwayat servis langsung.') }}</p>
                 </div>
             </div>
-            <div class="modal-footer border-top p-2 bg-light d-flex gap-2">
-                <a id="modalVehicleLink" href="" class="btn btn-primary flex-fill fw-bold py-2 d-flex align-items-center justify-content-center gap-1" style="border-radius: 10px;"><i class="bi bi-clock-history"></i> Buka Riwayat Lengkap</a>
-                <button type="button" class="btn btn-secondary px-4 py-2" data-bs-dismiss="modal" style="border-radius: 10px;">Tutup</button>
+            <div class="modal-footer border-top p-2 bg-light d-flex flex-wrap gap-2">
+                <a id="modalVehicleWaBtn" href="#" target="_blank" class="btn btn-success text-white fw-bold py-2 px-3 d-flex align-items-center justify-content-center gap-1 shadow-xs" style="border-radius: 10px;">
+                    <i class="bi bi-whatsapp"></i> {{ __('Kirim WA') }}
+                </a>
+                <a id="modalVehicleLink" href="" class="btn btn-primary flex-fill fw-bold py-2 d-flex align-items-center justify-content-center gap-1 shadow-xs" style="border-radius: 10px;">
+                    <i class="bi bi-clock-history"></i> {{ __('Buka Riwayat Lengkap') }}
+                </a>
+                <button type="button" class="btn btn-secondary px-3 py-2" data-bs-dismiss="modal" style="border-radius: 10px;">{{ __('Tutup') }}</button>
             </div>
         </div>
     </div>
@@ -606,7 +639,7 @@
 <!-- Floating Action Button (FAB) for Admin to Add Vehicle -->
 @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin']))
 <div class="fab-container">
-    <a href="{{ route('vehicles.create') }}" class="fab-btn" title="Tambah Kendaraan Baru">
+    <a href="{{ route('vehicles.create') }}" class="fab-btn" title="{{ __('Tambah Kendaraan Baru') }}">
         <i class="bi bi-plus-lg"></i>
     </a>
 </div>
@@ -620,17 +653,20 @@
             var searchVal = $('#customLiveSearch').val().toLowerCase().trim();
             var filterStatus = $('#customStatusFilter').val();
             var filterTempo = $('#customTempoFilter').val();
+            var filterKategori = $('#customKategoriFilter').val();
 
             $('.vehicle-card-col').each(function () {
-                var cardSearch = $(this).data('search');
+                var searchData = $(this).data('search');
                 var cardStatus = $(this).data('status');
                 var cardTempo = $(this).data('tempo');
+                var cardKategori = $(this).data('kategori');
 
-                var matchesSearch = cardSearch.indexOf(searchVal) > -1;
+                var matchesSearch = searchData.indexOf(searchVal) > -1;
                 var matchesStatus = !filterStatus || cardStatus === filterStatus;
                 var matchesTempo = !filterTempo || cardTempo === filterTempo;
+                var matchesKategori = !filterKategori || cardKategori === filterKategori;
 
-                if (matchesSearch && matchesStatus && matchesTempo) {
+                if (matchesSearch && matchesStatus && matchesTempo && matchesKategori) {
                     $(this).show();
                 } else {
                     $(this).hide();
@@ -678,6 +714,7 @@
 
         $('#customStatusFilter').on('change', filterVehicles);
         $('#customTempoFilter').on('change', filterVehicles);
+        $('#customKategoriFilter').on('change', filterVehicles);
 
         // Vehicle Detail Modal population handler
         $('.btn-detail-vehicle').on('click', function () {
@@ -710,11 +747,21 @@
             // Set link
             $('#modalVehicleLink').attr('href', showUrl);
 
+            // Set WhatsApp Message link
+            var waMsg = "🔔 *Pemberitahuan Servis & Pemeliharaan Armada*\n\n"
+                + "Kepada Yth: " + (driver || "Pengemudi/Petugas") + "\n"
+                + "Kendaraan: " + merek + " " + tipe + " (" + plat + ")\n"
+                + "Lokasi Pool: " + (pool || "Pool Pusat") + "\n"
+                + "Odometer Terkini: " + km + "\n"
+                + "Status: " + status + "\n\n"
+                + "Mohon lakukan koordinasi dan perawatan berkala di bengkel. Terima kasih.\n- Sistem FleetMaintenance";
+            $('#modalVehicleWaBtn').attr('href', 'https://wa.me/?text=' + encodeURIComponent(waMsg));
+
             // Set status badge style
             var $badge = $('#modalVehicleStatus').text(status).removeClass('bg-success bg-warning bg-secondary text-white text-dark');
-            if (status === 'Siap Pakai') {
+            if (status === '{{ __('Siap Pakai') }}' || status === 'Siap Pakai' || status === 'Ready to Use') {
                 $badge.addClass('bg-success text-white');
-            } else if (status === 'Sedang Diservis') {
+            } else if (status === '{{ __('Sedang Diservis') }}' || status === 'Sedang Diservis' || status === 'Under Service') {
                 $badge.addClass('bg-warning text-dark');
             } else {
                 $badge.addClass('bg-secondary text-white');

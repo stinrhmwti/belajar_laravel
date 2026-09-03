@@ -161,7 +161,7 @@ class DashboardController extends Controller
             $bulanLabel = [];
             $bulanTotal = [];
             for ($i = 5; $i >= 0; $i--) {
-                $bulan = now()->subMonths($i);
+                $bulan = now()->startOfMonth()->subMonths($i);
                 $bulanLabel[] = $bulan->translatedFormat('M Y');
                 $bulanTotal[] = (float) Expense::whereMonth('tanggal', $bulan->month)
                     ->whereYear('tanggal', $bulan->year)

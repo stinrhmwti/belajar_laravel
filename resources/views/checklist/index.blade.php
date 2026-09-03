@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Checklist Harian')
+@section('title', __('Checklist Harian'))
 
 @section('content')
 <style>
@@ -459,17 +459,24 @@
         border-color: transparent !important;
         box-shadow: none;
     }
+    .hover-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 30px rgba(0, 0, 0, 0.08) !important;
+    }
+    .hover-card:hover .transition-img {
+        transform: scale(1.06);
+    }
 </style>
 
 {{-- Page Header --}}
 <div class="page-header">
     <div class="page-header-left">
-        <h3><i class="bi bi-clipboard2-check-fill me-2" style="color:#0891b2;"></i>Checklist Harian</h3>
-        <p>Pantau &amp; rekap kondisi harian seluruh armada kendaraan.</p>
+        <h3><i class="bi bi-clipboard2-check-fill me-2" style="color:#0891b2;"></i>{{ __('Checklist Harian') }}</h3>
+        <p>{{ __('Pantau & rekap kondisi harian seluruh armada kendaraan.') }}</p>
     </div>
-    @if (in_array(auth()->user()->role, ['admin', 'teknisi']))
+    @if (in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi', 'user']))
         <a href="{{ route('checklist.create') }}" class="btn-input-checklist">
-            <i class="bi bi-plus-circle-fill"></i> Input Checklist
+            <i class="bi bi-plus-circle-fill"></i> {{ __('Input Checklist') }}
         </a>
     @endif
 </div>
@@ -492,36 +499,36 @@
     <div class="summary-card">
         <div class="summary-icon blue"><i class="bi bi-clipboard-data-fill"></i></div>
         <div class="summary-card-body">
-            <div class="label">Total Checklist</div>
+            <div class="label">{{ __('Total Checklist') }}</div>
             <div class="value">{{ $totalChecklist }}</div>
         </div>
     </div>
     <div class="summary-card">
         <div class="summary-icon green"><i class="bi bi-shield-fill-check"></i></div>
         <div class="summary-card-body">
-            <div class="label">Kondisi Baik</div>
+            <div class="label">{{ __('Kondisi Baik') }}</div>
             <div class="value">{{ $totalBaik }}</div>
         </div>
     </div>
     <div class="summary-card">
         <div class="summary-icon red"><i class="bi bi-exclamation-octagon-fill"></i></div>
         <div class="summary-card-body">
-            <div class="label">Ada Masalah</div>
+            <div class="label">{{ __('Ada Masalah') }}</div>
             <div class="value">{{ $totalBermasalah }}</div>
         </div>
     </div>
 </div>
 
 <div class="mb-4">
-    <div class="d-flex align-items-center gap-3 justify-content-start">
+    <div class="d-flex align-items-center gap-3 justify-content-start flex-wrap">
         <div class="input-group custom-input-group" style="width: 380px !important; flex-shrink: 0;">
             <span class="input-group-text bg-transparent border-0 text-muted" style="padding-right: 0;"><i class="bi bi-search"></i></span>
-            <input type="text" id="checklistSearch" class="form-control bg-transparent border-0 shadow-none" placeholder="Cari berdasarkan Plat, Driver, Merk, atau Catatan..." style="font-size: 0.88rem; padding-left: 8px;">
+            <input type="text" id="checklistSearch" class="form-control bg-transparent border-0 shadow-none" placeholder="{{ __('Cari berdasarkan Plat, Driver, Merk, atau Catatan...') }}" style="font-size: 0.88rem; padding-left: 8px;">
         </div>
-        <select id="checklistFilterDropdown" class="form-select border shadow-none" style="width: 175px !important; min-width: 175px !important; font-size: 0.88rem; flex-shrink: 0;">
-            <option value="all">Semua Status ({{ $totalChecklist }})</option>
-            <option value="baik">Kondisi Baik ({{ $totalBaik }})</option>
-            <option value="masalah">Ada Masalah ({{ $totalBermasalah }})</option>
+        <select id="checklistFilterDropdown" class="form-select border shadow-none" style="width: 195px !important; min-width: 195px !important; font-size: 0.88rem; flex-shrink: 0;">
+            <option value="all">{{ __('Semua Status') }} ({{ $totalChecklist }})</option>
+            <option value="baik">{{ __('Kondisi Baik') }} ({{ $totalBaik }})</option>
+            <option value="masalah">{{ __('Ada Masalah') }} ({{ $totalBermasalah }})</option>
         </select>
     </div>
 </div>
@@ -541,7 +548,7 @@
          data-jenis="{{ $c->vehicle->jenis_kendaraan }}"
          data-foto="{{ $c->vehicle->foto_url }}"
          data-teknisi="{{ $c->nama_teknisi }}"
-         data-tanggal="{{ $c->tanggal->format('d F Y') }}"
+         data-tanggal="{{ $c->tanggal->translatedFormat('d F Y') }}"
          data-odometer="{{ number_format($c->odometer, 0, ',', '.') }} km"
          data-oli="{{ $c->oli_mesin }}"
          data-radiator="{{ $c->air_radiator }}"
@@ -549,7 +556,7 @@
          data-ban="{{ $c->ban_rem }}"
          data-lampu="{{ $c->lampu_klakson }}"
          data-kebersihan="{{ $c->kebersihan }}"
-         data-catatan="{{ $c->catatan_tambahan ?? 'Tidak ada catatan tambahan.' }}"
+         data-catatan="{{ $c->catatan_tambahan ?? __('Tidak ada catatan tambahan.') }}"
          data-masalah="{{ $c->ada_masalah ? 1 : 0 }}">
         <div class="card h-100 border border-slate-100 rounded-4 overflow-hidden shadow-xs hover-card transition-all p-3 {{ $c->ada_masalah ? 'border-warning' : '' }}" style="transition: all 0.25s ease; border-radius: 16px;">
             <!-- Plate & Status Header (Above Image) -->
@@ -562,15 +569,15 @@
                 <div>
                     @if ($totalOk === 6)
                         <span class="badge bg-success text-white px-3 py-2 fw-bold shadow-sm" style="border-radius: 10px;">
-                            <i class="bi bi-check-circle-fill"></i> 6/6 Baik
+                            <i class="bi bi-check-circle-fill"></i> 6/6 {{ __('Baik') }}
                         </span>
                     @elseif ($totalOk >= 4)
                         <span class="badge bg-warning text-dark px-3 py-2 fw-bold shadow-sm" style="border-radius: 10px;">
-                            <i class="bi bi-exclamation-circle-fill"></i> {{ $totalOk }}/6 Baik
+                            <i class="bi bi-exclamation-circle-fill"></i> {{ $totalOk }}/6 {{ __('Baik') }}
                         </span>
                     @else
                         <span class="badge bg-danger text-white px-3 py-2 fw-bold shadow-sm" style="border-radius: 10px;">
-                            <i class="bi bi-x-circle-fill"></i> {{ $totalOk }}/6 Baik
+                            <i class="bi bi-x-circle-fill"></i> {{ $totalOk }}/6 {{ __('Baik') }}
                         </span>
                     @endif
                 </div>
@@ -585,7 +592,7 @@
             <div class="card-body px-0 pt-3 pb-0">
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <span class="tgl-cell text-muted fw-bold font-monospace" style="font-size: 0.82rem;">
-                        <i class="bi bi-calendar3 me-1"></i> {{ $c->tanggal->format('d M Y') }}
+                        <i class="bi bi-calendar3 me-1"></i> {{ $c->tanggal->translatedFormat('d M Y') }}
                     </span>
                     <div class="teknisi-cell">
                         <div class="teknisi-avatar">{{ strtoupper(substr($c->nama_teknisi, 0, 2)) }}</div>
@@ -595,20 +602,20 @@
 
                 <!-- Parameters Status -->
                 <div class="mb-3 py-2 border-top border-bottom">
-                    <span class="text-muted d-block mb-1" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;">Detail Kondisi</span>
+                    <span class="text-muted d-block mb-1" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;">{{ __('Detail Kondisi') }}</span>
                     @php $adaMasalah = false; @endphp
                     <div class="d-flex flex-wrap gap-1">
                         @foreach ($paramMap as $field => $label)
                             @if ($c->$field === 'Not OK')
                                 @php $adaMasalah = true; @endphp
                                 <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-1 rounded" style="font-size: 0.7rem; font-weight: 600;">
-                                    <i class="bi bi-exclamation-triangle-fill"></i> {{ $label }}
+                                    <i class="bi bi-exclamation-triangle-fill"></i> {{ __($label) }}
                                 </span>
                             @endif
                         @endforeach
                         @if (!$adaMasalah)
                             <span class="text-success fw-bold d-inline-flex align-items-center gap-2" style="font-size: 0.82rem;">
-                                <i class="bi bi-patch-check-fill fs-5"></i> Semua Sistem Aman
+                                <i class="bi bi-patch-check-fill fs-5"></i> {{ __('Semua Sistem Aman') }}
                             </span>
                         @endif
                     </div>
@@ -616,7 +623,7 @@
 
                 <!-- Catatan -->
                 <div class="mb-3">
-                    <span class="text-muted d-block" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;">Catatan Tambahan</span>
+                    <span class="text-muted d-block" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px;">{{ __('Catatan Tambahan') }}</span>
                     @if ($c->catatan_tambahan)
                         <p class="mb-0 text-secondary font-monospace" style="font-size: 0.82rem; font-style: italic;">"{{ $c->catatan_tambahan }}"</p>
                     @else
@@ -626,16 +633,21 @@
 
                 <!-- Action Buttons -->
                 <div class="d-flex justify-content-end align-items-center gap-2 pt-2 border-top">
-                    <button class="btn btn-sm btn-outline-primary px-3 py-1.5 d-inline-flex align-items-center gap-1 btn-detail-checklist me-2" style="font-size: 0.78rem; border-radius: 8px;">
-                        <i class="bi bi-info-circle-fill"></i> Detail
+                    <a href="{{ route('checklist.show', $c->id) }}" class="btn btn-sm btn-outline-secondary px-2.5 py-1.5 d-inline-flex align-items-center gap-1" style="font-size: 0.78rem; border-radius: 8px;" title="{{ __('Cetak Berita Acara / Simpan PDF') }}">
+                        <i class="bi bi-printer-fill"></i> {{ __('Cetak') }}
+                    </a>
+                    <button class="btn btn-sm btn-outline-primary px-3 py-1.5 d-inline-flex align-items-center gap-1 btn-detail-checklist" style="font-size: 0.78rem; border-radius: 8px;">
+                        <i class="bi bi-info-circle-fill"></i> {{ __('Detail') }}
                     </button>
-                    <form action="{{ route('checklist.destroy', $c->id) }}" method="POST" class="d-inline form-confirm-delete" data-text="Data checklist harian ini akan dihapus secara permanen dari sistem!">
+                    @if (in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
+                    <form action="{{ route('checklist.destroy', $c->id) }}" method="POST" class="d-inline form-confirm-delete" data-text="{{ __('Data checklist harian ini akan dihapus secara permanen dari sistem!') }}">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-sm btn-outline-danger px-3 py-1.5 d-inline-flex align-items-center gap-1" style="font-size: 0.78rem; border-radius: 8px;">
-                            <i class="bi bi-trash-fill"></i> Hapus
+                            <i class="bi bi-trash-fill"></i> {{ __('Hapus') }}
                         </button>
                     </form>
+                    @endif
                 </div>
             </div>
         </div>
@@ -646,8 +658,8 @@
             <div class="empty-state-icon">
                 <i class="bi bi-clipboard-x"></i>
             </div>
-            <h6>Belum Ada Data Checklist</h6>
-            <p>Mulai tambahkan checklist harian untuk memantau kondisi kendaraan.</p>
+            <h6>{{ __('Belum Ada Data Checklist') }}</h6>
+            <p>{{ __('Mulai tambahkan checklist harian untuk memantau kondisi kendaraan.') }}</p>
         </div>
     </div>
     @endforelse
@@ -658,7 +670,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
             <div class="modal-header border-bottom py-3">
-                <h5 class="modal-title fw-bold text-dark mb-0"><i class="bi bi-clipboard2-check-fill text-primary me-2"></i> Detail Inspeksi Kendaraan</h5>
+                <h5 class="modal-title fw-bold text-dark mb-0"><i class="bi bi-clipboard2-check-fill text-primary me-2"></i> {{ __('Detail Inspeksi Kendaraan') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
@@ -676,13 +688,13 @@
                 <div class="row g-3 mb-4">
                     <div class="col-6">
                         <div class="p-2 border rounded-3 bg-white">
-                            <small class="text-muted d-block" style="font-size: 0.75rem;">Inspektur / Teknisi</small>
+                            <small class="text-muted d-block" style="font-size: 0.75rem;">{{ __('Inspektur / Teknisi') }}</small>
                             <span class="fw-bold text-dark" id="modalTeknisi" style="font-size: 0.85rem;"></span>
                         </div>
                     </div>
                     <div class="col-6">
                         <div class="p-2 border rounded-3 bg-white">
-                            <small class="text-muted d-block" style="font-size: 0.75rem;">Tanggal Inspeksi</small>
+                            <small class="text-muted d-block" style="font-size: 0.75rem;">{{ __('Tanggal Inspeksi') }}</small>
                             <span class="fw-bold text-dark" id="modalTanggal" style="font-size: 0.85rem;"></span>
                         </div>
                     </div>
@@ -691,13 +703,13 @@
                             @csrf
                             @method('PUT')
                             <div class="d-flex align-items-center justify-content-between">
-                                <label class="text-muted mb-0 fw-semibold" style="font-size: 0.75rem;">Odometer Saat Inspeksi (km)</label>
+                                <label class="text-muted mb-0 fw-semibold" style="font-size: 0.75rem;">{{ __('Odometer Saat Inspeksi (km)') }}</label>
                                 <i class="bi bi-speedometer2 text-secondary fs-5"></i>
                             </div>
                             <div class="d-flex align-items-center gap-2">
                                 <input type="number" name="odometer" id="modalOdometerInput" class="form-control form-control-sm fw-bold text-dark shadow-none border" style="font-size: 0.95rem; padding: 6px 12px; border-radius: 8px;" required>
                                 <button type="submit" class="btn btn-sm btn-primary fw-bold px-3 py-2" style="border-radius: 8px; font-size: 0.8rem; flex-shrink: 0;">
-                                    <i class="bi bi-save me-1"></i> Simpan
+                                    <i class="bi bi-save me-1"></i> {{ __('Simpan') }}
                                 </button>
                             </div>
                         </form>
@@ -705,24 +717,30 @@
                 </div>
 
                 <!-- Status Parameter Grid -->
-                <h6 class="fw-bold text-dark mb-3" style="font-size: 0.9rem;">Status Parameter Kondisi:</h6>
+                <h6 class="fw-bold text-dark mb-3" style="font-size: 0.9rem;">{{ __('Status Parameter Kondisi:') }}</h6>
                 <div class="row g-2 mb-4" id="modalParams">
                     <!-- Parameter items will be filled here dynamically -->
                 </div>
 
                 <!-- Catatan Tambahan -->
                 <div class="p-3 bg-light rounded-4">
-                    <small class="text-muted d-block mb-1" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">Catatan Tambahan</small>
+                    <small class="text-muted d-block mb-1" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">{{ __('Catatan Tambahan') }}</small>
                     <p class="mb-0 text-secondary font-monospace" id="modalCatatan" style="font-size: 0.85rem; font-style: italic;"></p>
                 </div>
             </div>
-            <div class="modal-footer border-top p-2 bg-light">
-                <button type="button" class="btn btn-secondary w-100 fw-bold py-2" data-bs-dismiss="modal" style="border-radius: 10px;">Tutup</button>
+            <div class="modal-footer border-top p-2 bg-light d-flex gap-2">
+                <a href="#" id="modalBtnPrint" class="btn btn-outline-primary fw-bold py-2 flex-grow-1 d-flex align-items-center justify-content-center gap-2" style="border-radius: 10px;">
+                    <i class="bi bi-printer-fill"></i> {{ __('Cetak Berita Acara / PDF') }}
+                </a>
+                <button type="button" class="btn btn-secondary fw-bold py-2 px-4" data-bs-dismiss="modal" style="border-radius: 10px;">{{ __('Tutup') }}</button>
             </div>
         </div>
     </div>
 </div>
-
+        </div>
+    </div>
+</div>
+@push('scripts')
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
     $(document).ready(function () {
@@ -779,9 +797,21 @@
             $('#modalTanggal').text(tanggal);
             $('#modalOdometerInput').val(odometerRaw);
             $('#updateOdometerForm').attr('action', '/checklist/' + id + '/odometer');
+            $('#modalBtnPrint').attr('href', '/checklist/' + id);
             $('#modalCatatan').text(catatan);
 
             // Populate parameters list with beautiful badges
+            var trans = {
+                'Oli Mesin': '{{ __('Oli Mesin') }}',
+                'Air Radiator': '{{ __('Air Radiator') }}',
+                'Minyak Rem': '{{ __('Minyak Rem') }}',
+                'Ban & Rem': '{{ __('Ban & Rem') }}',
+                'Lampu & Klakson': '{{ __('Lampu & Klakson') }}',
+                'Kebersihan': '{{ __('Kebersihan') }}',
+                'AMAN': '{{ __('AMAN') }}',
+                'MASALAH': '{{ __('MASALAH') }}'
+            };
+
             var params = [
                 { name: 'Oli Mesin', val: card.data('oli'), icon: 'bi-droplet-fill' },
                 { name: 'Air Radiator', val: card.data('radiator'), icon: 'bi-thermometer-half' },
@@ -802,10 +832,10 @@
                 var pCard = $(`
                     <div class="d-flex align-items-center justify-content-between p-2.5 border rounded-3 ${bg}" style="border: 1px solid; font-size: 0.8rem;">
                         <span class="d-flex align-items-center gap-2 fw-semibold">
-                            <i class="bi ${p.icon}"></i> ${p.name}
+                            <i class="bi ${p.icon}"></i> ${trans[p.name]}
                         </span>
                         <span class="fw-bold d-flex align-items-center gap-1" style="font-size: 0.72rem;">
-                            <i class="bi ${iconStatus}"></i> ${textStatus}
+                            <i class="bi ${iconStatus}"></i> ${trans[textStatus]}
                         </span>
                     </div>
                 `);
@@ -818,4 +848,5 @@
         });
     });
 </script>
+@endpush
 @endsection

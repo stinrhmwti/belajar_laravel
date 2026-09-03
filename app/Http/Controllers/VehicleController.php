@@ -11,7 +11,7 @@ class VehicleController extends Controller
 {
     public function index()
     {
-        $vehicles = Vehicle::orderBy('plat_nomor')->get();
+        $vehicles = Vehicle::with(['latestChecklist', 'lastServiceExpense'])->orderBy('plat_nomor')->get();
 
         return view('vehicles.index', compact('vehicles'));
     }
@@ -84,7 +84,26 @@ class VehicleController extends Controller
             'pajak_5_tahunan' => 'nullable|numeric|min:0',
             'jatuh_tempo_kir' => 'nullable|date',
             'tanggal_servis_manual' => 'nullable|date',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'foto' => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    if ($value && $value->isValid()) {
+                        if ($value->getSize() > 2097152) {
+                            $fail('Foto tidak boleh lebih besar dari 2MB.');
+                        }
+                        $ext = strtolower($value->getClientOriginalExtension() ?: $value->guessExtension());
+                        $mime = strtolower($value->getClientMimeType());
+                        $isImageMime = str_starts_with($mime, 'image/');
+                        $allowedExtensions = ['jpeg', 'png', 'jpg', 'gif', 'webp', 'jfif', 'heic', 'heif'];
+
+                        if (!in_array($ext, $allowedExtensions) && !$isImageMime) {
+                            $fail('Foto harus berupa file bertipe: jpeg, png, jpg, gif.');
+                        }
+                    } else if ($value) {
+                        $fail('Gagal mengunggah file.');
+                    }
+                }
+            ],
         ]);
 
         if ($request->hasFile('foto')) {
@@ -117,7 +136,26 @@ class VehicleController extends Controller
             'jatuh_tempo_kir' => 'nullable|date',
             'tanggal_servis_manual' => 'nullable|date',
             'status' => 'required|string|in:Siap Pakai,Sedang Diservis,Selesai',
-            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'foto' => [
+                'nullable',
+                function ($attribute, $value, $fail) {
+                    if ($value && $value->isValid()) {
+                        if ($value->getSize() > 2097152) {
+                            $fail('Foto tidak boleh lebih besar dari 2MB.');
+                        }
+                        $ext = strtolower($value->getClientOriginalExtension() ?: $value->guessExtension());
+                        $mime = strtolower($value->getClientMimeType());
+                        $isImageMime = str_starts_with($mime, 'image/');
+                        $allowedExtensions = ['jpeg', 'png', 'jpg', 'gif', 'webp', 'jfif', 'heic', 'heif'];
+
+                        if (!in_array($ext, $allowedExtensions) && !$isImageMime) {
+                            $fail('Foto harus berupa file bertipe: jpeg, png, jpg, gif.');
+                        }
+                    } else if ($value) {
+                        $fail('Gagal mengunggah file.');
+                    }
+                }
+            ],
         ]);
 
         if ($request->hasFile('foto')) {
@@ -125,6 +163,8 @@ class VehicleController extends Controller
                 Storage::disk('public')->delete($vehicle->foto);
             }
             $validated['foto'] = $request->file('foto')->store('vehicles', 'public');
+        } else {
+            unset($validated['foto']);
         }
 
         $vehicle->update($validated);

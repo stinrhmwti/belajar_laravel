@@ -141,12 +141,12 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h3 class="fw-bold text-dark mb-1">Daftar Keluhan &amp; Masalah Kendaraan</h3>
-        <p class="text-muted mb-0" style="font-size: 0.95rem;">Monitoring dan manajemen laporan masalah teknis armada dari driver.</p>
+        <h3 class="fw-bold text-dark mb-1">{{ __('Daftar Keluhan & Masalah Kendaraan') }}</h3>
+        <p class="text-muted mb-0" style="font-size: 0.95rem;">{{ __('Monitoring dan manajemen laporan masalah teknis armada dari driver.') }}</p>
     </div>
     <a href="{{ route('complaints.create') }}" class="btn btn-primary px-4 py-2 shadow-sm d-flex align-items-center gap-2">
         <i class="bi bi-megaphone-fill fs-6"></i>
-        <span>Lapor Keluhan Baru</span>
+        <span>{{ __('Lapor Keluhan Baru') }}</span>
     </a>
 </div>
 
@@ -158,7 +158,7 @@
                 <i class="bi bi-exclamation-octagon-fill"></i>
             </div>
             <div>
-                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Keluhan Baru</span>
+                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">{{ __('Keluhan Baru') }}</span>
                 <h4 class="fw-bold text-dark mb-0">{{ $complaints->where('status', 'Baru')->count() }}</h4>
             </div>
         </div>
@@ -169,7 +169,7 @@
                 <i class="bi bi-tools"></i>
             </div>
             <div>
-                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Sedang Diproses</span>
+                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">{{ __('Sedang Diproses') }}</span>
                 <h4 class="fw-bold text-dark mb-0">{{ $complaints->where('status', 'Diproses')->count() }}</h4>
             </div>
         </div>
@@ -180,7 +180,7 @@
                 <i class="bi bi-check-circle-fill"></i>
             </div>
             <div>
-                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Selesai Ditangani</span>
+                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">{{ __('Selesai Ditangani') }}</span>
                 <h4 class="fw-bold text-dark mb-0">{{ $complaints->where('status', 'Selesai')->count() }}</h4>
             </div>
         </div>
@@ -190,10 +190,10 @@
 <div class="mb-3 d-flex justify-content-between align-items-center flex-wrap gap-2">
     <div class="d-flex align-items-center gap-2">
         <i class="bi bi-grid-fill text-primary fs-5"></i>
-        <span class="fw-bold text-dark fs-5">Data Riwayat Laporan</span>
+        <span class="fw-bold text-dark fs-5">{{ __('Data Riwayat Laporan') }}</span>
     </div>
     <div class="d-flex align-items-center gap-2">
-        <input type="text" id="complaintSearch" class="form-control form-control-sm" placeholder="🔍 Cari berdasarkan Plat, Driver, Merk, atau Keluhan..." style="width: 320px; border-radius: 8px; font-size: 0.85rem; box-shadow: none;">
+        <input type="text" id="complaintSearch" class="form-control form-control-sm" placeholder="🔍 {{ __('Cari berdasarkan Plat, Driver, Merk, atau Keluhan...') }}" style="width: 320px; border-radius: 8px; font-size: 0.85rem; box-shadow: none;">
     </div>
 </div>
 
@@ -215,15 +215,15 @@
                 <div>
                     @if ($c->status === 'Baru')
                         <span class="badge bg-danger text-white px-3 py-2 fw-bold shadow-sm d-inline-flex align-items-center gap-2" style="border-radius: 10px;">
-                            <span class="bg-white rounded-circle" style="width: 5px; height: 5px; display: inline-block;"></span> Baru
+                            <span class="bg-white rounded-circle" style="width: 5px; height: 5px; display: inline-block;"></span> {{ __('Baru') }}
                         </span>
                     @elseif ($c->status === 'Diproses')
                         <span class="badge bg-warning text-dark px-3 py-2 fw-bold d-inline-flex align-items-center gap-2 shadow-sm" style="border-radius: 10px;">
-                            <span class="bg-dark rounded-circle" style="width: 5px; height: 5px; display: inline-block;"></span> Diproses
+                            <span class="bg-dark rounded-circle" style="width: 5px; height: 5px; display: inline-block;"></span> {{ __('Diproses') }}
                         </span>
                     @else
                         <span class="badge bg-success text-white px-3 py-2 fw-bold d-inline-flex align-items-center gap-2 shadow-sm" style="border-radius: 10px;">
-                            <span class="bg-white rounded-circle" style="width: 5px; height: 5px; display: inline-block;"></span> Selesai
+                            <span class="bg-white rounded-circle" style="width: 5px; height: 5px; display: inline-block;"></span> {{ __('Selesai') }}
                         </span>
                     @endif
                 </div>
@@ -240,20 +240,20 @@
                 <div class="mb-2">
                     @if ($c->status === 'Selesai')
                         <span class="badge bg-success-subtle text-success border border-success-subtle py-1.5 px-2.5 w-100 text-start" style="font-size:0.75rem;">
-                            <i class="bi bi-clock-fill me-1"></i> SLA: Selesai Tepat Waktu
+                            <i class="bi bi-clock-fill me-1"></i> SLA: {{ __('Selesai Tepat Waktu') }}
                         </span>
                     @else
                         @if ($diffDays > 0)
                             <span class="badge bg-info-subtle text-info border border-info-subtle py-1.5 px-2.5 w-100 text-start" style="font-size:0.75rem;">
-                                <i class="bi bi-clock-fill me-1"></i> Target selesai: 2 Hari (Sisa {{ $diffDays }} Hari)
+                                <i class="bi bi-clock-fill me-1"></i> {{ __('Target selesai:') }} 2 {{ __('hari') }} ({{ __('Sisa') }} {{ $diffDays }} {{ __('hari') }})
                             </span>
                         @elseif ($diffDays === 0)
                             <span class="badge bg-warning-subtle text-warning border border-warning-subtle py-1.5 px-2.5 w-100 text-start" style="font-size:0.75rem;">
-                                <i class="bi bi-clock-fill me-1"></i> Target selesai hari ini!
+                                <i class="bi bi-clock-fill me-1"></i> {{ __('Target selesai hari ini!') }}
                             </span>
                         @else
                             <span class="badge bg-danger-subtle text-danger border border-danger-subtle py-1.5 px-2.5 w-100 text-start" style="font-size:0.75rem;">
-                                <i class="bi bi-clock-fill me-1"></i> Terlambat {{ abs($diffDays) }} Hari
+                                <i class="bi bi-clock-fill me-1"></i> {{ __('Terlambat') }} {{ abs($diffDays) }} {{ __('hari') }}
                             </span>
                         @endif
                     @endif
@@ -286,7 +286,7 @@
                 <!-- Progress Perbaikan -->
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-1">
-                        <span class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">Progres Perbaikan</span>
+                        <span class="text-muted text-uppercase fw-bold" style="font-size: 0.7rem; letter-spacing: 0.5px;">{{ __('Progres Perbaikan') }}</span>
                         <span class="fw-bold text-dark" style="font-size: 0.8rem;">{{ $c->progress_perbaikan }}%</span>
                     </div>
                     <div class="progress" style="height: 6px; border-radius: 3px; background-color: #e2e8f0;">
@@ -297,7 +297,7 @@
                 <!-- Catatan Penyelesaian (jika ada) -->
                 @if ($c->catatan_penyelesaian)
                 <div class="p-3 rounded-3 bg-success-subtle text-success border border-success-subtle mb-3" style="font-size: 0.82rem; line-height: 1.4;">
-                    <strong class="d-block mb-1"><i class="bi bi-patch-check-fill me-1"></i> Solusi Perbaikan:</strong>
+                    <strong class="d-block mb-1"><i class="bi bi-patch-check-fill me-1"></i> {{ __('Solusi Perbaikan') }}:</strong>
                     {{ $c->catatan_penyelesaian }}
                 </div>
                 @endif
@@ -316,39 +316,35 @@
                         data-diperbaiki-at="{{ $c->diperbaiki_at ? $c->diperbaiki_at->translatedFormat('d M Y, H:i') . ' WIB' : '' }}"
                         data-selesai-at="{{ $c->selesai_at ? $c->selesai_at->translatedFormat('d M Y, H:i') . ' WIB' : '' }}"
                         data-solusi="{{ $c->catatan_penyelesaian ?? '' }}">
-                    <i class="bi bi-clock-history"></i> Detail &amp; Timeline
+                    <i class="bi bi-clock-history"></i> {{ __('Detail & Timeline') }}
                 </button>
 
                 <!-- Action Form for Technician & Super Admin -->
                 @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'teknisi']))
                 <div class="teknisi-panel">
                     <h6 class="teknisi-panel-title">
-                        <i class="bi bi-tools text-primary"></i> Teknisi Control Panel
+                        <i class="bi bi-tools text-primary"></i> {{ __('Teknisi Control Panel') }}
                     </h6>
                     <form action="{{ route('complaints.updateStatus', $c) }}" method="POST" class="d-flex flex-column gap-2.5">
                         @csrf @method('PUT')
                         
                         <!-- Status Select & Update Button -->
-                        <div class="row g-2">
-                            <div class="col-8">
-                                <select name="status" class="form-select form-select-sm shadow-none border-slate-200" style="border-radius: 8px; font-size: 0.78rem; height: 34px;"
-                                        onchange="toggleComplaintFields(this, '{{ $c->id }}')">
-                                    <option value="Baru" @selected($c->status === 'Baru')>Baru</option>
-                                    <option value="Diproses" @selected($c->status === 'Diproses')>Diproses (Sedang Diperbaiki)</option>
-                                    <option value="Selesai" @selected($c->status === 'Selesai')>Selesai</option>
-                                </select>
-                            </div>
-                            <div class="col-4">
-                                <button class="btn btn-sm btn-primary w-100 d-inline-flex align-items-center justify-content-center gap-1 shadow-sm" style="border-radius: 8px; font-size: 0.78rem; height: 34px; font-weight: 600;">
-                                    <i class="bi bi-arrow-repeat"></i> Update
-                                </button>
-                            </div>
+                        <div class="d-flex gap-2">
+                            <select name="status" class="form-select form-select-sm shadow-none border-slate-200 flex-grow-1" style="border-radius: 8px; font-size: 0.78rem; height: 34px;"
+                                    onchange="toggleComplaintFields(this, '{{ $c->id }}')">
+                                <option value="Baru" @selected($c->status === 'Baru')>{{ __('Baru') }}</option>
+                                <option value="Diproses" @selected($c->status === 'Diproses')>{{ __('Diproses') }} ({{ __('Sedang Diperbaiki') }})</option>
+                                <option value="Selesai" @selected($c->status === 'Selesai')>{{ __('Selesai') }}</option>
+                            </select>
+                            <button class="btn btn-sm btn-primary d-inline-flex align-items-center justify-content-center gap-1 shadow-sm px-2.5" style="border-radius: 8px; font-size: 0.78rem; height: 34px; font-weight: 600; min-width: 76px;">
+                                <i class="bi bi-arrow-repeat"></i> {{ __('Update') }}
+                            </button>
                         </div>
 
                         <!-- Progress Slider -->
                         <div class="bg-white dark-adaptive-bg p-2.5 rounded-3 border border-slate-100 shadow-sm" id="progressContainer_{{ $c->id }}" style="display: {{ $c->status === 'Diproses' ? 'block' : 'none' }} !important;">
                             <label class="form-label text-secondary fw-semibold mb-1 d-flex justify-content-between" style="font-size: 0.72rem;">
-                                <span>Set Progres Perbaikan:</span>
+                                <span>Set {{ __('Progres Perbaikan') }}:</span>
                                 <span class="text-primary font-monospace fw-bold"><span id="progressVal_{{ $c->id }}">{{ $c->progress_perbaikan }}</span>%</span>
                             </label>
                             <input type="range" name="progress_perbaikan" class="form-range" min="0" max="100" step="5" value="{{ $c->progress_perbaikan }}" oninput="document.getElementById('progressVal_{{ $c->id }}').innerText = this.value">
@@ -356,22 +352,22 @@
 
                         <!-- Collapse Button for Timeline Dates -->
                         <button class="btn btn-sm btn-link text-decoration-none text-start p-0 fw-semibold text-secondary d-flex align-items-center gap-1" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDates_{{ $c->id }}" aria-expanded="false" style="font-size: 0.72rem; outline: none; box-shadow: none;">
-                            <i class="bi bi-calendar-date text-primary"></i> Atur Manual Tanggal &amp; Waktu
+                            <i class="bi bi-calendar-date text-primary"></i> {{ __('Atur Manual Tanggal & Waktu') }}
                         </button>
                         
                         <!-- Collapsible Date Inputs -->
                         <div class="collapse" id="collapseDates_{{ $c->id }}">
                             <div class="bg-white dark-adaptive-bg p-2.5 rounded-3 border border-slate-100 d-flex flex-column gap-2 shadow-sm" style="font-size: 0.75rem;">
                                 <div>
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.68rem; font-weight: 600;">1. Tanggal Diterima Admin/Teknisi</label>
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.68rem; font-weight: 600;">1. {{ __('Tanggal Diterima Admin/Teknisi') }}</label>
                                     <input type="datetime-local" name="diterima_at" class="form-control form-control-sm border-slate-200" value="{{ $c->diterima_at ? $c->diterima_at->format('Y-m-d\TH:i') : '' }}" style="font-size: 0.75rem; border-radius: 6px;">
                                 </div>
                                 <div>
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.68rem; font-weight: 600;">2. Tanggal Mulai Perbaikan</label>
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.68rem; font-weight: 600;">2. {{ __('Tanggal Mulai Perbaikan') }}</label>
                                     <input type="datetime-local" name="diperbaiki_at" class="form-control form-control-sm border-slate-200" value="{{ $c->diperbaiki_at ? $c->diperbaiki_at->format('Y-m-d\TH:i') : '' }}" style="font-size: 0.75rem; border-radius: 6px;">
                                 </div>
                                 <div id="dateSelesai_{{ $c->id }}" style="display: {{ $c->status === 'Selesai' ? 'block' : 'none' }} !important;">
-                                    <label class="form-label text-secondary mb-1" style="font-size: 0.68rem; font-weight: 600;">3. Tanggal Selesai Perbaikan</label>
+                                    <label class="form-label text-secondary mb-1" style="font-size: 0.68rem; font-weight: 600;">3. {{ __('Tanggal Selesai Perbaikan') }}</label>
                                     <input type="datetime-local" name="selesai_at" class="form-control form-control-sm border-slate-200" value="{{ $c->selesai_at ? $c->selesai_at->format('Y-m-d\TH:i') : '' }}" style="font-size: 0.75rem; border-radius: 6px;">
                                 </div>
                             </div>
@@ -379,19 +375,19 @@
 
                         <!-- Biaya Perbaikan Bengkel -->
                         <div id="biayaContainer_{{ $c->id }}" style="display: {{ $c->status === 'Selesai' ? 'block' : 'none' }} !important;">
-                            <label class="form-label text-secondary mb-1 fw-semibold" style="font-size: 0.72rem;">Biaya Bengkel (Rp):</label>
+                            <label class="form-label text-secondary mb-1 fw-semibold" style="font-size: 0.72rem;">{{ __('Biaya Bengkel (Rp):') }}</label>
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text border-slate-200 text-secondary bg-slate-50" style="border-top-left-radius: 8px; border-bottom-left-radius: 8px; font-size: 0.75rem; font-weight: 600;">Rp</span>
-                                <input type="number" name="jumlah_biaya" class="form-control form-control-sm border-slate-200 shadow-none" placeholder="Contoh: 150000" style="border-top-right-radius: 8px; border-bottom-right-radius: 8px; font-size: 0.78rem;">
+                                <input type="number" name="jumlah_biaya" class="form-control form-control-sm border-slate-200 shadow-none" placeholder="{{ __('Contoh: 150000') }}" style="border-top-right-radius: 8px; border-bottom-right-radius: 8px; font-size: 0.78rem;">
                             </div>
                         </div>
 
                         <!-- Catatan Solusi / Penyelesaian -->
                         <div>
-                            <label class="form-label text-secondary mb-1 fw-semibold" style="font-size: 0.72rem;">Catatan Solusi / Tindakan:</label>
+                            <label class="form-label text-secondary mb-1 fw-semibold" style="font-size: 0.72rem;">{{ __('Catatan Solusi / Tindakan:') }}</label>
                             <div class="input-group input-group-sm">
                                 <span class="input-group-text border-slate-200 text-secondary bg-slate-50" style="border-top-left-radius: 8px; border-bottom-left-radius: 8px;"><i class="bi bi-chat-left-dots"></i></span>
-                                <input type="text" name="catatan_penyelesaian" class="form-control form-control-sm border-slate-200 shadow-none" placeholder="Tulis tindakan perbaikan..." value="{{ $c->catatan_penyelesaian }}" style="border-top-right-radius: 8px; border-bottom-right-radius: 8px; font-size: 0.78rem;">
+                                <input type="text" name="catatan_penyelesaian" class="form-control form-control-sm border-slate-200 shadow-none" placeholder="{{ __('Tulis tindakan perbaikan...') }}" value="{{ $c->catatan_penyelesaian }}" style="border-top-right-radius: 8px; border-bottom-right-radius: 8px; font-size: 0.78rem;">
                             </div>
                         </div>
                     </form>
@@ -403,8 +399,8 @@
     @empty
     <div class="col-12 text-center py-5 text-muted">
         <i class="bi bi-shield-check text-success fs-1 d-block mb-2"></i>
-        <span class="fw-bold text-dark d-block">Tidak Ada Keluhan Kendaraan</span>
-        <small class="text-muted">Semua armada dalam kondisi normal dan baik-baik saja.</small>
+        <span class="fw-bold text-dark d-block">{{ __('Tidak Ada Keluhan Kendaraan') }}</span>
+        <small class="text-muted">{{ __('Semua armada dalam kondisi normal dan baik-baik saja.') }}</small>
     </div>
     @endforelse
 </div>
@@ -414,7 +410,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
             <div class="modal-header border-bottom py-3">
-                <h5 class="modal-title fw-bold text-dark mb-0"><i class="bi bi-clock-history text-primary me-2"></i> Lacak Status Keluhan</h5>
+                <h5 class="modal-title fw-bold text-dark mb-0"><i class="bi bi-clock-history text-primary me-2"></i> {{ __('Lacak Status Keluhan') }}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
@@ -429,93 +425,100 @@
 
                 <!-- Detail Deskripsi Keluhan -->
                 <div class="mb-4">
-                    <small class="text-muted text-uppercase fw-bold d-block mb-1" style="font-size: 0.72rem; letter-spacing: 0.5px;">Keluhan Pengemudi</small>
+                    <small class="text-muted text-uppercase fw-bold d-block mb-1" style="font-size: 0.72rem; letter-spacing: 0.5px;">{{ __('Keluhan Pengemudi') }}</small>
                     <p class="p-3 bg-light border-0 text-dark rounded-3 font-monospace mb-0" id="modalKeluhan" style="font-size: 0.85rem; line-height: 1.4;"></p>
                 </div>
-
+ 
                 <!-- Progress Perbaikan -->
                 <div class="mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-1">
-                        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">Progres Perbaikan</small>
+                        <small class="text-muted text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">{{ __('Progres Perbaikan') }}</small>
                         <span class="fw-bold text-dark" id="modalProgressVal" style="font-size: 0.85rem;">0%</span>
                     </div>
                     <div class="progress" style="height: 8px; border-radius: 4px; background-color: #e2e8f0;">
                         <div class="progress-bar bg-success" id="modalProgressBar" role="progressbar" style="width: 0%"></div>
                     </div>
                 </div>
-
+ 
                 <!-- Foto & Video Media -->
                 <div class="mb-4 d-none" id="modalMediaSection">
-                    <small class="text-muted text-uppercase fw-bold d-block mb-2" style="font-size: 0.72rem; letter-spacing: 0.5px;">Bukti Foto &amp; Video Kerusakan</small>
+                    <small class="text-muted text-uppercase fw-bold d-block mb-2" style="font-size: 0.72rem; letter-spacing: 0.5px;">{{ __('Bukti Foto & Video Kerusakan') }}</small>
                     <div class="row g-2">
                         <div class="col-6 d-none" id="modalFotoContainer">
                             <div class="border rounded-3 p-1 text-center bg-light">
                                 <a id="modalFotoLink" href="" target="_blank">
                                     <img id="modalFotoImg" src="" alt="Foto Kerusakan" class="img-fluid rounded-2 object-fit-cover" style="height: 110px; width: 100%;">
                                 </a>
-                                <small class="text-muted mt-1 d-block" style="font-size: 0.68rem;">Lihat Foto</small>
+                                <small class="text-muted mt-1 d-block" style="font-size: 0.68rem;">{{ __('Lihat Foto') }}</small>
                             </div>
                         </div>
                         <div class="col-6 d-none" id="modalVideoContainer">
                             <div class="border rounded-3 p-1 bg-light">
                                 <video id="modalVideoPlayer" controls class="w-100 rounded-2 object-fit-cover" style="height: 110px;"></video>
-                                <small class="text-muted mt-1 d-block text-center" style="font-size: 0.68rem;">Putar Video/Suara</small>
+                                <small class="text-muted mt-1 d-block text-center" style="font-size: 0.68rem;">{{ __('Putar Video/Suara') }}</small>
                             </div>
                         </div>
                     </div>
                 </div>
-
+ 
                 <!-- Timeline Perbaikan -->
-                <h6 class="fw-bold text-dark mb-3" style="font-size: 0.9rem;"><i class="bi bi-clock"></i> Riwayat Proses Perbaikan:</h6>
+                <h6 class="fw-bold text-dark mb-3" style="font-size: 0.9rem;"><i class="bi bi-clock"></i> {{ __('Riwayat Proses Perbaikan:') }}</h6>
                 <div class="timeline-container mb-4">
                     <!-- Driver Melapor -->
                     <div class="timeline-item">
                         <div class="timeline-badge completed"></div>
-                        <div class="timeline-title">Laporan Dibuat (Driver)</div>
+                        <div class="timeline-title">{{ __('Laporan Dibuat (Driver)') }}</div>
                         <div class="timeline-date" id="timeMelapor"></div>
                     </div>
                     <!-- Diterima Admin -->
                     <div class="timeline-item">
                         <div class="timeline-badge" id="badgeDiterima"></div>
-                        <div class="timeline-title">Diterima &amp; Diproses Admin</div>
+                        <div class="timeline-title">{{ __('Diterima & Diproses Admin') }}</div>
                         <div class="timeline-date" id="timeDiterima">—</div>
                     </div>
-                    <!-- Sedang Diperbaiki -->
+                    <!-- {{ __('Sedang Diperbaiki') }} -->
                     <div class="timeline-item">
                         <div class="timeline-badge" id="badgeDiperbaiki"></div>
-                        <div class="timeline-title">Mulai Proses Perbaikan Teknisi</div>
+                        <div class="timeline-title">{{ __('Mulai Proses Perbaikan Teknisi') }}</div>
                         <div class="timeline-date" id="timeDiperbaiki">—</div>
                     </div>
                     <!-- Selesai -->
                     <div class="timeline-item">
                         <div class="timeline-badge" id="badgeSelesai"></div>
-                        <div class="timeline-title">Selesai Diperbaiki &amp; Aman</div>
+                        <div class="timeline-title">{{ __('Selesai Diperbaiki & Aman') }}</div>
                         <div class="timeline-date" id="timeSelesai">—</div>
                     </div>
                 </div>
-
+ 
                 <!-- Catatan Solusi -->
                 <div class="p-3 bg-success-subtle text-success border border-success-subtle rounded-4 d-none" id="modalSolusiContainer">
-                    <small class="fw-bold d-block mb-1 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;"><i class="bi bi-patch-check-fill me-1"></i> Solusi Perbaikan</small>
+                    <small class="fw-bold d-block mb-1 text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;"><i class="bi bi-patch-check-fill me-1"></i> {{ __('Solusi Perbaikan') }}</small>
                     <p class="mb-0 font-monospace" id="modalSolusiText" style="font-size: 0.85rem;"></p>
                 </div>
             </div>
             <div class="modal-footer border-top p-2 bg-light">
-                <button type="button" class="btn btn-secondary w-100 fw-bold py-2" data-bs-dismiss="modal" style="border-radius: 10px;">Tutup</button>
+                <button type="button" class="btn btn-secondary w-100 fw-bold py-2" data-bs-dismiss="modal" style="border-radius: 10px;">{{ __('Tutup') }}</button>
             </div>
         </div>
     </div>
 </div>
-
+ 
 <!-- Floating Action Button (FAB) to Report Complaint -->
 <div class="fab-container">
-    <a href="{{ route('complaints.create') }}" class="fab-btn" title="Lapor Keluhan Baru">
+    <a href="{{ route('complaints.create') }}" class="fab-btn" title="{{ __('Lapor Keluhan Baru') }}">
         <i class="bi bi-megaphone-fill" style="font-size: 1.25rem;"></i>
     </a>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script>
+    const translations = {
+        baru: "{{ __('Baru') }}",
+        diproses: "{{ __('Diproses') }}",
+        selesai: "{{ __('Selesai') }}",
+        menungguPersetujuan: "{{ __('Menunggu persetujuan admin...') }}"
+    };
+
     function toggleComplaintFields(select, complaintId) {
         var val = select.value;
         var prog = document.getElementById('progressContainer_' + complaintId);
@@ -610,11 +613,11 @@
             // Status Badge
             var badgeHtml = '';
             if (status === 'Baru') {
-                badgeHtml = '<span class="badge bg-danger text-white px-3 py-2 fw-bold" style="border-radius:10px;">Baru</span>';
+                badgeHtml = '<span class="badge bg-danger text-white px-3 py-2 fw-bold" style="border-radius:10px;">' + translations.baru + '</span>';
             } else if (status === 'Diproses') {
-                badgeHtml = '<span class="badge bg-warning text-dark px-3 py-2 fw-bold" style="border-radius:10px;">Diproses</span>';
+                badgeHtml = '<span class="badge bg-warning text-dark px-3 py-2 fw-bold" style="border-radius:10px;">' + translations.diproses + '</span>';
             } else {
-                badgeHtml = '<span class="badge bg-success text-white px-3 py-2 fw-bold" style="border-radius:10px;">Selesai</span>';
+                badgeHtml = '<span class="badge bg-success text-white px-3 py-2 fw-bold" style="border-radius:10px;">' + translations.selesai + '</span>';
             }
             $('#modalStatusBadge').html(badgeHtml);
 
@@ -651,7 +654,7 @@
                 $('#timeDiterima').text(diterimaAt);
                 $('#badgeDiterima').addClass('completed');
             } else {
-                $('#timeDiterima').text('Menunggu persetujuan admin...');
+                $('#timeDiterima').text(translations.menungguPersetujuan);
             }
 
             if (diperbaikiAt) {

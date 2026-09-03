@@ -9,24 +9,32 @@
     .table-hover tbody tr:hover { background-color: #f9fafb; }
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
     <div>
-        <h3 class="fw-bold text-dark mb-1">Rekap Biaya Operasional</h3>
-        <p class="text-muted mb-0" style="font-size: 0.95rem;">Catat dan kelola pengeluaran harian operasional kendaraan.</p>
+        <h3 class="fw-bold text-dark mb-1">{{ __('Rekap Biaya Operasional') }}</h3>
+        <p class="text-muted mb-0" style="font-size: 0.92rem;">{{ __('Catat dan kelola pengeluaran harian operasional kendaraan.') }}</p>
     </div>
-    <div class="d-flex gap-2">
-        <button id="exportCsvBtn" class="btn btn-outline-success px-4 py-2 d-flex align-items-center gap-2" title="Ekspor Data Tampil ke CSV">
-            <i class="bi bi-file-earmark-excel-fill"></i>
-            <span>Ekspor CSV</span>
-        </button>
-        <button id="printReportBtn" class="btn btn-outline-primary px-4 py-2 d-flex align-items-center gap-2" title="Cetak Laporan / Simpan PDF">
-            <i class="bi bi-printer-fill"></i>
-            <span>Cetak Laporan</span>
-        </button>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <!-- Tools Action Group -->
+        <div class="btn-group shadow-xs" role="group" style="border-radius: 10px; overflow: hidden;">
+            <button type="button" class="btn btn-sm btn-outline-warning text-dark px-3 py-2 d-inline-flex align-items-center gap-1.5" data-bs-toggle="modal" data-bs-target="#fuelExpenseCalcModal" title="{{ __('Hitung Efisiensi Konsumsi BBM') }}" style="font-size: 0.82rem; font-weight: 600;">
+                <i class="bi bi-fuel-pump-fill text-warning"></i>
+                <span>{{ __('Kalkulator BBM') }}</span>
+            </button>
+            <button id="exportCsvBtn" class="btn btn-sm btn-outline-success px-3 py-2 d-inline-flex align-items-center gap-1.5" title="{{ __('Ekspor Data Tampil ke CSV') }}" style="font-size: 0.82rem; font-weight: 600;">
+                <i class="bi bi-file-earmark-excel-fill"></i>
+                <span>{{ __('Ekspor CSV') }}</span>
+            </button>
+            <button id="printReportBtn" class="btn btn-sm btn-outline-primary px-3 py-2 d-inline-flex align-items-center gap-1.5" title="{{ __('Cetak Laporan / Simpan PDF') }}" style="font-size: 0.82rem; font-weight: 600;">
+                <i class="bi bi-printer-fill"></i>
+                <span>{{ __('Cetak Laporan') }}</span>
+            </button>
+        </div>
+
         @if (in_array(auth()->user()->role, ['admin', 'teknisi']))
-            <a href="{{ route('expenses.create') }}" class="btn btn-primary px-4 py-2 d-flex align-items-center gap-2">
-                <i class="bi bi-plus-circle"></i>
-                <span>Catat Pengeluaran</span>
+            <a href="{{ route('expenses.create') }}" class="btn btn-sm btn-primary px-3.5 py-2 d-inline-flex align-items-center gap-1.5 shadow-xs" style="border-radius: 10px; font-size: 0.82rem; font-weight: 700; height: 36px;">
+                <i class="bi bi-plus-circle-fill"></i>
+                <span>{{ __('Catat Pengeluaran') }}</span>
             </a>
         @endif
     </div>
@@ -41,7 +49,7 @@
                     <i class="bi bi-wallet2 fs-3"></i>
                 </div>
                 <div>
-                    <span class="text-muted fw-semibold text-uppercase d-block mb-1" style="font-size: 0.72rem; letter-spacing: 0.5px;">Total Biaya Disetujui (Bulan Ini)</span>
+                    <span class="text-muted fw-semibold text-uppercase d-block mb-1" style="font-size: 0.72rem; letter-spacing: 0.5px;">{{ __('Total Biaya Disetujui (Bulan Ini)') }}</span>
                     <h3 class="fw-bold text-dark mb-0">Rp {{ number_format($expenses->where('status_approval', 'Disetujui')->where('tanggal', '>=', now()->startOfMonth())->where('tanggal', '<=', now()->endOfMonth())->sum('jumlah_biaya'), 0, ',', '.') }}</h3>
                 </div>
             </div>
@@ -54,8 +62,8 @@
                     <i class="bi bi-hourglass-split fs-3"></i>
                 </div>
                 <div>
-                    <span class="text-muted fw-semibold text-uppercase d-block mb-1" style="font-size: 0.72rem; letter-spacing: 0.5px;">Menunggu Persetujuan Manager</span>
-                    <h3 class="fw-bold text-dark mb-0">{{ $expenses->where('status_approval', 'Menunggu Persetujuan')->count() }} <small class="text-muted fs-6 font-normal">Pengajuan</small></h3>
+                    <span class="text-muted fw-semibold text-uppercase d-block mb-1" style="font-size: 0.72rem; letter-spacing: 0.5px;">{{ __('Menunggu persetujuan Manager') }}</span>
+                    <h3 class="fw-bold text-dark mb-0">{{ $expenses->where('status_approval', 'Menunggu Persetujuan')->count() }} <small class="text-muted fs-6 font-normal">{{ __('Pengajuan') }}</small></h3>
                 </div>
             </div>
         </div>
@@ -64,28 +72,28 @@
 
 <div class="card mb-4 border-0 shadow-xs" style="border-radius: 16px;">
     <div class="card-body p-4">
-        <h6 class="fw-bold text-dark mb-3"><i class="bi bi-funnel-fill text-primary me-1"></i> Penyaringan Laporan Pengeluaran</h6>
+        <h6 class="fw-bold text-dark mb-3"><i class="bi bi-funnel-fill text-primary me-1"></i> {{ __('Penyaringan Laporan Pengeluaran') }}</h6>
         <form action="{{ route('expenses.index') }}" method="GET" class="row g-3">
             <div class="col-md-4 col-sm-12">
-                <label class="form-label text-muted fw-semibold mb-1" style="font-size: 0.78rem;">Cari Plat Nomor</label>
+                <label class="form-label text-muted fw-semibold mb-1" style="font-size: 0.78rem;">{{ __('Cari Plat Nomor') }}</label>
                 <div class="input-group shadow-xs" style="border-radius: 8px; overflow: hidden;">
                     <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
                     <input type="text" name="q" class="form-control border-start-0" placeholder="Contoh: B 1234 KTR" value="{{ request('q') }}" style="font-size: 0.88rem;">
                 </div>
             </div>
             <div class="col-md-4 col-sm-6">
-                <label class="form-label text-muted fw-semibold mb-1" style="font-size: 0.78rem;">Kategori Biaya</label>
+                <label class="form-label text-muted fw-semibold mb-1" style="font-size: 0.78rem;">{{ __('Kategori Biaya') }}</label>
                 <select name="jenis" class="form-select shadow-xs" style="border-radius: 8px; font-size: 0.88rem;">
-                    <option value="">Semua Kategori</option>
+                    <option value="">{{ __('Semua Kategori') }}</option>
                     @foreach (['BBM', 'Tol', 'Bengkel', 'Parkir', 'Pajak', 'Lainnya'] as $j)
-                        <option value="{{ $j }}" @selected(request('jenis') === $j)>{{ $j }}</option>
+                        <option value="{{ $j }}" @selected(request('jenis') === $j)>{{ __($j) }}</option>
                     @endforeach
                 </select>
             </div>
             <div class="col-md-4 col-sm-6">
-                <label class="form-label text-muted fw-semibold mb-1" style="font-size: 0.78rem;">Filter Bulan</label>
+                <label class="form-label text-muted fw-semibold mb-1" style="font-size: 0.78rem;">{{ __('Filter Bulan') }}</label>
                 <select name="bulan" class="form-select shadow-xs" style="border-radius: 8px; font-size: 0.88rem;">
-                    <option value="">Semua Bulan</option>
+                    <option value="">{{ __('Semua Bulan') }}</option>
                     @foreach (range(1, 12) as $m)
                         <option value="{{ $m }}" @selected((string) request('bulan') === (string) $m)>
                             {{ \Carbon\Carbon::create(null, $m, 1)->translatedFormat('F') }}
@@ -94,16 +102,16 @@
                 </select>
             </div>
             <div class="col-md-4 col-sm-6">
-                <label class="form-label text-muted fw-semibold mb-1" style="font-size: 0.78rem;">Tanggal Mulai</label>
+                <label class="form-label text-muted fw-semibold mb-1" style="font-size: 0.78rem;">{{ __('Tanggal Mulai') }}</label>
                 <input type="date" name="tanggal_mulai" class="form-control shadow-xs" value="{{ request('tanggal_mulai') }}" style="border-radius: 8px; font-size: 0.88rem;">
             </div>
             <div class="col-md-4 col-sm-6">
-                <label class="form-label text-muted fw-semibold mb-1" style="font-size: 0.78rem;">Tanggal Selesai</label>
+                <label class="form-label text-muted fw-semibold mb-1" style="font-size: 0.78rem;">{{ __('Tanggal Selesai') }}</label>
                 <input type="date" name="tanggal_selesai" class="form-control shadow-xs" value="{{ request('tanggal_selesai') }}" style="border-radius: 8px; font-size: 0.88rem;">
             </div>
             <div class="col-md-4 col-sm-12 d-flex align-items-end gap-2">
                 <button type="submit" class="btn btn-primary w-100 py-2 d-flex align-items-center justify-content-center gap-1.5 shadow-xs" style="border-radius: 8px; font-weight: 600; font-size: 0.88rem;">
-                    <i class="bi bi-funnel"></i> Terapkan Filter
+                    <i class="bi bi-funnel"></i> {{ __('Terapkan Filter') }}
                 </button>
                 @if (request('q') || request('jenis') || request('bulan') || request('tanggal_mulai') || request('tanggal_selesai'))
                 <a href="{{ route('expenses.index') }}" class="btn btn-outline-secondary py-2 px-3 shadow-xs" style="border-radius: 8px;" title="Reset Semua Filter">
@@ -122,8 +130,8 @@
                 <i class="bi bi-pie-chart-fill fs-5"></i>
             </div>
             <div>
-                <h6 class="fw-bold mb-0 text-dark">Ringkasan Biaya per Kendaraan (Bulan Ini)</h6>
-                <small class="text-muted" style="font-size: 0.78rem;">Analisis akumulasi biaya operasional &amp; pemeliharaan per armada</small>
+                <h6 class="fw-bold mb-0 text-dark">{{ __('Ringkasan Biaya per Kendaraan (Bulan Ini)') }}</h6>
+                <small class="text-muted" style="font-size: 0.78rem;">{{ __('Analisis akumulasi biaya operasional & pemeliharaan per armada') }}</small>
             </div>
         </div>
         @if($rekapPerKendaraan->count() > 0)
@@ -159,13 +167,13 @@
         @empty
             <div class="text-center py-3 text-muted">
                 <i class="bi bi-pie-chart fs-2 d-block mb-1 text-secondary opacity-50"></i>
-                <span style="font-size: 0.85rem;">Tidak ada akumulasi biaya bulan ini.</span>
+                <span style="font-size: 0.85rem;">{{ __('Tidak ada akumulasi biaya bulan ini.') }}</span>
             </div>
         @endforelse
 
         <div class="mt-3 pt-2 border-top d-flex align-items-center gap-2 text-muted" style="font-size: 0.8rem;">
             <i class="bi bi-info-circle text-danger"></i>
-            <span>Grafik di atas memprioritaskan kendaraan dengan total biaya pengeluaran tertinggi bulan ini untuk kemudahan evaluasi unit boros/masuk bengkel.</span>
+            <span>{{ __('Grafik di atas memprioritaskan kendaraan dengan total biaya pengeluaran tertinggi bulan ini untuk kemudahan evaluasi unit boros/masuk bengkel.') }}</span>
         </div>
     </div>
 </div>
@@ -174,14 +182,14 @@
     <div class="d-flex align-items-center gap-3">
         <div class="d-flex align-items-center gap-2">
             <i class="bi bi-grid-fill text-danger fs-5"></i>
-            <span class="fw-bold text-dark fs-5">Rincian Pengeluaran Operasional</span>
+            <span class="fw-bold text-dark fs-5">{{ __('Rincian Pengeluaran Operasional') }}</span>
         </div>
         <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill fw-semibold" id="totalBiayaTampilBadge" style="font-size: 0.82rem;">
-            Total Terfilter: Rp 0
+            {{ __('Total Terfilter:') }} Rp 0
         </span>
     </div>
     <div class="d-flex align-items-center gap-2">
-        <input type="text" id="expenseSearch" class="form-control form-control-sm" placeholder="🔍 Cari pengeluaran..." style="width: 250px; border-radius: 8px; font-size: 0.85rem; box-shadow: none;">
+        <input type="text" id="expenseSearch" class="form-control form-control-sm" placeholder="🔍 {{ __('Cari pengeluaran...') }}" style="width: 250px; border-radius: 8px; font-size: 0.85rem; box-shadow: none;">
     </div>
 </div>
 
@@ -205,11 +213,11 @@
                 <!-- Status Badge -->
                 <div>
                     @if ($e->status_approval === 'Disetujui')
-                        <span class="badge bg-success text-white px-3 py-2 fw-bold shadow-sm" style="border-radius: 10px;">Disetujui</span>
+                        <span class="badge bg-success text-white px-3 py-2 fw-bold shadow-sm" style="border-radius: 10px;">{{ __('Disetujui') }}</span>
                     @elseif ($e->status_approval === 'Menunggu Persetujuan')
-                        <span class="badge bg-warning text-dark px-3 py-2 fw-bold shadow-sm" style="border-radius: 10px;">Menunggu</span>
+                        <span class="badge bg-warning text-dark px-3 py-2 fw-bold shadow-sm" style="border-radius: 10px;">{{ __('Menunggu') }}</span>
                     @else
-                        <span class="badge bg-danger text-white px-3 py-2 fw-bold shadow-sm" style="border-radius: 10px;">Ditolak</span>
+                        <span class="badge bg-danger text-white px-3 py-2 fw-bold shadow-sm" style="border-radius: 10px;">{{ __('Ditolak') }}</span>
                     @endif
                 </div>
             </div>
@@ -229,7 +237,7 @@
                 @endif
 
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-uppercase text-danger fw-bold font-monospace" style="font-size: 0.72rem; letter-spacing: 0.8px;">{{ $e->jenis_pengeluaran }}</span>
+                    <span class="text-uppercase text-danger fw-bold font-monospace" style="font-size: 0.72rem; letter-spacing: 0.8px;">{{ __($e->jenis_pengeluaran) }}</span>
                     <span class="text-muted font-monospace" style="font-size: 0.8rem;"><i class="bi bi-calendar3"></i> {{ $e->tanggal->format('d M Y') }}</span>
                 </div>
 
@@ -243,18 +251,18 @@
                     <div class="d-flex gap-2">
                         <form action="{{ route('expenses.approve', $e) }}" method="POST" class="w-100">
                             @csrf @method('PUT')
-                            <button type="submit" name="status_approval" value="Disetujui" class="btn btn-sm btn-success w-100" style="border-radius: 8px;">Setujui</button>
+                            <button type="submit" name="status_approval" value="Disetujui" class="btn btn-sm btn-success w-100" style="border-radius: 8px;">{{ __('Setujui') }}</button>
                         </form>
                         <form action="{{ route('expenses.approve', $e) }}" method="POST" class="w-100">
                             @csrf @method('PUT')
-                            <button type="submit" name="status_approval" value="Ditolak" class="btn btn-sm btn-danger w-100" style="border-radius: 8px;">Tolak</button>
+                            <button type="submit" name="status_approval" value="Ditolak" class="btn btn-sm btn-danger w-100" style="border-radius: 8px;">{{ __('Tolak') }}</button>
                         </form>
                     </div>
                     @endif
                     @if (in_array(auth()->user()->role, ['superadmin', 'admin']))
-                    <form action="{{ route('expenses.destroy', $e) }}" method="POST" class="w-100 form-confirm-delete" data-text="Data pengeluaran ini akan dihapus secara permanen dari sistem!">
+                    <form action="{{ route('expenses.destroy', $e) }}" method="POST" class="w-100 form-confirm-delete" data-text="{{ __('Data pengeluaran ini akan dihapus secara permanen dari sistem!') }}">
                         @csrf @method('DELETE')
-                        <button class="btn btn-sm btn-outline-danger w-100" style="border-radius: 8px;">Hapus Catatan</button>
+                        <button class="btn btn-sm btn-outline-danger w-100" style="border-radius: 8px;">{{ __('Hapus Catatan') }}</button>
                     </form>
                     @endif
                 </div>
@@ -679,5 +687,111 @@
             printWindow.document.close();
         });
     });
+</script>
+
+<!-- Modal Kalkulator Efisiensi BBM di Menu Biaya -->
+<div class="modal fade" id="fuelExpenseCalcModal" tabindex="-1" aria-labelledby="fuelExpenseCalcModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header bg-warning text-dark py-3" style="border-top-left-radius: 16px; border-top-right-radius: 16px;">
+                <h6 class="modal-title fw-bold mb-0" id="fuelExpenseCalcModalLabel">
+                    <i class="bi bi-fuel-pump-fill me-1"></i> {{ __('Kalkulator Efisiensi BBM (KM/Liter)') }}
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="alert alert-warning py-2 px-3 d-flex align-items-center gap-2 mb-3 text-dark" style="border-radius: 10px; font-size: 0.82rem;">
+                    <i class="bi bi-calculator-fill fs-5"></i>
+                    <div>{{ __('Hitung konsumsi rata-rata bahan bakar dan perkiraan biaya per kilometer.') }}</div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="form-label fw-semibold text-muted text-uppercase" style="font-size: 0.72rem;">{{ __('Odometer Awal (KM)') }}</label>
+                        <input type="number" id="calcExpOdoPrev" class="form-control" placeholder="Contoh: 15000" value="15000">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-semibold text-muted text-uppercase" style="font-size: 0.72rem;">{{ __('Odometer Akhir (KM)') }}</label>
+                        <input type="number" id="calcExpOdoCurr" class="form-control" placeholder="Contoh: 15450" value="15450">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-semibold text-muted text-uppercase" style="font-size: 0.72rem;">{{ __('BBM Terisi (Liter)') }}</label>
+                        <input type="number" step="0.1" id="calcExpLiters" class="form-control" placeholder="Contoh: 35" value="35">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-semibold text-muted text-uppercase" style="font-size: 0.72rem;">{{ __('Nominal Biaya (Rp)') }}</label>
+                        <input type="number" id="calcExpCost" class="form-control" placeholder="Contoh: 350000" value="350000">
+                    </div>
+                </div>
+
+                <div class="p-3 bg-light rounded-4 border text-center">
+                    <span class="text-muted d-block mb-1 text-uppercase fw-semibold" style="font-size: 0.72rem; letter-spacing: 0.5px;">{{ __('Hasil Analisis Konsumsi') }}</span>
+                    <div class="d-flex justify-content-around align-items-center my-3">
+                        <div>
+                            <small class="text-muted d-block" style="font-size: 0.75rem;">{{ __('Jarak Tempuh') }}</small>
+                            <h5 class="fw-bold text-dark mb-0 font-monospace" id="calcExpResDist">450 km</h5>
+                        </div>
+                        <div class="border-start border-end px-3">
+                            <small class="text-muted d-block" style="font-size: 0.75rem;">{{ __('Konsumsi Rata-rata') }}</small>
+                            <h4 class="fw-bold text-primary mb-0 font-monospace" id="calcExpResKmL">12.9 km/L</h4>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block" style="font-size: 0.75rem;">{{ __('Biaya / KM') }}</small>
+                            <h5 class="fw-bold text-dark mb-0 font-monospace" id="calcExpResCostKm">Rp 778 /km</h5>
+                        </div>
+                    </div>
+                    <div id="calcExpBadgeStatus" class="mt-2">
+                        <span class="badge bg-success px-3 py-1.5 fw-bold"><i class="bi bi-patch-check-fill me-1"></i> Efisiensi Sangat Baik (Sangat Irit)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light py-2 border-top">
+                <button type="button" class="btn btn-secondary w-100 fw-bold" data-bs-dismiss="modal" style="border-radius: 8px;">{{ __('Tutup') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function calculateExpFuel() {
+        const odoPrev = parseFloat(document.getElementById('calcExpOdoPrev')?.value) || 0;
+        const odoCurr = parseFloat(document.getElementById('calcExpOdoCurr')?.value) || 0;
+        const liters = parseFloat(document.getElementById('calcExpLiters')?.value) || 0;
+        const cost = parseFloat(document.getElementById('calcExpCost')?.value) || 0;
+
+        const distance = Math.max(0, odoCurr - odoPrev);
+        const kmL = liters > 0 ? (distance / liters) : 0;
+        const costPerKm = distance > 0 ? (cost / distance) : 0;
+
+        const distEl = document.getElementById('calcExpResDist');
+        const kmlEl = document.getElementById('calcExpResKmL');
+        const costEl = document.getElementById('calcExpResCostKm');
+        const badgeContainer = document.getElementById('calcExpBadgeStatus');
+
+        if (distEl) distEl.innerText = distance.toLocaleString('id-ID') + ' km';
+        if (kmlEl) kmlEl.innerText = kmL.toFixed(1) + ' km/L';
+        if (costEl) costEl.innerText = 'Rp ' + Math.round(costPerKm).toLocaleString('id-ID') + ' /km';
+
+        if (badgeContainer) {
+            if (kmL >= 12) {
+                badgeContainer.innerHTML = '<span class="badge bg-success px-3 py-1.5 fw-bold"><i class="bi bi-patch-check-fill me-1"></i> Efisiensi Sangat Baik (Sangat Irit)</span>';
+            } else if (kmL >= 8) {
+                badgeContainer.innerHTML = '<span class="badge bg-warning text-dark px-3 py-1.5 fw-bold"><i class="bi bi-check-circle me-1"></i> Efisiensi Standar / Normal</span>';
+            } else {
+                badgeContainer.innerHTML = '<span class="badge bg-danger px-3 py-1.5 fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i> Konsumsi Boros (Perlu Tune-up)</span>';
+            }
+        }
+    }
+
+    ['calcExpOdoPrev', 'calcExpOdoCurr', 'calcExpLiters', 'calcExpCost'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', calculateExpFuel);
+        }
+    });
+
+    calculateExpFuel();
+});
 </script>
 @endsection

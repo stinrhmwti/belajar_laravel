@@ -4,6 +4,7 @@ use App\Http\Controllers\ComplaintController;
 use App\Http\Controllers\DailyChecklistController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
 use Illuminate\Support\Facades\Route;
@@ -13,12 +14,26 @@ Route::get('/', function () {
     return redirect()->route('dashboard');
 });
 
+// ============ SET LOCALE (PENGATURAN BAHASA) ============
+Route::get('/set-locale/{locale}', function ($locale) {
+    if (in_array($locale, ['en', 'id'])) {
+        session(['locale' => $locale]);
+    }
+    return redirect()->back();
+})->name('set-locale');
+
 // ============================================================
 // SEMUA ROUTE DI BAWAH INI WAJIB LOGIN
 // ============================================================
 Route::middleware(['auth'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // ============ PELACAKAN KENDARAAN (LIVE GPS TRACKING) ============
+    Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking.index');
+    Route::get('/tracking/api/vehicles', [TrackingController::class, 'apiVehicles'])->name('tracking.api');
+    Route::post('/tracking/{vehicle}/location', [TrackingController::class, 'updateLocation'])->name('tracking.updateLocation');
+    Route::put('/vehicles/{vehicle}/location', [TrackingController::class, 'updateLocation'])->name('vehicles.updateLocation');
 
     // ============ VEHICLES ============
     Route::get('/vehicles', [VehicleController::class, 'index'])->name('vehicles.index');
@@ -40,14 +55,17 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // ============ DAILY CHECKLIST ============
-    Route::middleware(['role:superadmin,admin,teknisi'])->group(function () {
+    Route::middleware(['role:superadmin,admin,teknisi,user'])->group(function () {
         Route::get('/checklist', [DailyChecklistController::class, 'index'])->name('checklist.index');
         Route::get('/checklist/{checklist}', [DailyChecklistController::class, 'show'])->name('checklist.show');
         Route::get('/checklist-create', [DailyChecklistController::class, 'create'])->name('checklist.create');
         Route::post('/checklist', [DailyChecklistController::class, 'store'])->name('checklist.store');
-        // Rute untuk menghapus checklist harian ditambahkan di sini
-        Route::delete('/checklist/{checklist}', [DailyChecklistController::class, 'destroy'])->name('checklist.destroy');
         Route::put('/checklist/{checklist}/odometer', [DailyChecklistController::class, 'updateOdometer'])->name('checklist.updateOdometer');
+    });
+
+    // Rute untuk menghapus checklist harian hanya untuk superadmin, admin, dan teknisi
+    Route::middleware(['role:superadmin,admin,teknisi'])->group(function () {
+        Route::delete('/checklist/{checklist}', [DailyChecklistController::class, 'destroy'])->name('checklist.destroy');
     });
 
     // ============ EXPENSES (REKAP BIAYA) ============

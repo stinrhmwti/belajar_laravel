@@ -10,7 +10,7 @@
     $lanBaseUrl = "http://" . $localIp . ($port && $port != '80' ? ":" . $port : "");
 @endphp
 <!DOCTYPE html>
-<html lang="id">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -47,7 +47,7 @@
         /* -- SIDEBAR -- */
         #sidebar {
             width: var(--sidebar-width);
-            background: linear-gradient(165deg, var(--sb-from) 0%, var(--sb-mid) 52%, var(--sb-to) 100%);
+            background: #090d16 !important;
             height: 100vh;
             position: fixed;
             top: 0; left: 0;
@@ -55,23 +55,39 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 4px 0 25px rgba(0, 0, 0, 0.35);
+            border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+            box-shadow: 4px 0 30px rgba(0, 0, 0, 0.45) !important;
         }
         #sidebar::before {
-            display: none;
+            display: block !important;
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 180px; height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: 1;
         }
         #sidebar::after {
-            display: none;
+            display: block !important;
+            content: '';
+            position: absolute;
+            bottom: -50px; left: -50px;
+            width: 200px; height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, transparent 75%);
+            pointer-events: none;
+            z-index: 1;
         }
 
         /* Brand */
         .sidebar-brand {
-            padding: 24px 22px;
+            padding: 24px 20px !important;
             display: flex;
             align-items: center;
             gap: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
             position: relative;
             z-index: 2;
             text-decoration: none;
@@ -79,22 +95,23 @@
         }
         .sidebar-brand:hover { text-decoration: none; }
         .brand-logo {
-            width: 42px; height: 42px;
-            border-radius: 12px;
-            background: #ffffff;
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.03) !important;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.2rem;
-            color: #0891b2;
+            color: #22d3ee;
             flex-shrink: 0;
-            box-shadow: none;
-            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
         }
         .sidebar-brand:hover .brand-logo {
-            transform: scale(1.08) rotate(-6deg);
-            box-shadow: none;
+            transform: scale(1.05) rotate(-4deg);
+            border-color: rgba(99, 102, 241, 0.4) !important;
+            background: rgba(99, 102, 241, 0.05) !important;
         }
         .brand-name {
             font-size: 1.15rem;
@@ -102,27 +119,28 @@
             letter-spacing: -0.5px;
             line-height: 1.1;
             margin-bottom: 2px;
-            background: linear-gradient(90deg, #ffffff 0%, #22d3ee 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            background: linear-gradient(90deg, #ffffff 30%, #818cf8 100%) !important;
+            -webkit-background-clip: text !important;
+            -webkit-text-fill-color: transparent !important;
+            background-clip: text !important;
         }
         .brand-sub {
-            font-size: 0.64rem;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.45);
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5) !important;
             letter-spacing: 0.8px;
             text-transform: uppercase;
         }
 
         /* Nav */
         .nav-section-label {
-            padding: 16px 22px 6px;
-            font-size: 0.62rem;
+            padding: 24px 22px 8px !important;
+            font-size: 0.72rem;
             font-weight: 800;
-            color: rgba(255, 255, 255, 0.35);
+            color: rgba(255, 255, 255, 0.55) !important;
             text-transform: uppercase;
-            letter-spacing: 1.2px;
+            letter-spacing: 1.5px;
+            background: transparent !important; /* overrides any highlights */
         }
         .sidebar-nav {
             padding: 10px 14px;
@@ -133,7 +151,7 @@
             overflow-y: auto;
             flex-wrap: nowrap !important;
             scrollbar-width: thin;
-            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+            scrollbar-color: rgba(255, 255, 255, 0.05) transparent;
         }
         .sidebar-nav::-webkit-scrollbar {
             width: 4px;
@@ -142,77 +160,77 @@
             background: transparent;
         }
         .sidebar-nav::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
             transition: background 0.3s;
         }
         .sidebar-nav::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.15);
         }
         .sidebar-nav .nav-item { margin-bottom: 4px; }
         .sidebar-nav .nav-link {
-            color: rgba(255, 255, 255, 0.75);
+            color: rgba(255, 255, 255, 0.88) !important;
             padding: 10px 14px;
-            border-radius: 12px;
-            font-weight: 500;
+            border-radius: 10px;
+            font-weight: 600;
             font-size: 0.88rem;
             display: flex;
             align-items: center;
             gap: 12px;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             text-decoration: none;
             border: 1px solid transparent;
+            margin: 2px 0;
         }
         .sidebar-nav .nav-link .nav-icon {
-            width: 32px; height: 32px;
-            border-radius: 9px;
+            width: 30px; height: 30px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.95rem;
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.04) !important;
+            color: rgba(255, 255, 255, 0.6) !important;
+            border: 1px solid rgba(255, 255, 255, 0.03) !important;
             flex-shrink: 0;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            border: 1px solid rgba(255, 255, 255, 0.03);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .sidebar-nav .nav-link:hover {
-            color: #fff;
-            background: rgba(255, 255, 255, 0.06);
+            color: #fff !important;
+            background: rgba(255, 255, 255, 0.04) !important;
             transform: translateX(4px);
-            border-color: rgba(255, 255, 255, 0.04);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-color: rgba(255, 255, 255, 0.03) !important;
         }
         .sidebar-nav .nav-link:hover .nav-icon {
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            border-color: rgba(255, 255, 255, 0.3);
-            transform: scale(1.05) rotate(5deg);
+            background: rgba(99, 102, 241, 0.15) !important;
+            color: #818cf8 !important;
+            border-color: rgba(99, 102, 241, 0.25) !important;
+            transform: scale(1.05) rotate(4deg);
         }
 
         .sidebar-nav .nav-link.active {
-            background: #ffffff;
-            color: #0f172a;
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.12) 0%, rgba(99, 102, 241, 0.01) 100%) !important;
+            color: #ffffff !important;
             font-weight: 700;
-            border: 1px solid #ffffff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.15) !important;
+            box-shadow: none !important;
         }
         .sidebar-nav .nav-link.active .nav-icon {
-            background: #0891b2;
-            color: #ffffff;
-            border-color: #0891b2;
-            box-shadow: none;
+            background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+            color: #ffffff !important;
+            border-color: #6366f1 !important;
+            box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25) !important;
             transform: scale(1.02);
         }
         .sidebar-nav .nav-link.active::before {
             content: '';
             position: absolute;
-            left: 0; top: 25%;
-            width: 3px; height: 50%;
+            left: -14px; top: 20%;
+            width: 4px; height: 60%;
             border-radius: 0 4px 4px 0;
-            background: #ffffff;
-            box-shadow: none;
+            background: #6366f1 !important;
+            box-shadow: 0 0 10px #6366f1 !important;
             animation: activeIndicator 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
         }
         @keyframes activeIndicator {
@@ -221,18 +239,18 @@
         }
         .sidebar-divider {
             height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08) 50%, transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.04) 50%, transparent);
             margin: 12px 14px;
         }
 
         /* Sidebar Footer */
         .sidebar-footer {
-            padding: 12px 14px 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 16px 14px 24px !important;
+            border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
             position: relative;
             z-index: 2;
             flex-shrink: 0;
-            background: rgba(0, 0, 0, 0.15);
+            background: rgba(0, 0, 0, 0.2) !important;
         }
         .sidebar-user-card {
             display: flex;
@@ -240,27 +258,27 @@
             gap: 12px;
             padding: 10px 12px;
             border-radius: 12px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.02) !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
             transition: all 0.25s ease;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2) !important;
         }
         .sidebar-user-card:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: rgba(99, 102, 241, 0.3);
+            background: rgba(255, 255, 255, 0.04) !important;
+            border-color: rgba(99, 102, 241, 0.2) !important;
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.1) !important;
         }
         .sidebar-user-avatar {
             width: 36px; height: 36px;
             border-radius: 10px;
-            background: #ffffff;
-            color: #0f172a;
+            background: rgba(255, 255, 255, 0.03) !important;
+            color: #ffffff !important;
             display: flex; align-items: center; justify-content: center;
             font-weight: 700; font-size: 0.82rem;
             flex-shrink: 0;
             position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
         }
         .sidebar-user-avatar .online-dot {
             position: absolute;
@@ -268,19 +286,26 @@
             width: 10px; height: 10px;
             border-radius: 50%;
             background: #22c55e;
-            border: 2px solid #1e1b4b;
+            border: 2px solid #090d16 !important;
             box-shadow: 0 0 6px #22c55e;
         }
         .sidebar-user-name {
-            font-size: 0.85rem; font-weight: 600; color: #fff;
-            line-height: 1.2; margin-bottom: 2px;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.2;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             max-width: 124px;
         }
         .sidebar-user-role {
-            font-size: 0.65rem; font-weight: 700;
-            letter-spacing: 0.5px; text-transform: uppercase;
-            color: #a5b4fc;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #a5b4fc !important;
         }
         #sidebar-logout-form button:hover {
             background: rgba(239, 68, 68, 0.12) !important;
@@ -897,60 +922,68 @@
         </div>
         <div>
             <div class="brand-name">FleetMaintenance</div>
-            <div class="brand-sub">Sistem Manajemen Armada</div>
+            <div class="brand-sub">{{ __('Sistem Manajemen Armada') }}</div>
         </div>
     </a>
 
     <ul class="nav flex-column sidebar-nav">
-        <div class="nav-section-label">Menu Utama</div>
+        <div class="nav-section-label">{{ __('Menu Utama') }}</div>
 
         <li class="nav-item">
             <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard*') ? 'active' : '' }}">
                 <div class="nav-icon"><i class="bi bi-speedometer2"></i></div>
-                Dashboard
+                {{ __('Dashboard') }}
             </a>
         </li>
         <li class="nav-item">
             <a href="{{ route('vehicles.index') }}" class="nav-link {{ request()->routeIs('vehicles*') ? 'active' : '' }}">
                 <div class="nav-icon"><i class="bi bi-car-front-fill"></i></div>
-                Kendaraan
+                {{ __('Kendaraan') }}
             </a>
         </li>
-        @if(auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
+        <li class="nav-item">
+            <a href="{{ route('tracking.index') }}" class="nav-link {{ request()->routeIs('tracking*') ? 'active' : '' }}">
+                <div class="nav-icon"><i class="bi bi-geo-alt-fill"></i></div>
+                {{ __('Pelacakan Kendaraan') }}
+            </a>
+        </li>
+        @if(auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi', 'user']))
         <li class="nav-item">
             <a href="{{ route('checklist.index') }}" class="nav-link {{ request()->routeIs('checklist*') ? 'active' : '' }}">
                 <div class="nav-icon"><i class="bi bi-clipboard-check-fill"></i></div>
-                Checklist Harian
+                {{ __('Checklist Harian') }}
             </a>
         </li>
+        @endif
+        @if(auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
         <li class="nav-item">
             <a href="{{ route('vehicle-histories.index') }}" class="nav-link {{ request()->routeIs('vehicle-histories*') ? 'active' : '' }}">
                 <div class="nav-icon"><i class="bi bi-clock-history"></i></div>
-                Riwayat Servis
+                {{ __('Riwayat Servis') }}
             </a>
         </li>
         <li class="nav-item">
             <a href="{{ route('expenses.index') }}" class="nav-link {{ request()->routeIs('expenses*') ? 'active' : '' }}">
                 <div class="nav-icon"><i class="bi bi-cash-stack"></i></div>
-                Rekap Biaya
+                {{ __('Rekap Biaya') }}
             </a>
         </li>
         @endif
         <li class="nav-item">
             <a href="{{ route('complaints.index') }}" class="nav-link {{ request()->routeIs('complaints*') ? 'active' : '' }}">
                 <div class="nav-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
-                Keluhan Kendaraan
+                {{ __('Keluhan Kendaraan') }}
             </a>
         </li>
 
 
         @if(auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin']))
             <div class="sidebar-divider"></div>
-            <div class="nav-section-label">Administrasi</div>
+            <div class="nav-section-label">{{ __('Administrasi') }}</div>
             <li class="nav-item">
                 <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users*') ? 'active' : '' }}">
                     <div class="nav-icon"><i class="bi bi-people-fill"></i></div>
-                    Kelola Pengguna
+                    {{ __('Kelola Pengguna') }}
                 </a>
             </li>
         @endif
@@ -958,9 +991,9 @@
 
     @if(auth()->check())
     <div class="sidebar-footer">
-        <div class="nav-section-label" style="padding: 0 0 8px 4px; font-size: 0.6rem; color: rgba(255, 255, 255, 0.35); text-transform: uppercase; letter-spacing: 1px;">Masuk Sebagai</div>
+        <div class="nav-section-label" style="padding: 0 0 8px 4px; font-size: 0.6rem; color: rgba(255, 255, 255, 0.35); text-transform: uppercase; letter-spacing: 1px;">{{ __('Masuk Sebagai') }}</div>
         <div class="sidebar-user-card d-flex align-items-center justify-content-between" style="padding: 10px 12px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);">
-            <div class="d-flex align-items-center gap-2" style="cursor: pointer; overflow: hidden; flex-grow: 1;" data-bs-toggle="offcanvas" data-bs-target="#offcanvasProfile" title="Lihat Profil">
+            <div class="d-flex align-items-center gap-2" style="cursor: pointer; overflow: hidden; flex-grow: 1;" data-bs-toggle="offcanvas" data-bs-target="#offcanvasProfile" title="{{ __('Lihat Profil') }}">
                 <div class="sidebar-user-avatar">
                     @if(auth()->user()->kelas)
                         <img src="{{ asset(auth()->user()->kelas) }}" alt="{{ auth()->user()->name }}" class="w-100 h-100 object-fit-cover" style="border-radius:9px;">
@@ -971,12 +1004,12 @@
                 </div>
                 <div style="overflow:hidden;">
                     <div class="sidebar-user-name">{{ auth()->user()->name }}</div>
-                    <div class="sidebar-user-role">{{ auth()->user()->role }}</div>
+                    <div class="sidebar-user-role">{{ __(auth()->user()->role) }}</div>
                 </div>
             </div>
             <form action="{{ route('logout') }}" method="POST" class="m-0 p-0" id="sidebar-logout-form">
                 @csrf
-                <button type="submit" class="btn btn-link text-danger p-1 d-flex align-items-center justify-content-center" style="border-radius: 8px; transition: background 0.2s; width: 28px; height: 28px;" title="Keluar">
+                <button type="submit" class="btn btn-link text-danger p-1 d-flex align-items-center justify-content-center" style="border-radius: 8px; transition: background 0.2s; width: 28px; height: 28px;" title="{{ __('Keluar') }}">
                     <i class="bi bi-box-arrow-right" style="font-size: 1rem;"></i>
                 </button>
             </form>
@@ -988,7 +1021,7 @@
 <div id="main-content">
     <header class="top-navbar">
         <div class="d-flex align-items-center gap-2">
-            <button class="btn btn-sm btn-outline-secondary d-lg-none" id="sidebarToggle" title="Buka Menu" style="padding: 6px 12px; border-radius: 8px;">
+            <button class="btn btn-sm btn-outline-secondary d-lg-none" id="sidebarToggle" title="{{ __('Buka Menu') }}" style="padding: 6px 12px; border-radius: 8px;">
                 <i class="bi bi-list fs-5"></i>
             </button>
             <div class="navbar-date-pill d-none d-sm-inline-flex">
@@ -999,15 +1032,40 @@
 
         <div class="d-flex align-items-center gap-2">
 
+            <!-- Language Switcher Dropdown -->
+            <div class="dropdown">
+                <button class="notif-btn" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Pilih Bahasa / Language Settings">
+                    <i class="bi bi-translate"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end py-1.5 shadow-sm border-slate-150" aria-labelledby="languageDropdown" style="border-radius: 12px; min-width: 160px; font-size: 0.88rem; z-index: 1050;">
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 fw-semibold {{ App::getLocale() === 'id' ? 'text-primary' : 'text-dark' }}" href="{{ route('set-locale', 'id') }}">
+                            <span>🇮🇩 Bahasa Indonesia</span>
+                            @if(App::getLocale() === 'id')
+                                <i class="bi bi-check-lg text-primary fs-6"></i>
+                            @endif
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 fw-semibold {{ App::getLocale() === 'en' ? 'text-primary' : 'text-dark' }}" href="{{ route('set-locale', 'en') }}">
+                            <span>🇺🇸 English (US)</span>
+                            @if(App::getLocale() === 'en')
+                                <i class="bi bi-check-lg text-primary fs-6"></i>
+                            @endif
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
             <!-- Spotlight Command Trigger -->
-            <button class="notif-btn" title="Pencarian Cepat (Ctrl+K)" data-bs-toggle="modal" data-bs-target="#spotlightModal">
+            <button class="notif-btn" title="{{ __('Pencarian Cepat (Ctrl+K)') }}" data-bs-toggle="modal" data-bs-target="#spotlightModal">
                 <i class="bi bi-search"></i>
             </button>
 
 
 
             <!-- QR Scanner Button -->
-            <button class="notif-btn" title="Scan QR Kendaraan" data-bs-toggle="modal" data-bs-target="#qrScannerModal">
+            <button class="notif-btn" title="{{ __('Scan QR Kendaraan') }}" data-bs-toggle="modal" data-bs-target="#qrScannerModal">
                 <i class="bi bi-qr-code-scan"></i>
             </button>
 
@@ -1016,10 +1074,10 @@
                 <a class="notif-btn position-relative" href="#"
                    id="notificationDropdown" role="button"
                    data-bs-toggle="dropdown" aria-expanded="false"
-                   title="Notifikasi Sistem">
+                   title="{{ __('Notifikasi Sistem') }}">
                     <i class="bi bi-bell-fill"></i>
                     @if(isset($notifCount) && $notifCount > 0)
-                        <span class="position-absolute top-0 start-75 translate-middle badge rounded-pill bg-danger border border-white"
+                        <span class="position-absolute top-0 start-75 translate-middle badge rounded-pill bg-danger border border-white notification-bell-badge"
                               style="font-size:0.58rem; min-width:18px; padding:3px 5px;">
                             {{ $notifCount }}
                         </span>
@@ -1031,66 +1089,78 @@
                     <li class="px-4 py-3 d-flex justify-content-between align-items-center border-bottom"
                         style="background:linear-gradient(135deg,#ef4444,#dc2626); border: none;">
                         <span class="fw-bold text-white" style="font-size:0.9rem;">
-                            <i class="bi bi-bell-fill me-2"></i> Notifikasi
+                            <i class="bi bi-bell-fill me-2"></i> {{ __('Notifikasi') }}
                         </span>
                         @if(isset($notifCount) && $notifCount > 0)
-                            <span class="badge bg-white" style="color:#dc2626; font-size:0.68rem;">
-                                {{ $notifCount }} Baru
+                            <span class="badge bg-white notification-header-badge" style="color:#dc2626; font-size:0.68rem;">
+                                {{ $notifCount }} {{ __('Baru') }}
                             </span>
                         @endif
                     </li>
 
                     <div class="notification-scroll bg-white" style="max-height:290px; overflow-y:auto;">
-                        @forelse($notifItems ?? [] as $n)
-                            @php
-                                $isDanger = str_contains($n['icon'], 'text-danger');
-                                $isSuccess = str_contains($n['icon'], 'text-success');
-                                $iconClass = explode(' ', $n['icon'])[0];
-                                $bgColor = $isDanger ? 'bg-danger-subtle' : ($isSuccess ? 'bg-success-subtle' : 'bg-warning-subtle');
-                                $iconColor = $isDanger ? 'text-danger' : ($isSuccess ? 'text-success' : 'text-warning');
-                                $hoverColor = $isDanger ? '#ef4444' : ($isSuccess ? '#10b981' : '#f59e0b');
-                                $badgeText = $isDanger ? 'Urgent' : ($isSuccess ? 'Selesai' : 'Info');
-                            @endphp
-                            <li class="notification-li" style="--hover-accent:{{ $hoverColor }};">
-                                <a class="dropdown-item py-3 px-4 border-bottom text-wrap notification-item"
-                                   href="{{ $n['link'] }}">
-                                    <div class="d-flex align-items-start gap-3">
-                                        <div class="{{ $bgColor }} {{ $iconColor }} rounded-circle d-flex align-items-center justify-content-center notification-icon-wrapper"
-                                             style="width:42px;height:42px;min-width:42px;flex-shrink:0;">
-                                            <i class="bi {{ $iconClass }} fs-5"></i>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <div class="fw-bold text-dark d-flex justify-content-between align-items-center" style="font-size:0.9rem;">
-                                                <span>Pemberitahuan</span>
-                                                <span class="badge {{ $isDanger ? 'bg-danger' : ($isSuccess ? 'bg-success' : 'bg-warning text-dark') }}" style="font-size:0.62rem;">{{ $badgeText }}</span>
-                                            </div>
-                                            <div class="text-muted mt-1" style="font-size:0.8rem; line-height:1.4;">
-                                                {{ $n['text'] }}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                        @empty
-                            <li>
-                                <div class="text-center py-5 text-muted px-4">
-                                    <div class="bg-success-subtle text-success rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3 shadow-sm" style="width:52px;height:52px;">
-                                        <i class="bi bi-shield-fill-check fs-3"></i>
-                                    </div>
-                                    <span class="fw-bold text-dark d-block mb-1" style="font-size:0.95rem;">Semua Armada Aman!</span>
-                                    <small class="text-muted d-block" style="font-size:0.78rem;">Tidak ada dokumen KIR/servis yang terlambat ataupun laporan baru saat ini.</small>
+                        <!-- Client-side empty state -->
+                        <li class="notification-empty-li d-none" style="list-style: none;">
+                            <div class="text-center py-5 text-muted px-4">
+                                <div class="bg-success-subtle text-success rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3 shadow-sm" style="width:52px;height:52px;">
+                                    <i class="bi bi-shield-fill-check fs-3"></i>
                                 </div>
-                            </li>
-                        @endforelse
-                    </div>
+                                <span class="fw-bold text-dark d-block mb-1" style="font-size:0.95rem;">{{ __('Armada Bebas Masalah') }}</span>
+                                <small class="text-muted d-block" style="font-size:0.78rem;">{{ __('Semua armada dalam kondisi normal dan baik-baik saja.') }}</small>
+                            </div>
+                        </li>
 
-                    @if(isset($notifCount) && $notifCount > 0)
-                    <li class="bg-light text-center py-3 border-top">
-                        <a href="{{ route('dashboard') }}" class="text-decoration-none fw-bold" style="font-size:0.82rem; color:#4f46e5;">
-                            Buka Dashboard Utama <i class="bi bi-arrow-right ms-1"></i>
-                        </a>
-                    </li>
-                    @endif
+                        @forelse($notifItems ?? [] as $n)
+                             @php
+                                 $isDanger = str_contains($n['icon'], 'text-danger');
+                                 $isSuccess = str_contains($n['icon'], 'text-success');
+                                 $iconClass = explode(' ', $n['icon'])[0];
+                                 $bgColor = $isDanger ? 'bg-danger-subtle' : ($isSuccess ? 'bg-success-subtle' : 'bg-warning-subtle');
+                                 $iconColor = $isDanger ? 'text-danger' : ($isSuccess ? 'text-success' : 'text-warning');
+                                 $hoverColor = $isDanger ? '#ef4444' : ($isSuccess ? '#10b981' : '#f59e0b');
+                                 $badgeText = $isDanger ? __('Urgent') : ($isSuccess ? __('Selesai') : __('Info'));
+                                 $notifHash = md5($n['text'] . $n['link']);
+                             @endphp
+                             <li class="notification-li" style="--hover-accent:{{ $hoverColor }};" data-notif-hash="{{ $notifHash }}">
+                                 <a class="dropdown-item py-3 px-4 border-bottom text-wrap notification-item"
+                                    href="{{ $n['link'] }}">
+                                     <div class="d-flex align-items-start gap-3">
+                                         <div class="{{ $bgColor }} {{ $iconColor }} rounded-circle d-flex align-items-center justify-content-center notification-icon-wrapper"
+                                              style="width:42px;height:42px;min-width:42px;flex-shrink:0;">
+                                             <i class="bi {{ $iconClass }} fs-5"></i>
+                                         </div>
+                                         <div class="flex-grow-1">
+                                             <div class="fw-bold text-dark d-flex justify-content-between align-items-center" style="font-size:0.9rem;">
+                                                 <span>{{ __('Pemberitahuan Penting') }}</span>
+                                                 <span class="badge {{ $isDanger ? 'bg-danger' : ($isSuccess ? 'bg-success' : 'bg-warning text-dark') }}" style="font-size:0.62rem;">{{ $badgeText }}</span>
+                                             </div>
+                                             <div class="text-muted mt-1" style="font-size:0.8rem; line-height:1.4;">
+                                                 {{ $n['text'] }}
+                                             </div>
+                                         </div>
+                                     </div>
+                                 </a>
+                             </li>
+                         @empty
+                             <li style="list-style: none;">
+                                 <div class="text-center py-5 text-muted px-4">
+                                     <div class="bg-success-subtle text-success rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3 shadow-sm" style="width:52px;height:52px;">
+                                         <i class="bi bi-shield-fill-check fs-3"></i>
+                                     </div>
+                                     <span class="fw-bold text-dark d-block mb-1" style="font-size:0.95rem;">{{ __('Armada Bebas Masalah') }}</span>
+                                     <small class="text-muted d-block" style="font-size:0.78rem;">{{ __('Semua armada dalam kondisi normal dan baik-baik saja.') }}</small>
+                                 </div>
+                             </li>
+                         @endforelse
+                     </div>
+ 
+                     @if(isset($notifCount) && $notifCount > 0)
+                     <li class="bg-light text-center py-3 border-top notification-footer-link">
+                         <a href="{{ route('dashboard') }}" class="text-decoration-none fw-bold" style="font-size:0.82rem; color:#4f46e5;">
+                             {{ __('Buka Dashboard Utama') }} <i class="bi bi-arrow-right ms-1"></i>
+                         </a>
+                     </li>
+                     @endif
                 </ul>
             </div>
 
@@ -1105,7 +1175,7 @@
                    aria-expanded="false">
                     <div class="d-none d-sm-block text-end">
                         <div class="navbar-user-name">{{ auth()->user()->name }}</div>
-                        <span class="navbar-user-role">{{ auth()->user()->role }}</span>
+                        <span class="navbar-user-role">{{ __(auth()->user()->role) }}</span>
                     </div>
                     <div class="navbar-user-avatar">
                         @if(auth()->user()->kelas)
@@ -1126,7 +1196,7 @@
                     </li>
                     <li>
                         <a class="dropdown-item d-flex align-items-center gap-2 py-2 fw-semibold" href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasProfile" style="font-size:0.875rem; border-radius:8px; margin:0 6px; width:calc(100% - 12px);">
-                            <i class="bi bi-person-bounding-box fs-5 text-primary"></i> Profil Saya
+                            <i class="bi bi-person-bounding-box fs-5 text-primary"></i> {{ __('Profil Saya') }}
                         </a>
                     </li>
                     <li>
@@ -1135,7 +1205,7 @@
                             <button type="submit"
                                     class="dropdown-item d-flex align-items-center gap-2 py-2 text-danger fw-semibold"
                                     style="font-size:0.875rem; border-radius:8px; margin:0 6px; width:calc(100% - 12px);">
-                                <i class="bi bi-box-arrow-right fs-5"></i> Keluar Sistem
+                                <i class="bi bi-box-arrow-right fs-5"></i> {{ __('Keluar Sistem') }}
                             </button>
                         </form>
                     </li>
@@ -1168,7 +1238,7 @@
 <div class="offcanvas offcanvas-end border-0" tabindex="-1" id="offcanvasNotification" aria-labelledby="offcanvasNotificationLabel" style="width: 400px; background: #ffffff; box-shadow: -10px 0 40px rgba(0,0,0,0.15);">
     <div class="offcanvas-header border-bottom py-3" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #fff;">
         <h5 class="offcanvas-title fw-bold" id="offcanvasNotificationLabel">
-            <i class="bi bi-bell-fill me-2"></i> Pusat Notifikasi
+            <i class="bi bi-bell-fill me-2"></i> {{ __('Pusat Notifikasi') }}
         </h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
@@ -1181,9 +1251,9 @@
                         <i class="bi {{ $item['icon'] }} fs-5"></i>
                     </div>
                     <div class="flex-grow-1">
-                        <p class="mb-0 text-dark fw-medium" style="font-size: 0.88rem; line-height: 1.45;">{{ $item['text'] }}</p>
+                        <p class="mb-0 text-dark fw-medium" style="font-size: 0.88rem; line-height: 1.45;">{{ __($item['text']) }}</p>
                         <small class="text-muted d-flex align-items-center gap-1 mt-1" style="font-size: 0.72rem;">
-                            <i class="bi bi-clock"></i> Baru saja
+                            <i class="bi bi-clock"></i> {{ __('Baru saja') }}
                         </small>
                     </div>
                 </a>
@@ -1192,8 +1262,8 @@
                     <div class="bg-success-subtle text-success rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3 shadow-sm" style="width: 60px; height: 60px;">
                         <i class="bi bi-shield-check fs-2"></i>
                     </div>
-                    <span class="fw-bold text-dark d-block mb-1" style="font-size: 0.95rem;">Semua Sistem Lancar!</span>
-                    <small class="text-muted d-block" style="font-size: 0.78rem;">Tidak ada keluhan baru, pengeluaran tertunda, atau jadwal KIR/Servis mendesak yang memerlukan perhatian Anda saat ini.</small>
+                    <span class="fw-bold text-dark d-block mb-1" style="font-size: 0.95rem;">{{ __('Semua Sistem Lancar!') }}</span>
+                    <small class="text-muted d-block" style="font-size: 0.78rem;">{{ __('Tidak ada keluhan baru, pengeluaran tertunda, atau jadwal KIR/Servis mendesak yang memerlukan perhatian Anda saat ini.') }}</small>
                 </div>
             @endforelse
         </div>
@@ -1202,8 +1272,8 @@
             <div class="bg-success-subtle text-success rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3 shadow-sm" style="width: 60px; height: 60px;">
                 <i class="bi bi-shield-check fs-2"></i>
             </div>
-            <span class="fw-bold text-dark d-block mb-1" style="font-size: 0.95rem;">Semua Sistem Lancar!</span>
-            <small class="text-muted d-block" style="font-size: 0.78rem;">Tidak ada keluhan baru, pengeluaran tertunda, atau jadwal KIR/Servis mendesak yang memerlukan perhatian Anda saat ini.</small>
+            <span class="fw-bold text-dark d-block mb-1" style="font-size: 0.95rem;">{{ __('Semua Sistem Lancar!') }}</span>
+            <small class="text-muted d-block" style="font-size: 0.78rem;">{{ __('Tidak ada keluhan baru, pengeluaran tertunda, atau jadwal KIR/Servis mendesak yang memerlukan perhatian Anda saat ini.') }}</small>
         </div>
     </div>
 </div>
@@ -1212,7 +1282,7 @@
 <div class="offcanvas offcanvas-end border-0" tabindex="-1" id="offcanvasProfile" aria-labelledby="offcanvasProfileLabel" style="width: 420px; background: #ffffff; box-shadow: -10px 0 40px rgba(0,0,0,0.15);">
     <div class="offcanvas-header border-bottom py-3" style="background: linear-gradient(135deg, #0f172a 0%, #450a0a 100%); color: #fff;">
         <h5 class="offcanvas-title fw-bold" id="offcanvasProfileLabel">
-            <i class="bi bi-person-fill me-2"></i> Profil Saya
+            <i class="bi bi-person-fill me-2"></i> {{ __('Profil Saya') }}
         </h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
@@ -1251,37 +1321,37 @@
                     <input type="file" id="avatarUpload" name="avatar" class="d-none" accept="image/*" onchange="previewAvatar(this)">
                 </div>
                 <h4 class="fw-extrabold text-dark mb-1 mt-2">{{ auth()->user()->name }}</h4>
-                <span class="badge bg-primary px-3 py-1.5 rounded-pill text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">{{ auth()->user()->role }}</span>
+                <span class="badge bg-primary px-3 py-1.5 rounded-pill text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">{{ __(auth()->user()->role) }}</span>
             </div>
 
             <div class="mb-3">
-                <label class="form-label text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Nama Lengkap</label>
+                <label class="form-label text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">{{ __('Nama Lengkap') }}</label>
                 <input type="text" name="name" class="form-control" value="{{ auth()->user()->name }}" required style="border-radius: 8px; font-size: 0.88rem;">
             </div>
 
             <div class="mb-3">
-                <label class="form-label text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Nomor Induk Pegawai (NIP)</label>
-                <input type="text" name="nis" class="form-control" value="{{ auth()->user()->nis }}" placeholder="Belum Diatur" style="border-radius: 8px; font-size: 0.88rem;">
+                <label class="form-label text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">{{ __('Nomor Induk Pegawai (NIP)') }}</label>
+                <input type="text" name="nis" class="form-control" value="{{ auth()->user()->nis }}" placeholder="{{ __('Belum Diatur') }}" style="border-radius: 8px; font-size: 0.88rem;">
             </div>
 
             <div class="mb-3">
-                <label class="form-label text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Alamat Email</label>
+                <label class="form-label text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">{{ __('Alamat Email') }}</label>
                 <input type="email" name="email" class="form-control" value="{{ auth()->user()->email }}" required style="border-radius: 8px; font-size: 0.88rem;">
             </div>
 
             <div class="mb-3">
-                <label class="form-label text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Password Baru (kosongkan jika tidak diubah)</label>
+                <label class="form-label text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">{{ __('Password Baru (kosongkan jika tidak diubah)') }}</label>
                 <input type="password" name="password" class="form-control" placeholder="••••••••" style="border-radius: 8px; font-size: 0.88rem;">
             </div>
 
             <div class="mb-3">
-                <label class="form-label text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">Konfirmasi Password Baru</label>
+                <label class="form-label text-muted text-uppercase fw-bold mb-1" style="font-size: 0.7rem; letter-spacing: 0.5px;">{{ __('Konfirmasi Password Baru') }}</label>
                 <input type="password" name="password_confirmation" class="form-control" placeholder="••••••••" style="border-radius: 8px; font-size: 0.88rem;">
             </div>
 
             <div class="d-flex flex-column gap-2 mt-4 pt-3 border-top">
                 <button type="submit" class="btn btn-primary py-2.5 fw-bold w-100 d-flex align-items-center justify-content-center gap-2" style="border-radius: 8px; font-size: 0.9rem;">
-                    <i class="bi bi-save2-fill"></i> Simpan Perubahan
+                    <i class="bi bi-save2-fill"></i> {{ __('Simpan Perubahan') }}
                 </button>
             </div>
         </form>
@@ -1294,68 +1364,77 @@
         <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
             <div class="p-3 border-bottom d-flex align-items-center gap-2">
                 <i class="bi bi-search text-muted fs-4"></i>
-                <input type="text" id="spotlightInput" class="form-control form-control-lg border-0 shadow-none bg-transparent ps-1" placeholder="Ketik perintah atau cari menu... (Tekan Esc untuk batal)" style="font-size: 1.1rem;">
+                <input type="text" id="spotlightInput" class="form-control form-control-lg border-0 shadow-none bg-transparent ps-1" placeholder="{{ __('Ketik perintah atau cari menu... (Tekan Esc untuk batal)') }}" style="font-size: 1.1rem;">
             </div>
             <div class="modal-body p-0" style="max-height: 400px; overflow-y: auto;">
                 <div class="list-group list-group-flush" id="spotlightResults">
                     <a href="{{ route('dashboard') }}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center gap-3 border-0">
                         <div class="rounded-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; flex-shrink: 0;"><i class="bi bi-speedometer2 fs-5"></i></div>
                         <div>
-                            <div class="fw-bold text-dark" style="font-size: 0.92rem;">Dashboard Utama</div>
-                            <small class="text-muted" style="font-size: 0.78rem;">Kembali ke halaman ringkasan monitoring armada</small>
+                            <div class="fw-bold text-dark" style="font-size: 0.92rem;">{{ __('Dashboard Utama') }}</div>
+                            <small class="text-muted" style="font-size: 0.78rem;">{{ __('Kembali ke halaman ringkasan monitoring armada') }}</small>
                         </div>
                     </a>
                     <a href="{{ route('vehicles.index') }}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center gap-3 border-0">
                         <div class="rounded-3 bg-success-subtle text-success d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; flex-shrink: 0;"><i class="bi bi-car-front-fill fs-5"></i></div>
                         <div>
-                            <div class="fw-bold text-dark" style="font-size: 0.92rem;">Data Kendaraan / Armada</div>
-                            <small class="text-muted" style="font-size: 0.78rem;">Lihat daftar mobil, masa berlaku KIR, dan status jalan</small>
+                            <div class="fw-bold text-dark" style="font-size: 0.92rem;">{{ __('Data Kendaraan / Armada') }}</div>
+                            <small class="text-muted" style="font-size: 0.78rem;">{{ __('Lihat daftar mobil, masa berlaku KIR, dan status jalan') }}</small>
+                        </div>
+                    </a>
+                    <a href="{{ route('tracking.index') }}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center gap-3 border-0">
+                        <div class="rounded-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; flex-shrink: 0;"><i class="bi bi-geo-alt-fill fs-5"></i></div>
+                        <div>
+                            <div class="fw-bold text-dark" style="font-size: 0.92rem;">{{ __('Pelacakan Kendaraan (Live GPS Map)') }}</div>
+                            <small class="text-muted" style="font-size: 0.78rem;">{{ __('Pantau posisi geografis dan rute armada secara real-time') }}</small>
                         </div>
                     </a>
                     <a href="{{ route('checklist.index') }}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center gap-3 border-0">
                         <div class="rounded-3 bg-info-subtle text-info d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; flex-shrink: 0;"><i class="bi bi-clipboard-check-fill fs-5"></i></div>
                         <div>
-                            <div class="fw-bold text-dark" style="font-size: 0.92rem;">Checklist Fisik Harian</div>
-                            <small class="text-muted" style="font-size: 0.78rem;">Buat laporan inspeksi kondisi fisik armada harian</small>
+                            <div class="fw-bold text-dark" style="font-size: 0.92rem;">{{ __('Checklist Fisik Harian') }}</div>
+                            <small class="text-muted" style="font-size: 0.78rem;">{{ __('Buat laporan inspeksi kondisi fisik armada harian') }}</small>
                         </div>
                     </a>
+                    @if(auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
                     <a href="{{ route('expenses.index') }}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center gap-3 border-0">
                         <div class="rounded-3 bg-warning-subtle text-warning-emphasis d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; flex-shrink: 0;"><i class="bi bi-cash-stack fs-5"></i></div>
                         <div>
-                            <div class="fw-bold text-dark" style="font-size: 0.92rem;">Rekap Biaya Operasional</div>
-                            <small class="text-muted" style="font-size: 0.78rem;">Manajemen pengeluaran bensin, tol, dan servis</small>
+                            <div class="fw-bold text-dark" style="font-size: 0.92rem;">{{ __('Rekap Biaya Operasional') }}</div>
+                            <small class="text-muted" style="font-size: 0.78rem;">{{ __('Manajemen pengeluaran bensin, tol, dan servis') }}</small>
                         </div>
                     </a>
+                    @endif
                     @if(auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
                     <a href="{{ route('vehicle-histories.index') }}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center gap-3 border-0">
                         <div class="rounded-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; flex-shrink: 0;"><i class="bi bi-clock-history fs-5"></i></div>
                         <div>
-                            <div class="fw-bold text-dark" style="font-size: 0.92rem;">Riwayat Servis Kendaraan</div>
-                            <small class="text-muted" style="font-size: 0.78rem;">Lihat dan kelola catatan perbaikan/pemeliharaan armada</small>
+                            <div class="fw-bold text-dark" style="font-size: 0.92rem;">{{ __('Riwayat Servis Kendaraan') }}</div>
+                            <small class="text-muted" style="font-size: 0.78rem;">{{ __('Lihat dan kelola catatan perbaikan/pemeliharaan armada') }}</small>
                         </div>
                     </a>
                     @endif
                     <a href="{{ route('complaints.index') }}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center gap-3 border-0">
                         <div class="rounded-3 bg-danger-subtle text-danger d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; flex-shrink: 0;"><i class="bi bi-exclamation-triangle-fill fs-5"></i></div>
                         <div>
-                            <div class="fw-bold text-dark" style="font-size: 0.92rem;">Keluhan Kendaraan</div>
-                            <small class="text-muted" style="font-size: 0.78rem;">Laporkan kerusakan atau masalah teknis pada mobil</small>
+                            <div class="fw-bold text-dark" style="font-size: 0.92rem;">{{ __('Keluhan Kendaraan') }}</div>
+                            <small class="text-muted" style="font-size: 0.78rem;">{{ __('Laporkan kerusakan atau masalah teknis pada mobil') }}</small>
                         </div>
                     </a>
                     @if(auth()->check() && auth()->user()->role === 'admin')
                     <a href="{{ route('users.index') }}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center gap-3 border-0">
                         <div class="rounded-3 bg-secondary-subtle text-secondary d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; flex-shrink: 0;"><i class="bi bi-people-fill fs-5"></i></div>
                         <div>
-                            <div class="fw-bold text-dark" style="font-size: 0.92rem;">Manajemen Pengguna</div>
-                            <small class="text-muted" style="font-size: 0.78rem;">Kelola akun admin, teknisi, dan driver sistem</small>
+                            <div class="fw-bold text-dark" style="font-size: 0.92rem;">{{ __('Manajemen Pengguna') }}</div>
+                            <small class="text-muted" style="font-size: 0.78rem;">{{ __('Kelola akun admin, teknisi, dan driver sistem') }}</small>
                         </div>
                     </a>
                     @endif
                 </div>
             </div>
             <div class="p-2.5 border-top bg-light d-flex justify-content-between align-items-center px-3" style="font-size: 0.75rem;">
-                <span class="text-muted">Gunakan tombol <kbd class="bg-dark text-white px-1.5 py-0.5 rounded shadow-sm" style="font-size:0.68rem;">Ctrl + K</kbd> untuk membuka dari mana saja</span>
-                <span class="text-muted">Tekan <kbd class="bg-dark text-white px-1.5 py-0.5 rounded shadow-sm" style="font-size:0.68rem;">Esc</kbd> untuk menutup</span>
+                <span class="text-muted">{!! __('Gunakan tombol <kbd class="bg-dark text-white px-1.5 py-0.5 rounded shadow-sm" style="font-size:0.68rem;">Ctrl + K</kbd> untuk membuka dari mana saja') !!}</span>
+                <span class="text-muted">{!! __('Tekan <kbd class="bg-dark text-white px-1.5 py-0.5 rounded shadow-sm" style="font-size:0.68rem;">Esc</kbd> untuk menutup') !!}</span>
             </div>
         </div>
     </div>
@@ -1494,12 +1573,12 @@
         <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
             <div class="modal-header border-0 pb-0">
                 <h5 class="modal-title fw-bold" id="qrScannerModalLabel">
-                    <i class="bi bi-qr-code-scan text-primary me-2"></i> Scan QR Kendaraan
+                    <i class="bi bi-qr-code-scan text-primary me-2"></i> {{ __('Scan QR Kendaraan') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="closeQrScannerBtn"></button>
             </div>
             <div class="modal-body text-center py-4">
-                <p class="text-muted mb-3" style="font-size: 0.88rem;">Arahkan kamera ke QR Code kendaraan untuk melihat informasi detail secara instan.</p>
+                <p class="text-muted mb-3" style="font-size: 0.88rem;">{{ __('Arahkan kamera ke QR Code kendaraan untuk melihat informasi detail secara instan.') }}</p>
                 <div id="qr-reader" style="width: 100%; max-width: 400px; margin: 0 auto; border-radius: 12px; overflow: hidden;"></div>
                 <div id="qr-reader-results" class="mt-3 fw-bold text-success" style="font-size: 0.95rem;"></div>
             </div>
@@ -1587,71 +1666,91 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        // Read dismissed notification IDs from localStorage
-        let dismissedNotifs = [];
+        // Read dismissed notification hashes from localStorage
+        let dismissedHashes = [];
         try {
-            dismissedNotifs = JSON.parse(localStorage.getItem('dismissed_notifications') || '[]');
+            dismissedHashes = JSON.parse(localStorage.getItem('dismissed_notif_hashes') || '[]');
         } catch(e) {
-            dismissedNotifs = [];
+            dismissedHashes = [];
         }
 
         function updateNotifBadges() {
-            let activeItems = document.querySelectorAll('.notification-sidebar-item:not(.d-none)');
+            let activeItems = document.querySelectorAll('.notification-li:not(.d-none)');
             let activeCount = activeItems.length;
 
-            let badges = document.querySelectorAll('.sidebar-notif-badge');
-            badges.forEach(badge => {
+            // Update top bell badge count
+            let bellBadges = document.querySelectorAll('.notification-bell-badge');
+            bellBadges.forEach(badge => {
                 badge.innerText = activeCount;
                 if (activeCount <= 0) {
-                    badge.style.setProperty('display', 'none', 'important');
+                    badge.classList.add('d-none');
                 } else {
-                    badge.style.display = 'inline-block';
+                    badge.classList.remove('d-none');
                 }
             });
 
-            // Toggle empty state if no active items
-            let listContainer = document.getElementById('offcanvasNotificationItems');
-            if (listContainer && activeCount === 0) {
-                if (!listContainer.querySelector('.notification-empty-state')) {
-                    listContainer.innerHTML = '';
-                    let emptyStateHtml = document.getElementById('jsNotificationEmptyState').innerHTML;
-                    let emptyDiv = document.createElement('div');
-                    emptyDiv.className = 'text-center py-5 text-muted px-4 notification-empty-state';
-                    emptyDiv.innerHTML = emptyStateHtml;
-                    listContainer.appendChild(emptyDiv);
+            // Update header count badge inside dropdown
+            let headerBadges = document.querySelectorAll('.notification-header-badge');
+            headerBadges.forEach(badge => {
+                badge.innerText = activeCount + ' ' + '{{ __("Baru") }}';
+                if (activeCount <= 0) {
+                    badge.classList.add('d-none');
+                } else {
+                    badge.classList.remove('d-none');
+                }
+            });
+
+            // Toggle client-side empty state list item
+            let emptyStateLi = document.querySelector('.notification-empty-li');
+            if (emptyStateLi) {
+                if (activeCount === 0) {
+                    emptyStateLi.classList.remove('d-none');
+                    // Hide main dashboard link at bottom of dropdown if no active notifications
+                    let footerLink = document.querySelector('.notification-footer-link');
+                    if (footerLink) {
+                        footerLink.classList.add('d-none');
+                    }
+                } else {
+                    emptyStateLi.classList.add('d-none');
+                    let footerLink = document.querySelector('.notification-footer-link');
+                    if (footerLink) {
+                        footerLink.classList.remove('d-none');
+                    }
                 }
             }
         }
 
         // Apply dismissed state on page load
-        let items = document.querySelectorAll('.notification-sidebar-item');
+        let items = document.querySelectorAll('.notification-li');
         items.forEach(item => {
-            let notifId = item.getAttribute('data-notif-id');
-            if (dismissedNotifs.includes(notifId)) {
+            let notifHash = item.getAttribute('data-notif-hash');
+            if (dismissedHashes.includes(notifHash)) {
                 item.classList.add('d-none');
             }
         });
 
         updateNotifBadges();
 
-        // Attach click handlers
-        let listContainer = document.getElementById('offcanvasNotificationItems');
-        if (listContainer) {
-            listContainer.addEventListener('click', function(e) {
-                let notifItem = e.target.closest('.notification-sidebar-item');
-                if (notifItem) {
-                    let notifId = notifItem.getAttribute('data-notif-id');
-                    if (notifId) {
-                        // Save to localStorage if not already dismissed
-                        if (!dismissedNotifs.includes(notifId)) {
-                            dismissedNotifs.push(notifId);
-                            try {
-                                localStorage.setItem('dismissed_notifications', JSON.stringify(dismissedNotifs));
-                            } catch(err) {}
+        // Attach click handlers to notification items to save dismiss state
+        let scrollContainer = document.querySelector('.notification-scroll');
+        if (scrollContainer) {
+            scrollContainer.addEventListener('click', function(e) {
+                let notifLink = e.target.closest('.notification-item');
+                if (notifLink) {
+                    let notifItem = notifLink.closest('.notification-li');
+                    if (notifItem) {
+                        let notifHash = notifItem.getAttribute('data-notif-hash');
+                        if (notifHash) {
+                            if (!dismissedHashes.includes(notifHash)) {
+                                dismissedHashes.push(notifHash);
+                                try {
+                                    localStorage.setItem('dismissed_notif_hashes', JSON.stringify(dismissedHashes));
+                                } catch(err) {}
+                            }
+                            // Hide instantly in DOM
+                            notifItem.classList.add('d-none');
+                            updateNotifBadges();
                         }
-                        // Hide in DOM instantly
-                        notifItem.classList.add('d-none');
-                        updateNotifBadges();
                     }
                 }
             });
@@ -1663,7 +1762,7 @@
             if (form) {
                 e.preventDefault();
                 const warningText = form.getAttribute('data-text') || 'Data ini akan dihapus secara permanen!';
-                if (confirm('Yakin ingin menghapus?\n\n' + warningText)) {
+                if (confirm('{{ __('Yakin ingin menghapus?') }}' + '\n\n' + warningText)) {
                     form.submit();
                 }
             }

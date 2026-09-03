@@ -1,10 +1,10 @@
 @extends('layouts.app')
-@section('title', 'Keluhan Kendaraan')
+@section('title', __('Keluhan Kendaraan'))
 
 @section('content')
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="page-title mb-0">Daftar Keluhan / Kendala Kendaraan</h5>
-    <a href="{{ route('complaints.create') }}" class="btn btn-brand"><i class="bi bi-megaphone"></i> Lapor Keluhan Baru</a>
+    <h5 class="page-title mb-0">{{ __('Daftar Keluhan / Kendala Kendaraan') }}</h5>
+    <a href="{{ route('complaints.create') }}" class="btn btn-brand"><i class="bi bi-megaphone"></i> {{ __('Lapor Keluhan Baru') }}</a>
 </div>
 
 <div class="card">
@@ -12,9 +12,9 @@
         <table id="tabelKeluhan" class="table table-hover mb-0 w-100" data-count="{{ $complaints->count() }}" data-lastcol="{{ in_array(auth()->user()->role, ['superadmin', 'teknisi']) ? 5 : -1 }}">
             <thead>
                 <tr>
-                    <th>Tanggal</th><th>Plat Nomor</th>
-                    <th>Pelapor</th><th>Keluhan</th><th>Status</th>
-                    @if (in_array(auth()->user()->role, ['superadmin', 'teknisi']))<th data-orderable="false">Aksi</th>@endif
+                    <th>{{ __('Tanggal') }}</th><th>{{ __('Plat Nomor') }}</th>
+                    <th>{{ __('Pelapor') }}</th><th>{{ __('Keluhan') }}</th><th>{{ __('Status') }}</th>
+                    @if (in_array(auth()->user()->role, ['superadmin', 'teknisi']))<th data-orderable="false">{{ __('Aksi') }}</th>@endif
                 </tr>
             </thead>
             <tbody>
@@ -26,11 +26,11 @@
                     <td>{{ $c->keluhan }}</td>
                     <td>
                         @if ($c->status === 'Baru')
-                            <span class="badge bg-danger">Baru</span>
+                            <span class="badge bg-danger">{{ __('Baru') }}</span>
                         @elseif ($c->status === 'Diproses')
-                            <span class="badge bg-warning text-dark">Diproses</span>
+                            <span class="badge bg-warning text-dark">{{ __('Diproses') }}</span>
                         @else
-                            <span class="badge bg-success">Selesai</span>
+                            <span class="badge bg-success">{{ __('Selesai') }}</span>
                         @endif
                     </td>
                     @if (in_array(auth()->user()->role, ['superadmin', 'teknisi']))
@@ -38,17 +38,17 @@
                         <form action="{{ route('complaints.updateStatus', $c) }}" method="POST" class="d-flex gap-1">
                             @csrf @method('PUT')
                             <select name="status" class="form-select form-select-sm" style="width:120px">
-                                <option value="Baru" @selected($c->status === 'Baru')>Baru</option>
-                                <option value="Diproses" @selected($c->status === 'Diproses')>Diproses</option>
-                                <option value="Selesai" @selected($c->status === 'Selesai')>Selesai</option>
+                                <option value="Baru" @selected($c->status === 'Baru')>{{ __('Baru') }}</option>
+                                <option value="Diproses" @selected($c->status === 'Diproses')>{{ __('Diproses') }}</option>
+                                <option value="Selesai" @selected($c->status === 'Selesai')>{{ __('Selesai') }}</option>
                             </select>
-                            <button class="btn btn-sm btn-brand">Update</button>
+                            <button class="btn btn-sm btn-brand">{{ __('Update') }}</button>
                         </form>
                     </td>
                     @endif
                 </tr>
                 @empty
-                <tr><td colspan="6" class="text-center py-3">Belum ada keluhan yang dilaporkan.</td></tr>
+                <tr><td colspan="6" class="text-center py-3">{{ __('Belum ada keluhan yang dilaporkan.') }}</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -71,14 +71,22 @@
                 responsive: true,
                 paging: true,
                 pageLength: 10,
-                lengthChange: false,
+                lengthChange: true,
+                lengthMenu: [
+                    [10, 25, 50, 100, 1000, -1],
+                    [10, 25, 50, 100, 1000, "{{ __('Semua') }}"]
+                ],
                 order: [[0, 'desc']],
                 language: {
-                    search: "Cari cepat:",
-                    zeroRecords: "Data tidak ditemukan",
-                    info: "Menampilkan _START_ - _END_ dari _TOTAL_ keluhan",
-                    infoEmpty: "Tidak ada data",
-                    paginate: { previous: "Sebelumnya", next: "Berikutnya" }
+                    search: "{{ __('Cari cepat:') }}",
+                    lengthMenu: "{{ __('Tampilkan _MENU_ keluhan per halaman') }}",
+                    zeroRecords: "{{ __('Data tidak ditemukan') }}",
+                    info: "{{ __('Menampilkan _START_ - _END_ dari _TOTAL_ keluhan') }}",
+                    infoEmpty: "{{ __('Tidak ada data') }}",
+                    paginate: { 
+                        previous: "{{ __('Sebelumnya') }}", 
+                        next: "{{ __('Berikutnya') }}" 
+                    }
                 },
                 columnDefs: [
                     { orderable: false, targets: lastCol }

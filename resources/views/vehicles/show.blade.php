@@ -1,21 +1,46 @@
 @extends('layouts.app')
-@section('title', 'Detail Kendaraan')
+@section('title', __('Detail Kendaraan'))
 
 @section('content')
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h5 class="page-title mb-0">Detail Kendaraan - {{ $vehicle->plat_nomor }}</h5>
-    <div class="d-flex gap-2">
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div>
+        <h5 class="page-title mb-0 fw-bold text-dark">{{ __('Detail Kendaraan') }} - {{ $vehicle->plat_nomor }}</h5>
+        <small class="text-muted">{{ $vehicle->merek }} {{ $vehicle->tipe }} ({{ $vehicle->jenis_kendaraan ?? 'Operasional' }})</small>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        @php
+            $pesanWa = "🔔 *Pemberitahuan Servis & Pemeliharaan Armada*\n\n"
+                . "Kepada Yth: " . ($vehicle->supir_utama ?: "Pengemudi/Petugas") . "\n"
+                . "Kendaraan: " . $vehicle->merek . " " . $vehicle->tipe . " (" . $vehicle->plat_nomor . ")\n"
+                . "Lokasi Pool: " . ($vehicle->lokasi_pool ?: "Pool Pusat") . "\n"
+                . "Odometer Terkini: " . number_format($vehicle->odometer_terkini, 0, ',', '.') . " km\n"
+                . "Jadwal Servis Berikutnya: " . ($nextServiceDate ? $nextServiceDate->translatedFormat('d F Y') : 'Segera') . "\n"
+                . "Jatuh Tempo KIR: " . ($vehicle->jatuh_tempo_kir ? $vehicle->jatuh_tempo_kir->translatedFormat('d F Y') : '-') . "\n\n"
+                . "Mohon lakukan koordinasi dan perawatan berkala di bengkel. Terima kasih.\n- Sistem FleetMaintenance";
+        @endphp
+        <a href="https://wa.me/?text={{ urlencode($pesanWa) }}" target="_blank" class="btn btn-sm btn-success d-flex align-items-center gap-1 text-white shadow-xs" style="border-radius: 8px; font-size: 0.8rem; padding: 6px 12px;" title="{{ __('Kirim Pengingat Servis via WhatsApp') }}">
+            <i class="bi bi-whatsapp"></i> {{ __('Kirim Pengingat WA') }}
+        </a>
+
+        <button type="button" class="btn btn-sm btn-outline-warning d-flex align-items-center gap-1 text-dark shadow-xs" data-bs-toggle="modal" data-bs-target="#fuelCalculatorModal" style="border-radius: 8px; font-size: 0.8rem; padding: 6px 12px;" title="{{ __('Hitung Efisiensi BBM (KM/L)') }}">
+            <i class="bi bi-fuel-pump-fill text-warning"></i> {{ __('Kalkulator BBM') }}
+        </button>
+
+        <button onclick="window.print()" class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1 shadow-xs" style="border-radius: 8px; font-size: 0.8rem; padding: 6px 12px;" title="{{ __('Cetak Rapor Kesehatan Kendaraan / PDF') }}">
+            <i class="bi bi-printer-fill"></i> {{ __('Cetak Rapor Unit') }}
+        </button>
+
         @if (auth()->check())
             @if (in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
-                <a href="{{ route('checklist.create', ['vehicle_id' => $vehicle->id]) }}" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" style="border-radius: 8px; font-size: 0.8rem; padding: 6px 12px;">
-                    <i class="bi bi-clipboard-check"></i> Catat Checklist
+                <a href="{{ route('checklist.create', ['vehicle_id' => $vehicle->id]) }}" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1 shadow-xs" style="border-radius: 8px; font-size: 0.8rem; padding: 6px 12px;">
+                    <i class="bi bi-clipboard-check"></i> {{ __('Catat Checklist') }}
                 </a>
-                <a href="{{ route('expenses.create', ['vehicle_id' => $vehicle->id]) }}" class="btn btn-sm btn-outline-success d-flex align-items-center gap-1" style="border-radius: 8px; font-size: 0.8rem; padding: 6px 12px;">
-                    <i class="bi bi-cash-stack"></i> Catat Pengeluaran
+                <a href="{{ route('expenses.create', ['vehicle_id' => $vehicle->id]) }}" class="btn btn-sm btn-outline-success d-flex align-items-center gap-1 shadow-xs" style="border-radius: 8px; font-size: 0.8rem; padding: 6px 12px;">
+                    <i class="bi bi-cash-stack"></i> {{ __('Catat Biaya') }}
                 </a>
             @endif
-            <a href="{{ route('complaints.create', ['vehicle_id' => $vehicle->id]) }}" class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1" style="border-radius: 8px; font-size: 0.8rem; padding: 6px 12px;">
-                <i class="bi bi-megaphone"></i> Lapor Keluhan
+            <a href="{{ route('complaints.create', ['vehicle_id' => $vehicle->id]) }}" class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1 shadow-xs" style="border-radius: 8px; font-size: 0.8rem; padding: 6px 12px;">
+                <i class="bi bi-megaphone"></i> {{ __('Lapor Keluhan') }}
             </a>
         @endif
     </div>
@@ -32,40 +57,40 @@
                     </span>
                     @if ($vehicle->status === 'Siap Pakai')
                         <span class="badge bg-success text-white px-3 py-2 fw-bold d-inline-flex align-items-center gap-2" style="border-radius: 10px;">
-                            <span class="bg-white rounded-circle" style="width: 6px; height: 6px; display: inline-block;"></span> Siap Pakai
+                            <span class="bg-white rounded-circle" style="width: 6px; height: 6px; display: inline-block;"></span> {{ __('Siap Pakai') }}
                         </span>
                     @elseif ($vehicle->status === 'Sedang Diservis')
                         <span class="badge bg-warning text-dark px-3 py-2 fw-bold d-inline-flex align-items-center gap-2" style="border-radius: 10px;">
-                            <span class="bg-dark rounded-circle" style="width: 6px; height: 6px; display: inline-block;"></span> Sedang Diservis
+                            <span class="bg-dark rounded-circle" style="width: 6px; height: 6px; display: inline-block;"></span> {{ __('Sedang Diservis') }}
                         </span>
                     @else
-                        <span class="badge bg-secondary text-white px-3 py-2 fw-bold" style="border-radius: 10px;">{{ $vehicle->status }}</span>
+                        <span class="badge bg-secondary text-white px-3 py-2 fw-bold" style="border-radius: 10px;">{{ __($vehicle->status) }}</span>
                     @endif
                 </div>
 
                 <div class="row g-3">
                     <div class="col-sm-6">
-                        <p class="mb-1 text-muted small text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.72rem;">Tipe &amp; Merk</p>
+                        <p class="mb-1 text-muted small text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.72rem;">{{ __('Tipe & Merk') }}</p>
                         <h6 class="fw-bold text-dark">{{ $vehicle->merek }} {{ $vehicle->tipe }} ({{ $vehicle->jenis_kendaraan }})</h6>
                     </div>
                     <div class="col-sm-6">
-                        <p class="mb-1 text-muted small text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.72rem;">Tahun Pembuatan</p>
+                        <p class="mb-1 text-muted small text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.72rem;">{{ __('Tahun Pembuatan') }}</p>
                         <h6 class="fw-bold text-dark">{{ $vehicle->tahun ?? 2024 }}</h6>
                     </div>
                     <div class="col-sm-6">
-                        <p class="mb-1 text-muted small text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.72rem;">Lokasi Pool</p>
+                        <p class="mb-1 text-muted small text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.72rem;">{{ __('Lokasi Pool') }}</p>
                         <h6 class="fw-bold text-dark">{{ $vehicle->lokasi_pool ?? '-' }}</h6>
                     </div>
                     <div class="col-sm-6">
-                        <p class="mb-1 text-muted small text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.72rem;">Supir Utama</p>
+                        <p class="mb-1 text-muted small text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.72rem;">{{ __('Supir Utama') }}</p>
                         <h6 class="fw-bold text-dark">{{ $vehicle->supir_utama ?? '-' }}</h6>
                     </div>
                     <div class="col-sm-6">
-                        <p class="mb-1 text-muted small text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.72rem;">Odometer Terkini</p>
+                        <p class="mb-1 text-muted small text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.72rem;">{{ __('Odometer Terkini') }}</p>
                         <h6 class="fw-bold text-dark font-monospace">{{ number_format($vehicle->odometer_terkini, 0, ',', '.') }} km</h6>
                     </div>
                     <div class="col-sm-6">
-                        <p class="mb-1 text-muted small text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.72rem;">Jatuh Tempo KIR</p>
+                        <p class="mb-1 text-muted small text-uppercase fw-semibold" style="letter-spacing: 0.5px; font-size: 0.72rem;">{{ __('Jatuh Tempo KIR') }}</p>
                         <h6 class="fw-bold text-dark">{{ $vehicle->jatuh_tempo_kir?->format('d M Y') ?? '-' }}</h6>
                     </div>
                 </div>
@@ -79,8 +104,8 @@
                         <!-- Generate QR pointing to this page -->
                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode(request()->url()) }}" alt="QR Code" style="width: 120px; height: 120px;">
                     </div>
-                    <h6 class="fw-bold text-dark mb-1" style="font-size: 0.88rem;">QR Code Unit</h6>
-                    <p class="text-muted mb-0" style="font-size: 0.72rem; max-width: 200px; margin: 0 auto;">Scan menggunakan HP untuk melihat riwayat unit ini.</p>
+                    <h6 class="fw-bold text-dark mb-1" style="font-size: 0.88rem;">{{ __('QR Code Unit') }}</h6>
+                    <p class="text-muted mb-0" style="font-size: 0.72rem; max-width: 200px; margin: 0 auto;">{{ __('Scan menggunakan HP untuk melihat riwayat unit ini.') }}</p>
                 </div>
 
                 <!-- Barcode Section -->
@@ -89,12 +114,12 @@
                         <!-- Generate 1D Barcode representing Plate Number using bwip-js API -->
                         <img src="https://bwipjs-api.metafloor.com/?bcid=code128&text={{ urlencode(str_replace(' ', '', $vehicle->plat_nomor)) }}&scale=2&rotate=N&includetext&height=12" alt="Barcode" style="max-width: 170px; height: auto;">
                     </div>
-                    <h6 class="fw-bold text-dark mb-1" style="font-size: 0.88rem;">Barcode Plat Nomor</h6>
-                    <p class="text-muted mb-0" style="font-size: 0.72rem; max-width: 200px; margin: 0 auto;">Barcode plat nomor untuk scanner fisik / inventaris.</p>
+                    <h6 class="fw-bold text-dark mb-1" style="font-size: 0.88rem;">{{ __('Barcode Plat Nomor') }}</h6>
+                    <p class="text-muted mb-0" style="font-size: 0.72rem; max-width: 200px; margin: 0 auto;">{{ __('Barcode plat nomor untuk scanner fisik / inventaris.') }}</p>
                 </div>
 
                 <button onclick="window.print()" class="btn btn-sm btn-outline-secondary px-3 py-1.5 rounded-3 mt-2" style="font-size: 0.78rem;">
-                    <i class="bi bi-printer"></i> Cetak Label
+                    <i class="bi bi-printer"></i> {{ __('Cetak Label') }}
                 </button>
             </div>
         </div>
@@ -200,15 +225,20 @@
                 <i class="bi bi-geo-alt-fill fs-5"></i>
             </div>
             <div>
-                <h6 class="fw-bold mb-0 text-dark">Lokasi Live GPS Kendaraan</h6>
-                <small class="text-muted" style="font-size: 0.78rem;">Status lokasi terkini armada berdasarkan koordinat aktif</small>
+                <h6 class="fw-bold mb-0 text-dark">{{ __('Lokasi Live GPS Kendaraan') }}</h6>
+                <small class="text-muted" style="font-size: 0.78rem;">{{ __('Status lokasi terkini armada berdasarkan koordinat aktif') }}</small>
             </div>
         </div>
-        @if ($vehicle->latitude && $vehicle->longitude)
-            <a href="https://www.google.com/maps/search/?api=1&query={{ $vehicle->latitude }},{{ $vehicle->longitude }}" target="_blank" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2" style="border-radius: 8px; font-size: 0.8rem; padding: 6px 12px;">
-                <i class="bi bi-map-fill"></i> Buka Google Maps
+        <div class="d-flex align-items-center gap-2">
+            <a href="{{ route('tracking.index', ['vehicle_id' => $vehicle->id]) }}" class="btn btn-sm btn-primary d-flex align-items-center gap-2" style="border-radius: 8px; font-size: 0.8rem; padding: 6px 12px;">
+                <i class="bi bi-geo-alt-fill"></i> {{ __('Buka di Peta Pelacakan Lengkap') }}
             </a>
-        @endif
+            @if ($vehicle->latitude && $vehicle->longitude)
+                <a href="https://www.google.com/maps/search/?api=1&query={{ $vehicle->latitude }},{{ $vehicle->longitude }}" target="_blank" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2" style="border-radius: 8px; font-size: 0.8rem; padding: 6px 12px;">
+                    <i class="bi bi-map-fill"></i> {{ __('Buka Google Maps') }}
+                </a>
+            @endif
+        </div>
     </div>
     <div class="card-body p-0">
         @if ($vehicle->latitude && $vehicle->longitude)
@@ -267,7 +297,7 @@
         @else
             <div class="text-center py-5 text-muted">
                 <i class="bi bi-geo-alt fs-1 d-block mb-2 text-secondary opacity-50"></i>
-                <span>Data koordinat GPS belum tersedia untuk armada ini.</span>
+                <span>{{ __('Data koordinat GPS belum tersedia untuk armada ini.') }}</span>
             </div>
         @endif
     </div>
@@ -282,13 +312,13 @@
                         <i class="bi bi-clock-history fs-5"></i>
                     </div>
                     <div>
-                        <h6 class="fw-bold mb-0 text-dark">Timeline Riwayat Servis &amp; Perbaikan</h6>
-                        <small class="text-muted" style="font-size: 0.78rem;">Catatan perawatan unit secara kronologis</small>
+                        <h6 class="fw-bold mb-0 text-dark">{{ __('Timeline Riwayat Servis & Perbaikan') }}</h6>
+                        <small class="text-muted" style="font-size: 0.78rem;">{{ __('Catatan perawatan unit secara kronologis') }}</small>
                     </div>
                 </div>
                 @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
                     <a href="{{ route('vehicle-histories.create', ['vehicle_id' => $vehicle->id]) }}" class="btn btn-xs btn-primary py-1.5 px-3 d-inline-flex align-items-center gap-1" style="border-radius: 8px; font-size: 0.75rem; font-weight: 600;">
-                        <i class="bi bi-plus-circle"></i> Catat Servis
+                        <i class="bi bi-plus-circle"></i> {{ __('Catat Servis') }}
                     </a>
                 @endif
             </div>
@@ -308,7 +338,7 @@
                                                 <i class="bi bi-calendar3 me-1"></i>{{ $history->tanggal->translatedFormat('d M Y') }}
                                                 @if ($history->teknisi)
                                                     <span class="mx-1.5 text-secondary opacity-50">|</span>
-                                                    <i class="bi bi-person me-1"></i>Teknisi: {{ $history->teknisi->name }}
+                                                    <i class="bi bi-person me-1"></i>{{ __('Teknisi') }}: {{ $history->teknisi->name }}
                                                 @endif
                                             </small>
                                         </div>
@@ -319,14 +349,14 @@
                                     
                                     @if ($history->sparepart_digunakan)
                                         <div class="mt-2 pt-2 border-top border-slate-200">
-                                            <small class="text-muted fw-bold d-block text-uppercase mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">Sparepart / Suku Cadang:</small>
+                                            <small class="text-muted fw-bold d-block text-uppercase mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">{{ __('Sparepart / Suku Cadang') }}:</small>
                                             <span class="text-dark bg-white border border-slate-200 px-2 py-0.5 rounded d-inline-block fw-medium" style="font-size: 0.8rem; border-radius: 6px;">{{ $history->sparepart_digunakan }}</span>
                                         </div>
                                     @endif
-
+ 
                                     @if ($history->keterangan)
                                         <div class="mt-2">
-                                            <small class="text-muted fw-bold d-block text-uppercase mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">Keterangan:</small>
+                                            <small class="text-muted fw-bold d-block text-uppercase mb-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">{{ __('Keterangan') }}:</small>
                                             <p class="text-secondary mb-0" style="font-size: 0.82rem; line-height: 1.45;">{{ $history->keterangan }}</p>
                                         </div>
                                     @endif
@@ -337,7 +367,7 @@
                 @else
                     <div class="text-center py-4 text-muted">
                         <i class="bi bi-clock-history fs-2 d-block mb-2 text-secondary opacity-50"></i>
-                        <span>Belum ada riwayat perawatan/servis untuk unit ini.</span>
+                        <span>{{ __('Belum ada riwayat perawatan/servis untuk unit ini.') }}</span>
                     </div>
                 @endif
             </div>
@@ -351,20 +381,20 @@
                     <i class="bi bi-calendar-event fs-5"></i>
                 </div>
                 <div>
-                    <h6 class="fw-bold mb-0 text-dark">Estimasi Servis</h6>
-                    <small class="text-muted" style="font-size: 0.78rem;">Prediksi jadwal servis berikutnya</small>
+                    <h6 class="fw-bold mb-0 text-dark">{{ __('Estimasi Servis') }}</h6>
+                    <small class="text-muted" style="font-size: 0.78rem;">{{ __('Prediksi jadwal servis berikutnya') }}</small>
                 </div>
             </div>
             <div class="card-body p-4 text-center">
                 @if($vehicle->tanggal_servis_manual)
                     <h4 class="text-primary fw-extrabold mb-1" style="font-size: 1.25rem;">{{ $vehicle->tanggal_servis_manual->translatedFormat('d F Y') }}</h4>
-                    <span class="badge bg-info text-white px-2.5 py-1.5 mb-2" style="font-size: 0.72rem; border-radius: 6px;">Jadwal Manual</span>
-                    <p class="text-muted small mb-0">Ditetapkan secara manual oleh Admin/Teknisi.</p>
+                    <span class="badge bg-info text-white px-2.5 py-1.5 mb-2" style="font-size: 0.72rem; border-radius: 6px;">{{ __('Jadwal Manual') }}</span>
+                    <p class="text-muted small mb-0">{{ __('Ditetapkan secara manual oleh Admin/Teknisi.') }}</p>
                 @elseif($nextServiceDate)
                     <h4 class="text-primary fw-extrabold mb-1" style="font-size: 1.25rem;">{{ $nextServiceDate->translatedFormat('d F Y') }}</h4>
-                    <p class="text-muted small mb-0">Estimasi berdasarkan interval 3 bulan dari servis terakhir.</p>
+                    <p class="text-muted small mb-0">{{ __('Estimasi berdasarkan interval 3 bulan dari servis terakhir.') }}</p>
                 @else
-                    <p class="text-muted small mb-0">Data servis belum tersedia untuk estimasi.</p>
+                    <p class="text-muted small mb-0">{{ __('Data servis belum tersedia untuk estimasi.') }}</p>
                 @endif
             </div>
         </div>
@@ -372,20 +402,20 @@
 </div>
 
 <div class="card mb-4">
-    <div class="card-header bg-white fw-bold">10 Checklist Harian Terakhir</div>
+    <div class="card-header bg-white fw-bold">{{ __('10 Checklist Harian Terakhir') }}</div>
     <div class="table-responsive">
         <table class="table table-hover mb-0">
-            <thead><tr><th>Tanggal</th><th>Teknisi</th><th>Odometer</th><th>Catatan</th></tr></thead>
+            <thead><tr><th>{{ __('Tanggal') }}</th><th>{{ __('Teknisi') }}</th><th>{{ __('Odometer') }}</th><th>{{ __('Catatan') }}</th></tr></thead>
             <tbody>
                 @forelse ($vehicle->checklists as $c)
                 <tr>
                     <td>{{ $c->tanggal->format('d/m/Y') }}</td>
                     <td>{{ $c->nama_teknisi }}</td>
                     <td>{{ $c->odometer }}</td>
-                    <td>{{ $c->catatan_tambahan }} @if($c->ada_masalah)<span class="badge bg-danger">Ada Masalah</span>@endif</td>
+                    <td>{{ $c->catatan_tambahan }} @if($c->ada_masalah)<span class="badge bg-danger">{{ __('Ada Masalah') }}</span>@endif</td>
                 </tr>
                 @empty
-                <tr><td colspan="4" class="text-center py-3">Belum ada checklist.</td></tr>
+                <tr><td colspan="4" class="text-center py-3">{{ __('Belum ada checklist.') }}</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -393,10 +423,10 @@
 </div>
 
 <div class="card">
-    <div class="card-header bg-white fw-bold">10 Pengeluaran Terakhir</div>
+    <div class="card-header bg-white fw-bold">{{ __('10 Pengeluaran Terakhir') }}</div>
     <div class="table-responsive">
         <table class="table table-hover mb-0">
-            <thead><tr><th>Tanggal</th><th>Jenis</th><th>Jumlah</th><th>Keterangan</th></tr></thead>
+            <thead><tr><th>{{ __('Tanggal') }}</th><th>{{ __('Jenis') }}</th><th>{{ __('Jumlah') }}</th><th>{{ __('Keterangan') }}</th></tr></thead>
             <tbody>
                 @forelse ($vehicle->expenses as $e)
                 <tr>
@@ -406,12 +436,115 @@
                     <td>{{ $e->keterangan }}</td>
                 </tr>
                 @empty
-                <tr><td colspan="4" class="text-center py-3">Belum ada data pengeluaran.</td></tr>
+                <tr><td colspan="4" class="text-center py-3">{{ __('Belum ada data pengeluaran.') }}</td></tr>
                 @endforelse
             </tbody>
         </table>
     </div>
 </div>
 
-<a href="{{ route('vehicles.index') }}" class="btn btn-secondary mt-3">Kembali</a>
+<a href="{{ route('vehicles.index') }}" class="btn btn-secondary mt-3">{{ __('Kembali') }}</a>
+
+<!-- Modal Kalkulator Efisiensi BBM -->
+<div class="modal fade" id="fuelCalculatorModal" tabindex="-1" aria-labelledby="fuelCalculatorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header bg-warning text-dark py-3" style="border-top-left-radius: 16px; border-top-right-radius: 16px;">
+                <h6 class="modal-title fw-bold mb-0" id="fuelCalculatorModalLabel">
+                    <i class="bi bi-fuel-pump-fill me-1"></i> {{ __('Kalkulator Efisiensi Bahan Bakar (BBM)') }}
+                </h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="alert alert-warning py-2 px-3 d-flex align-items-center gap-2 mb-3 text-dark" style="border-radius: 10px; font-size: 0.82rem;">
+                    <i class="bi bi-info-circle-fill fs-5"></i>
+                    <div>{{ __('Hitung konsumsi rata-rata bahan bakar untuk armada') }} <strong>{{ $vehicle->plat_nomor }}</strong></div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="form-label fw-semibold text-muted text-uppercase" style="font-size: 0.72rem;">{{ __('Odometer Sebelumnya (KM)') }}</label>
+                        <input type="number" id="calcOdoPrev" class="form-control" placeholder="Contoh: 12000" value="{{ max(0, $vehicle->odometer_terkini - 350) }}">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-semibold text-muted text-uppercase" style="font-size: 0.72rem;">{{ __('Odometer Saat Ini (KM)') }}</label>
+                        <input type="number" id="calcOdoCurr" class="form-control" placeholder="Contoh: 12350" value="{{ $vehicle->odometer_terkini }}">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-semibold text-muted text-uppercase" style="font-size: 0.72rem;">{{ __('Jumlah Liter BBM (L)') }}</label>
+                        <input type="number" step="0.1" id="calcLiters" class="form-control" placeholder="Contoh: 30" value="30">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-semibold text-muted text-uppercase" style="font-size: 0.72rem;">{{ __('Total Biaya BBM (Rp)') }}</label>
+                        <input type="number" id="calcCost" class="form-control" placeholder="Contoh: 300000" value="300000">
+                    </div>
+                </div>
+
+                <!-- Hasil Kalkulasi Box -->
+                <div class="p-3 bg-light rounded-4 border text-center">
+                    <span class="text-muted d-block mb-1 text-uppercase fw-semibold" style="font-size: 0.72rem; letter-spacing: 0.5px;">{{ __('Hasil Analisis Efisiensi BBM') }}</span>
+                    <div class="d-flex justify-content-around align-items-center my-3">
+                        <div>
+                            <small class="text-muted d-block" style="font-size: 0.75rem;">{{ __('Jarak Tempuh') }}</small>
+                            <h5 class="fw-bold text-dark mb-0 font-monospace" id="calcResDistance">0 km</h5>
+                        </div>
+                        <div class="border-start border-end px-3">
+                            <small class="text-muted d-block" style="font-size: 0.75rem;">{{ __('Konsumsi BBM') }}</small>
+                            <h4 class="fw-bold text-primary mb-0 font-monospace" id="calcResKmL">0.0 km/L</h4>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block" style="font-size: 0.75rem;">{{ __('Biaya per KM') }}</small>
+                            <h5 class="fw-bold text-dark mb-0 font-monospace" id="calcResCostKm">Rp 0 /km</h5>
+                        </div>
+                    </div>
+                    <div id="calcBadgeStatus" class="mt-2">
+                        <span class="badge bg-success px-3 py-1.5 fw-bold">{{ __('Sangat Irit') }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer bg-light py-2 border-top">
+                <button type="button" class="btn btn-secondary w-100 fw-bold" data-bs-dismiss="modal" style="border-radius: 8px;">{{ __('Tutup') }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function calculateFuel() {
+        const odoPrev = parseFloat(document.getElementById('calcOdoPrev').value) || 0;
+        const odoCurr = parseFloat(document.getElementById('calcOdoCurr').value) || 0;
+        const liters = parseFloat(document.getElementById('calcLiters').value) || 0;
+        const cost = parseFloat(document.getElementById('calcCost').value) || 0;
+
+        const distance = Math.max(0, odoCurr - odoPrev);
+        const kmL = liters > 0 ? (distance / liters) : 0;
+        const costPerKm = distance > 0 ? (cost / distance) : 0;
+
+        document.getElementById('calcResDistance').innerText = distance.toLocaleString('id-ID') + ' km';
+        document.getElementById('calcResKmL').innerText = kmL.toFixed(1) + ' km/L';
+        document.getElementById('calcResCostKm').innerText = 'Rp ' + Math.round(costPerKm).toLocaleString('id-ID') + ' /km';
+
+        const badgeContainer = document.getElementById('calcBadgeStatus');
+        if (kmL >= 12) {
+            badgeContainer.innerHTML = '<span class="badge bg-success px-3 py-1.5 fw-bold"><i class="bi bi-patch-check-fill me-1"></i> Efisiensi Sangat Baik (Sangat Irit)</span>';
+        } else if (kmL >= 8) {
+            badgeContainer.innerHTML = '<span class="badge bg-warning text-dark px-3 py-1.5 fw-bold"><i class="bi bi-check-circle me-1"></i> Efisiensi Standar / Normal</span>';
+        } else {
+            badgeContainer.innerHTML = '<span class="badge bg-danger px-3 py-1.5 fw-bold"><i class="bi bi-exclamation-triangle-fill me-1"></i> Konsumsi Boros (Perlu Cek Filter / Tune-up)</span>';
+        }
+    }
+
+    ['calcOdoPrev', 'calcOdoCurr', 'calcLiters', 'calcCost'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', calculateFuel);
+        }
+    });
+
+    calculateFuel();
+});
+</script>
+@endpush
 @endsection

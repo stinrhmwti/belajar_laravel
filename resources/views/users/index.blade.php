@@ -142,12 +142,12 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
-        <h3 class="fw-bold text-dark mb-1">Kelola Pengguna Sistem Armada</h3>
-        <p class="text-muted mb-0" style="font-size: 0.95rem;">Manajemen hak akses &amp; pengguna aplikasi FleetMaintenance.</p>
+        <h3 class="fw-bold text-dark mb-1">{{ __('Kelola Pengguna Sistem Armada') }}</h3>
+        <p class="text-muted mb-0" style="font-size: 0.95rem;">{{ __('Manajemen hak akses & pengguna aplikasi FleetMaintenance.') }}</p>
     </div>
     <a href="{{ route('users.create') }}" class="btn btn-primary px-4 py-2 shadow-sm d-flex align-items-center gap-2">
         <i class="bi bi-person-plus-fill fs-6"></i>
-        <span>Tambah Pengguna Baru</span>
+        <span>{{ __('Tambah Pengguna Baru') }}</span>
     </a>
 </div>
 
@@ -159,7 +159,7 @@
                 <i class="bi bi-shield-fill"></i>
             </div>
             <div>
-                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Super Admin</span>
+                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">{{ __('Superadmin') }}</span>
                 <h5 class="fw-bold text-dark mb-0">{{ $users->where('role', 'superadmin')->count() }} <small class="text-muted fs-6 font-normal">User</small></h5>
             </div>
         </div>
@@ -170,7 +170,7 @@
                 <i class="bi bi-shield-lock-fill"></i>
             </div>
             <div>
-                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Admin Fleet</span>
+                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">{{ __('Admin Fleet') }}</span>
                 <h5 class="fw-bold text-dark mb-0">{{ $users->where('role', 'admin')->count() }} <small class="text-muted fs-6 font-normal">User</small></h5>
             </div>
         </div>
@@ -181,7 +181,7 @@
                 <i class="bi bi-tools"></i>
             </div>
             <div>
-                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Mekanik / Teknisi</span>
+                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">{{ __('Mekanik / Teknisi') }}</span>
                 <h5 class="fw-bold text-dark mb-0">{{ $users->where('role', 'teknisi')->count() }} <small class="text-muted fs-6 font-normal">User</small></h5>
             </div>
         </div>
@@ -192,7 +192,7 @@
                 <i class="bi bi-person-badge-fill"></i>
             </div>
             <div>
-                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Driver / User</span>
+                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">{{ __('Driver / User') }}</span>
                 <h5 class="fw-bold text-dark mb-0">{{ $users->where('role', 'user')->count() }} <small class="text-muted fs-6 font-normal">User</small></h5>
             </div>
         </div>
@@ -203,7 +203,7 @@
                 <i class="bi bi-award-fill"></i>
             </div>
             <div>
-                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Pimpinan</span>
+                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">{{ __('Pimpinan') }}</span>
                 <h5 class="fw-bold text-dark mb-0">{{ $users->where('role', 'pimpinan')->count() }} <small class="text-muted fs-6 font-normal">User</small></h5>
             </div>
         </div>
@@ -214,20 +214,20 @@
     <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
         <div class="d-flex align-items-center gap-2">
             <i class="bi bi-people-fill text-primary fs-5"></i>
-            <span class="fw-bold text-dark">Daftar Akun Pengguna</span>
+            <span class="fw-bold text-dark">{{ __('Daftar Akun Pengguna') }}</span>
         </div>
-        <span class="badge bg-light text-secondary border px-3 py-2">Total {{ $users->count() }} Pengguna Aktif</span>
+        <span class="badge bg-light text-secondary border px-3 py-2">{{ __('Total') }} {{ $users->count() }} {{ __('Pengguna Aktif') }}</span>
     </div>
     <div class="table-responsive">
         <table id="tabelPengguna" class="table table-hover align-middle mb-0 w-100" data-count="{{ $users->count() }}">
             <thead>
                 <tr>
-                    <th class="ps-4">Pengguna</th>
-                    <th>NIP / ID Karyawan</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Role &amp; Hak Akses</th>
-                    <th class="pe-4 text-end" data-orderable="false">Aksi</th>
+                    <th class="ps-4">{{ __('Pengguna') }}</th>
+                    <th>{{ __('NIP / ID Karyawan') }}</th>
+                    <th>{{ __('Username') }}</th>
+                    <th>{{ __('Email') }}</th>
+                    <th>{{ __('Role & Hak Akses') }}</th>
+                    <th class="pe-4 text-end" data-orderable="false">{{ __('Aksi') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -324,13 +324,21 @@
                 responsive: true,
                 paging: true,
                 pageLength: 10,
-                lengthChange: false,
+                lengthChange: true,
+                lengthMenu: [
+                    [10, 25, 50, 100, 1000, -1],
+                    [10, 25, 50, 100, 1000, "{{ __('Semua') }}"]
+                ],
                 language: {
-                    search: "Cari cepat:",
-                    zeroRecords: "Data tidak ditemukan",
-                    info: "Menampilkan _START_ - _END_ dari _TOTAL_ pengguna",
-                    infoEmpty: "Tidak ada data",
-                    paginate: { previous: "Sebelumnya", next: "Berikutnya" }
+                    search: "{{ __('Cari cepat:') }}",
+                    lengthMenu: "{{ __('Tampilkan _MENU_ pengguna per halaman') }}",
+                    zeroRecords: "{{ __('Data tidak ditemukan') }}",
+                    info: "{{ __('Menampilkan _START_ - _END_ dari _TOTAL_ pengguna') }}",
+                    infoEmpty: "{{ __('Tidak ada data') }}",
+                    paginate: { 
+                        previous: "{{ __('Sebelumnya') }}", 
+                        next: "{{ __('Berikutnya') }}" 
+                    }
                 },
                 columnDefs: [
                     { orderable: false, targets: -1 }

@@ -217,19 +217,20 @@
         text-align: center;
     }
     .calendar-day-header {
-        font-weight: 700;
-        font-size: 0.72rem;
+        font-weight: 800;
+        font-size: 0.75rem;
         text-transform: uppercase;
+        letter-spacing: 0.5px;
         color: #64748b;
-        padding: 6px 0;
+        padding: 8px 0;
     }
     .calendar-card-custom {
         position: relative;
         border-radius: 16px !important;
-        background-color: #fff5f5 !important;
-        border: 1px solid #f5c2c7 !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.02) !important;
-        transition: box-shadow 0.2s ease;
+        background-color: #ffffff !important;
+        border: 1px solid rgba(0, 0, 0, 0.08) !important;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04) !important;
+        transition: box-shadow 0.25s ease, transform 0.25s ease;
         overflow: hidden !important;
     }
     .calendar-card-custom::before {
@@ -237,54 +238,61 @@
         position: absolute;
         left: 0; top: 0; bottom: 0;
         width: 5px;
-        background: linear-gradient(to bottom, #ef4444, #dc2626) !important;
+        background: linear-gradient(to bottom, #0891b2, #0e3054) !important;
         z-index: 10;
     }
     .calendar-card-custom:hover {
-        box-shadow: 0 8px 25px rgba(0,0,0,0.05) !important;
+        box-shadow: 0 15px 35px rgba(15, 23, 42, 0.07) !important;
     }
     body.dark-theme .calendar-card-custom {
-        background-color: rgba(239, 68, 68, 0.05) !important;
-        border-color: #842029 !important;
+        background-color: #1e293b !important;
+        border-color: #334155 !important;
     }
     .calendar-cell {
         background: #ffffff !important;
-        border: 1.5px solid #f5c2c7 !important;
-        border-radius: 8px;
-        min-height: 52px;
-        padding: 4px;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 12px;
+        min-height: 76px;
+        padding: 8px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        transition: all 0.2s ease;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
     }
     body.dark-theme .calendar-cell {
-        background: #1e293b !important;
-        border-color: #842029 !important;
+        background: #0f172a !important;
+        border-color: #1e293b !important;
     }
     .calendar-cell-empty {
-        background: rgba(255, 255, 255, 0.5) !important;
-        border: 1px dashed #f5c2c7 !important;
-        border-radius: 8px;
-        min-height: 52px;
-        opacity: 0.7;
+        background: rgba(248, 250, 252, 0.5) !important;
+        border: 1.5px dashed #e2e8f0 !important;
+        border-radius: 12px;
+        min-height: 76px;
+        opacity: 0.6;
     }
     body.dark-theme .calendar-cell-empty {
-        background: rgba(30, 41, 59, 0.4) !important;
-        border-color: #842029 !important;
+        background: rgba(15, 23, 42, 0.3) !important;
+        border-color: #1e293b !important;
     }
     .calendar-cell:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(8, 145, 178, 0.08) !important;
+        border-color: #0891b2 !important;
     }
     .calendar-cell.today {
-        border: 2px solid #dc2626 !important;
-        background: rgba(220, 38, 38, 0.05) !important;
+        border: 2px solid #0891b2 !important;
+        background: rgba(8, 145, 178, 0.04) !important;
+    }
+    .calendar-cell.selected-date {
+        border: 2px solid #0e3054 !important;
+        background: rgba(14, 48, 84, 0.03) !important;
+        box-shadow: 0 0 0 3px rgba(14, 48, 84, 0.15) !important;
     }
     .calendar-date-number {
-        font-size: 0.75rem;
-        font-weight: 700;
-        color: #475569;
+        font-size: 0.8rem;
+        font-weight: 800;
+        color: #334155;
         text-align: right;
     }
     body.dark-theme .calendar-date-number {
@@ -295,6 +303,29 @@
         height: 6px;
         border-radius: 50%;
         display: inline-block;
+    }
+    .calendar-event-badge {
+        font-size: 0.62rem;
+        font-weight: 700;
+        padding: 2px 4px;
+        border-radius: 4px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+        text-decoration: none;
+    }
+    .agenda-scroll::-webkit-scrollbar {
+        width: 4px;
+    }
+    .agenda-scroll::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .agenda-scroll::-webkit-scrollbar-thumb {
+        background-color: rgba(8, 145, 178, 0.2);
+        border-radius: 10px;
     }
     
     /* CSS for Leaderboard */
@@ -733,24 +764,142 @@
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <nav style="--bs-breadcrumb-divider: '/';" aria-label="breadcrumb">
             <ol class="breadcrumb mb-0" style="font-size: 0.85rem; font-weight: 600;">
-                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none" style="color: #64748b;">Dashboard</a></li>
-                <li class="breadcrumb-item active" style="color: #0891b2;" aria-current="page">Pemeliharaan Armada</li>
+                <li class="breadcrumb-item"><a href="{{ route('dashboard') }}" class="text-decoration-none" style="color: #64748b;">{{ __('Dashboard') }}</a></li>
+                <li class="breadcrumb-item active" style="color: #0891b2;" aria-current="page">{{ __('Pemeliharaan Armada') }}</li>
             </ol>
         </nav>
         <span id="liveClock" class="text-muted fw-semibold font-monospace" style="font-size: 0.78rem;"></span>
     </div>
 
     <!-- Banner Image Card -->
-    <div class="card border-0 shadow-sm overflow-hidden mb-4 rounded-4" style="background: url('{{ asset('images/box_truck_new.jpg') }}') no-repeat center right; background-size: cover; min-height: 280px; position: relative; border-radius: 16px;">
-        <div class="card-body p-4 p-md-5 d-flex align-items-center text-white position-relative" style="z-index: 2; min-height: 280px;">
-            <div class="col-12 col-md-8 col-lg-7 text-start">
-                <span class="badge bg-warning text-dark fw-bold mb-3" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; border-radius: 5px;">SERVIS DIGITAL &amp; STANDARISASI</span>
-                <h2 class="fw-extrabold mb-2 text-white" style="letter-spacing: -1px; font-size: clamp(1.8rem, 5vw, 2.5rem); line-height: 1.1;">SERVIS <span class="text-warning">PASTI</span> DARI YANG AHLI</h2>
-                <p class="text-white-50 small mb-0 d-none d-sm-block" style="font-size: 0.88rem; line-height: 1.5; text-shadow: 0 2px 4px rgba(0,0,0,0.6);">Inspeksi harian armada dan penjadwalan servis teratur demi keselamatan dan kelancaran operasional di jalan raya.</p>
+    <div class="card border-0 shadow-lg overflow-hidden mb-4 rounded-4 position-relative" 
+         style="background: url('{{ asset('images/clean_car_lineup.jpg') }}') no-repeat center 85%; 
+                background-size: cover; 
+                min-height: 480px; 
+                border-radius: 20px !important; 
+                border: 1px solid rgba(0,0,0,0.05) !important;
+                box-shadow: 0 15px 35px rgba(15,23,42,0.1) !important;
+                transition: transform 0.3s ease, box-shadow 0.3s ease;">
+        
+        <!-- Subtle transparent overlay on the left to ensure high text contrast while keeping background fully visible -->
+        <div style="position: absolute; inset: 0; background: linear-gradient(95deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.55) 45%, rgba(255, 255, 255, 0.1) 75%, rgba(255, 255, 255, 0) 100%); pointer-events: none; z-index: 1;"></div>
+        
+        <!-- Card Content -->
+        <div class="card-body p-4 p-md-5 d-flex flex-column align-items-start justify-content-start position-relative" style="z-index: 2; min-height: 480px; padding-bottom: 100px !important;">
+            <div class="col-12 col-md-9 col-lg-7 text-start py-2">
+                <h1 class="fw-extrabold mb-1" style="color: #0e3054; font-size: clamp(1.8rem, 4vw, 2.5rem); letter-spacing: -1.5px; line-height: 1.15;">
+                    {{ __('SISTEM MANAJEMEN ARMADA') }}
+                </h1>
+                <h5 class="fw-bold mb-3" style="color: #0891b2; letter-spacing: -0.5px;">
+                    {{ __('Kelola Armada, Optimalkan Performa') }}
+                </h5>
+                <p class="mb-4 d-none d-sm-block text-secondary" style="font-size: 0.95rem; line-height: 1.6; max-width: 580px; font-weight: 500; color: #475569 !important;">
+                    {{ __('Solusi lengkap untuk manajemen kendaraan perusahaan mulai dari pemantauan, perawatan, hingga pelaporan dalam satu sistem terintegrasi.') }}
+                </p>
+                
+                <!-- Quick Icon Features Section -->
+                <div class="d-flex align-items-center mb-2 flex-wrap" style="gap: 15px 0;">
+                    <!-- Icon 1: Data Armada -->
+                    <div class="text-center px-3" style="min-width: 80px;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-sm" style="width: 46px; height: 46px; background-color: #0e3054; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                            <i class="bi bi-car-front text-white fs-5"></i>
+                        </div>
+                        <span class="d-block mt-2 fw-semibold text-secondary" style="font-size: 0.75rem; color: #475569 !important;">{{ __('Data Armada') }}</span>
+                    </div>
+
+                    <div class="d-none d-sm-block" style="height: 35px; width: 1px; background-color: rgba(71, 85, 105, 0.25);"></div>
+                    
+                    <!-- Icon 2: Perawatan -->
+                    <div class="text-center px-3" style="min-width: 80px;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-sm" style="width: 46px; height: 46px; background-color: #0e3054; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                            <i class="bi bi-tools text-white fs-5"></i>
+                        </div>
+                        <span class="d-block mt-2 fw-semibold text-secondary" style="font-size: 0.75rem; color: #475569 !important;">{{ __('Perawatan') }}</span>
+                    </div>
+
+                    <div class="d-none d-sm-block" style="height: 35px; width: 1px; background-color: rgba(71, 85, 105, 0.25);"></div>
+
+                    <!-- Icon 3: Bahan Bakar -->
+                    <div class="text-center px-3" style="min-width: 80px;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-sm" style="width: 46px; height: 46px; background-color: #0e3054; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                            <i class="bi bi-fuel-pump text-white fs-5"></i>
+                        </div>
+                        <span class="d-block mt-2 fw-semibold text-secondary" style="font-size: 0.75rem; color: #475569 !important;">{{ __('Bahan Bakar') }}</span>
+                    </div>
+
+                    <div class="d-none d-sm-block" style="height: 35px; width: 1px; background-color: rgba(71, 85, 105, 0.25);"></div>
+
+                    <!-- Icon 4: Laporan -->
+                    <div class="text-center px-3" style="min-width: 80px;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-sm" style="width: 46px; height: 46px; background-color: #0e3054; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                            <i class="bi bi-bar-chart-line text-white fs-5"></i>
+                        </div>
+                        <span class="d-block mt-2 fw-semibold text-secondary" style="font-size: 0.75rem; color: #475569 !important;">{{ __('Laporan') }}</span>
+                    </div>
+
+                    <div class="d-none d-sm-block" style="height: 35px; width: 1px; background-color: rgba(71, 85, 105, 0.25);"></div>
+
+                    <!-- Icon 5: Pengingat -->
+                    <div class="text-center px-3" style="min-width: 80px;">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-sm" style="width: 46px; height: 46px; background-color: #0e3054; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                            <i class="bi bi-bell text-white fs-5"></i>
+                        </div>
+                        <span class="d-block mt-2 fw-semibold text-secondary" style="font-size: 0.75rem; color: #475569 !important;">{{ __('Pengingat') }}</span>
+                    </div>
+                </div>
             </div>
         </div>
-        <!-- Gradient overlay for text readability -->
-        <div style="position: absolute; inset: 0; background: linear-gradient(to right, rgba(15,23,42,0.7) 0%, rgba(15,23,42,0.3) 50%, rgba(15,23,42,0.05) 100%); pointer-events: none;"></div>
+
+        <!-- Top Right Badge: Armada Terpantau -->
+        <div class="position-absolute d-none d-lg-flex align-items-center gap-3 p-3 shadow" 
+             style="top: 30px; right: 30px; background: rgba(224, 242, 254, 0.85); backdrop-filter: blur(8px); border-radius: 16px; border: 1px solid rgba(255,255,255,0.4); max-width: 290px; z-index: 3;">
+            <div class="rounded-3 d-flex align-items-center justify-content-center text-white shadow-sm" style="width: 44px; height: 44px; background-color: #0e3054; flex-shrink: 0;">
+                <i class="bi bi-shield-check fs-4"></i>
+            </div>
+            <div class="text-start">
+                <h6 class="fw-extrabold mb-0.5" style="color: #0e3054; font-size: 0.85rem;">{{ __('Armada Terpantau') }}</h6>
+                <p class="mb-0 text-secondary" style="font-size: 0.72rem; line-height: 1.3; font-weight: 500;">{{ __('Semua kendaraan dalam kondisi siap dan terkontrol penuh.') }}</p>
+            </div>
+        </div>
+
+        <!-- Bottom Semi-Transparent Full-Width Status Bar -->
+        <div class="w-100 position-absolute bottom-0 start-0 px-4 py-3 d-none d-md-block" 
+             style="background: rgba(14, 48, 84, 0.6); backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,0.08); z-index: 3;">
+            <div class="row text-white g-0 text-start align-items-center">
+                <!-- Col 1 -->
+                <div class="col-md-3 d-flex align-items-center gap-3 pe-4" style="border-right: 1px solid rgba(255, 255, 255, 0.15);">
+                    <i class="bi bi-display fs-4 text-white"></i>
+                    <div>
+                        <h6 class="fw-bold mb-0" style="font-size: 0.78rem; letter-spacing: 0.2px;">{{ __('Monitoring Real-Time') }}</h6>
+                        <span class="text-white-50" style="font-size: 0.65rem; line-height: 1.2; display: block;">{{ __('Pantau lokasi dan status kendaraan secara real-time.') }}</span>
+                    </div>
+                </div>
+                <!-- Col 2 -->
+                <div class="col-md-3 d-flex align-items-center gap-3 px-4" style="border-right: 1px solid rgba(255, 255, 255, 0.15);">
+                    <i class="bi bi-calendar3 fs-4 text-white"></i>
+                    <div>
+                        <h6 class="fw-bold mb-0" style="font-size: 0.78rem; letter-spacing: 0.2px;">{{ __('Jadwal Perawatan') }}</h6>
+                        <span class="text-white-50" style="font-size: 0.65rem; line-height: 1.2; display: block;">{{ __('Kelola jadwal servis dan perawatan kendaraan dengan mudah.') }}</span>
+                    </div>
+                </div>
+                <!-- Col 3 -->
+                <div class="col-md-3 d-flex align-items-center gap-3 px-4" style="border-right: 1px solid rgba(255, 255, 255, 0.15);">
+                    <i class="bi bi-file-earmark-text fs-4 text-white"></i>
+                    <div>
+                        <h6 class="fw-bold mb-0" style="font-size: 0.78rem; letter-spacing: 0.2px;">{{ __('Laporan Lengkap') }}</h6>
+                        <span class="text-white-50" style="font-size: 0.65rem; line-height: 1.2; display: block;">{{ __('Dapatkan laporan penggunaan dan biaya operasional.') }}</span>
+                    </div>
+                </div>
+                <!-- Col 4 -->
+                <div class="col-md-3 d-flex align-items-center gap-3 ps-4">
+                    <i class="bi bi-shield-check fs-4 text-white"></i>
+                    <div>
+                        <h6 class="fw-bold mb-0" style="font-size: 0.78rem; letter-spacing: 0.2px;">{{ __('Keamanan Data') }}</h6>
+                        <span class="text-white-50" style="font-size: 0.65rem; line-height: 1.2; display: block;">{{ __('Data armada aman dengan sistem yang terintegrasi.') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Selamat Datang Greetings Card -->
@@ -761,11 +910,11 @@
             <div class="row mb-4">
                 <div class="col-12 text-start">
                     <span class="badge badge-soft-success mb-2 py-1.5 px-3 fw-bold" style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.8px; border-radius: 5px;">
-                        <i class="bi bi-shield-check me-1"></i> Panel {{ ucfirst($role) }}
+                        <i class="bi bi-shield-check me-1"></i> {{ __('Panel') }} {{ ucfirst($role) }}
                     </span>
-                    <h3 class="fw-extrabold text-dark mb-2 dark-text-white" style="font-size: clamp(1.4rem, 4vw, 1.8rem); letter-spacing: -0.5px;">Selamat Datang di Bengkel Resmi FleetMaintenance</h3>
+                    <h3 class="fw-extrabold text-dark mb-2 dark-text-white" style="font-size: clamp(1.4rem, 4vw, 1.8rem); letter-spacing: -0.5px;">{{ __('Selamat Datang di Bengkel Resmi FleetMaintenance') }}</h3>
                     <p class="text-muted mb-0" style="font-size: 0.9rem; line-height: 1.6; max-width: 900px;">
-                        Untuk menjamin keamanan dan kenyamanan dalam berkendara, pastikan armada Anda mendapatkan servis terbaik dari mekanik ahli, dilengkapi dengan prosedur standar dan pencatatan riwayat terpadu.
+                        {{ __('Untuk menjamin keamanan dan kenyamanan dalam berkendara, pastikan armada Anda mendapatkan servis terbaik dari mekanik ahli, dilengkapi dengan prosedur standar dan pencatatan riwayat terpadu.') }}
                     </p>
                 </div>
             </div>
@@ -780,11 +929,11 @@
                                 <div class="icon-box d-flex align-items-center justify-content-center bg-soft-info text-info rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
                                     <i class="bi bi-car-front-fill"></i>
                                 </div>
-                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Kelola Armada</h6>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">{{ __('Kelola Armada') }}</h6>
                             </div>
-                            <p class="text-secondary small mb-3">Pantau status kesiapan, detail spesifikasi, dan jadwal servis unit armada.</p>
+                            <p class="text-secondary small mb-3">{{ __('Pantau status kesiapan, detail spesifikasi, dan jadwal servis unit armada.') }}</p>
                             <a href="{{ route('vehicles.index') }}" class="btn btn-sm btn-info text-white fw-bold w-100 py-2 rounded-3 mt-auto">
-                                Buka Master Armada <i class="bi bi-arrow-right ms-1"></i>
+                                {{ __('Buka Master Armada') }} <i class="bi bi-arrow-right ms-1"></i>
                             </a>
                         </div>
                     </div>
@@ -795,11 +944,11 @@
                                 <div class="icon-box d-flex align-items-center justify-content-center bg-soft-primary text-primary rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
                                     <i class="bi bi-people-fill"></i>
                                 </div>
-                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Kelola Pengguna</h6>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">{{ __('Kelola Pengguna') }}</h6>
                             </div>
-                            <p class="text-secondary small mb-3">Daftarkan dan atur hak akses untuk supir, mekanik, dan pimpinan.</p>
+                            <p class="text-secondary small mb-3">{{ __('Daftarkan dan atur hak akses untuk supir, mekanik, dan pimpinan.') }}</p>
                             <a href="{{ route('users.index') }}" class="btn btn-sm btn-primary fw-bold w-100 py-2 rounded-3 mt-auto">
-                                Buka Manajemen User <i class="bi bi-arrow-right ms-1"></i>
+                                {{ __('Buka Manajemen User') }} <i class="bi bi-arrow-right ms-1"></i>
                             </a>
                         </div>
                     </div>
@@ -810,11 +959,11 @@
                                 <div class="icon-box d-flex align-items-center justify-content-center bg-soft-success text-success rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
                                     <i class="bi bi-printer-fill"></i>
                                 </div>
-                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Cetak Laporan</h6>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">{{ __('Cetak Laporan') }}</h6>
                             </div>
-                            <p class="text-secondary small mb-3">Ekspor atau cetak seluruh riwayat aktivitas pemeliharaan armada.</p>
+                            <p class="text-secondary small mb-3">{{ __('Cetak rangkuman aktivitas perawatan armada ke kertas atau PDF.') }}</p>
                             <button onclick="window.print()" class="btn btn-sm btn-success fw-bold w-100 py-2 rounded-3 mt-auto text-white">
-                                Cetak Laporan Sekarang <i class="bi bi-printer ms-1"></i>
+                                {{ __('Cetak Laporan Sekarang') }} <i class="bi bi-printer ms-1"></i>
                             </button>
                         </div>
                     </div>
@@ -827,11 +976,11 @@
                                 <div class="icon-box d-flex align-items-center justify-content-center bg-soft-info text-info rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
                                     <i class="bi bi-clipboard2-check-fill"></i>
                                 </div>
-                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Input Checklist</h6>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">{{ __('Input Checklist') }}</h6>
                             </div>
-                            <p class="text-secondary small mb-3">Catat kondisi kelayakan fisik & fungsional kendaraan hari ini.</p>
+                            <p class="text-secondary small mb-3">{{ __('Catat kondisi kelayakan fisik & fungsional kendaraan hari ini.') }}</p>
                             <a href="{{ route('checklist.create') }}" class="btn btn-sm btn-info text-white fw-bold w-100 py-2 rounded-3 mt-auto">
-                                Mulai Checklist Baru <i class="bi bi-arrow-right ms-1"></i>
+                                {{ __('Mulai Checklist Baru') }} <i class="bi bi-arrow-right ms-1"></i>
                             </a>
                         </div>
                     </div>
@@ -842,11 +991,11 @@
                                 <div class="icon-box d-flex align-items-center justify-content-center bg-soft-warning text-warning rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
                                     <i class="bi bi-wallet2"></i>
                                 </div>
-                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Catat Biaya Bengkel</h6>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">{{ __('Catat Biaya Bengkel') }}</h6>
                             </div>
-                            <p class="text-secondary small mb-3">Input pengeluaran suku cadang, jasa servis, dan perbaikan unit.</p>
+                            <p class="text-secondary small mb-3">{{ __('Input pengeluaran suku cadang, jasa servis, dan perbaikan unit.') }}</p>
                             <a href="{{ route('expenses.create') }}" class="btn btn-sm btn-warning text-white fw-bold w-100 py-2 rounded-3 mt-auto">
-                                Input Biaya Servis <i class="bi bi-arrow-right ms-1"></i>
+                                {{ __('Input Biaya Servis') }} <i class="bi bi-arrow-right ms-1"></i>
                             </a>
                         </div>
                     </div>
@@ -857,11 +1006,11 @@
                                 <div class="icon-box d-flex align-items-center justify-content-center bg-soft-success text-success rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
                                     <i class="bi bi-printer-fill"></i>
                                 </div>
-                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Cetak Laporan</h6>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">{{ __('Cetak Laporan') }}</h6>
                             </div>
-                            <p class="text-secondary small mb-3">Cetak rangkuman aktivitas perawatan armada ke kertas atau PDF.</p>
+                            <p class="text-secondary small mb-3">{{ __('Cetak rangkuman aktivitas perawatan armada ke kertas atau PDF.') }}</p>
                             <button onclick="window.print()" class="btn btn-sm btn-success fw-bold w-100 py-2 rounded-3 text-white mt-auto">
-                                Cetak Laporan Sekarang <i class="bi bi-printer ms-1"></i>
+                                {{ __('Cetak Laporan Sekarang') }} <i class="bi bi-printer ms-1"></i>
                             </button>
                         </div>
                     </div>
@@ -874,11 +1023,11 @@
                                 <div class="icon-box d-flex align-items-center justify-content-center bg-soft-warning text-warning rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
                                     <i class="bi bi-wallet2"></i>
                                 </div>
-                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Rekap Biaya Operasional</h6>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">{{ __('Rekap Biaya Operasional') }}</h6>
                             </div>
-                            <p class="text-secondary small mb-3">Tinjau, setujui, dan pantau seluruh transaksi pengeluaran perawatan armada.</p>
+                            <p class="text-secondary small mb-3">{{ __('Tinjau, setujui, dan pantau seluruh transaksi pengeluaran perawatan armada.') }}</p>
                             <a href="{{ route('expenses.index') }}" class="btn btn-sm btn-warning text-white fw-bold w-100 py-2 rounded-3 mt-auto">
-                                Buka Rekap Biaya <i class="bi bi-arrow-right ms-1"></i>
+                                {{ __('Buka Rekap Biaya') }} <i class="bi bi-arrow-right ms-1"></i>
                             </a>
                         </div>
                     </div>
@@ -889,43 +1038,58 @@
                                 <div class="icon-box d-flex align-items-center justify-content-center bg-soft-success text-success rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
                                     <i class="bi bi-printer-fill"></i>
                                 </div>
-                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Cetak Laporan</h6>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">{{ __('Cetak Laporan') }}</h6>
                             </div>
-                            <p class="text-secondary small mb-3">Cetak rangkuman aktivitas keuangan dan perbaikan armada.</p>
+                            <p class="text-secondary small mb-3">{{ __('Cetak rangkuman aktivitas keuangan dan perbaikan armada.') }}</p>
                             <button onclick="window.print()" class="btn btn-sm btn-success fw-bold w-100 py-2 rounded-3 text-white mt-auto">
-                                Cetak Laporan Sekarang <i class="bi bi-printer ms-1"></i>
+                                {{ __('Cetak Laporan Sekarang') }} <i class="bi bi-printer ms-1"></i>
                             </button>
                         </div>
                     </div>
 
                 @else
-                    <!-- Action 1 -->
-                    <div class="col-md-6">
+                    <!-- Action 1: Input Checklist -->
+                    <div class="col-md-4">
+                        <div class="card h-100 hover-lift border-0 shadow-xs p-3 text-start bg-light-soft" style="border-radius: 12px; background: rgba(8, 145, 178, 0.04); border: 1px solid rgba(8, 145, 178, 0.08) !important;">
+                            <div class="d-flex align-items-center gap-3 mb-3">
+                                <div class="icon-box d-flex align-items-center justify-content-center bg-soft-info text-info rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
+                                    <i class="bi bi-clipboard2-check-fill"></i>
+                                </div>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">{{ __('Input Checklist') }}</h6>
+                            </div>
+                            <p class="text-secondary small mb-3">{{ __('Catat kondisi kelayakan fisik & fungsional kendaraan Anda hari ini.') }}</p>
+                            <a href="{{ route('checklist.create') }}" class="btn btn-sm btn-info text-white fw-bold w-100 py-2 rounded-3 mt-auto">
+                                {{ __('Mulai Checklist Baru') }} <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Action 2: Lapor Keluhan -->
+                    <div class="col-md-4">
                         <div class="card h-100 hover-lift border-0 shadow-xs p-3 text-start bg-light-soft" style="border-radius: 12px; background: rgba(239, 68, 68, 0.04); border: 1px solid rgba(239, 68, 68, 0.08) !important;">
                             <div class="d-flex align-items-center gap-3 mb-3">
                                 <div class="icon-box d-flex align-items-center justify-content-center bg-soft-danger text-danger rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
                                     <i class="bi bi-megaphone-fill"></i>
                                 </div>
-                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Lapor Keluhan</h6>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">{{ __('Lapor Keluhan') }}</h6>
                             </div>
-                            <p class="text-secondary small mb-3">Laporkan kendala atau keluhan kerusakan kendaraan Anda ke tim bengkel.</p>
+                            <p class="text-secondary small mb-3">{{ __('Laporkan kendala atau keluhan kerusakan kendaraan Anda ke tim bengkel.') }}</p>
                             <a href="{{ route('complaints.create') }}" class="btn btn-sm btn-danger fw-bold w-100 py-2 rounded-3 mt-auto">
-                                Buat Laporan Keluhan <i class="bi bi-arrow-right ms-1"></i>
+                                {{ __('Buat Laporan Keluhan') }} <i class="bi bi-arrow-right ms-1"></i>
                             </a>
                         </div>
                     </div>
-                    <!-- Action 2 -->
-                    <div class="col-md-6">
+                    <!-- Action 3: Cetak Laporan -->
+                    <div class="col-md-4">
                         <div class="card h-100 hover-lift border-0 shadow-xs p-3 text-start bg-light-soft" style="border-radius: 12px; background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.08) !important;">
                             <div class="d-flex align-items-center gap-3 mb-3">
                                 <div class="icon-box d-flex align-items-center justify-content-center bg-soft-success text-success rounded-3" style="width: 44px; height: 44px; font-size: 1.25rem;">
                                     <i class="bi bi-printer-fill"></i>
                                 </div>
-                                <h6 class="fw-bold mb-0 text-dark dark-text-white">Cetak Laporan</h6>
+                                <h6 class="fw-bold mb-0 text-dark dark-text-white">{{ __('Cetak Laporan') }}</h6>
                             </div>
-                            <p class="text-secondary small mb-3">Cetak rangkuman data laporan atau halaman dashboard ini.</p>
+                            <p class="text-secondary small mb-3">{{ __('Cetak rangkuman data laporan atau halaman dashboard ini.') }}</p>
                             <button onclick="window.print()" class="btn btn-sm btn-success fw-bold w-100 py-2 rounded-3 text-white mt-auto">
-                                Cetak Halaman Ini <i class="bi bi-printer ms-1"></i>
+                                {{ __('Cetak Halaman Ini') }} <i class="bi bi-printer ms-1"></i>
                             </button>
                         </div>
                     </div>
@@ -947,7 +1111,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div class="card-grad-title d-flex align-items-center gap-2">
                             <span class="pulse-dot-green"></span>
-                            <span>Total Kendaraan</span>
+                            <span>{{ __('Total Kendaraan') }}</span>
                         </div>
                         <div class="card-grad-icon">
                             <i class="bi bi-car-front-fill"></i>
@@ -955,12 +1119,12 @@
                     </div>
                     <div class="d-flex align-items-baseline justify-content-between">
                         <h2 class="mb-0 fw-extrabold display-6 text-white">{{ $totalKendaraan }}</h2>
-                        <span class="badge font-normal text-white" style="background: rgba(255, 255, 255, 0.22) !important; font-size:0.75rem;">Unit Aktif</span>
+                        <span class="badge font-normal text-white" style="background: rgba(255, 255, 255, 0.22) !important; font-size:0.75rem;">{{ __('Unit Aktif') }}</span>
                     </div>
                 </div>
                 <div class="mt-3">
                     <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
-                        <span class="text-white-50">Rasio Siap Operasional</span>
+                        <span class="text-white-50">{{ __('Rasio Siap Operasional') }}</span>
                         <span class="fw-bold text-white">{{ $totalKendaraan > 0 ? round(($selesaiServis / $totalKendaraan) * 100) : 100 }}%</span>
                     </div>
                     <div class="progress" style="height: 4px; border-radius: 10px; background: rgba(255, 255, 255, 0.22);">
@@ -982,19 +1146,19 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div class="card-grad-title d-flex align-items-center gap-2">
                             <span class="{{ $keluhanHariIni > 0 ? 'pulse-dot-red' : 'pulse-dot-green' }}"></span>
-                            <span>Keluhan Hari Ini</span>
+                            <span>{{ __('Keluhan Hari Ini') }}</span>
                         </div>
                         <div class="card-grad-icon"><i class="bi bi-exclamation-octagon-fill"></i></div>
                     </div>
                     <div class="d-flex align-items-baseline justify-content-between">
                         <h2 class="mb-0 fw-extrabold display-6 text-white">{{ $keluhanHariIni }}</h2>
-                        <span class="badge bg-danger text-white border border-danger-subtle fw-bold" style="font-size:0.68rem; letter-spacing: 0.5px; text-transform: uppercase; padding: 3px 8px; border-radius: 12px; background: rgba(220,38,38,0.7) !important;">Baru</span>
+                        <span class="badge bg-danger text-white border border-danger-subtle fw-bold" style="font-size:0.68rem; letter-spacing: 0.5px; text-transform: uppercase; padding: 3px 8px; border-radius: 12px; background: rgba(220,38,38,0.7) !important;">{{ __('Baru') }}</span>
                     </div>
                 </div>
                 <div class="mt-3">
                     <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
-                        <span class="text-white-50">Tindak Lanjut Segera</span>
-                        <span class="fw-bold text-white">Butuh Respon</span>
+                        <span class="text-white-50">{{ __('Tindak Lanjut Segera') }}</span>
+                        <span class="fw-bold text-white">{{ __('Butuh Respon') }}</span>
                     </div>
                     <div class="progress" style="height: 4px; border-radius: 10px; background: rgba(255, 255, 255, 0.22);">
                         <div class="progress-bar bg-white" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
@@ -1015,18 +1179,18 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div class="card-grad-title d-flex align-items-center gap-2">
                             <span class="{{ $sedangServis > 0 ? 'pulse-dot-yellow' : 'pulse-dot-green' }}"></span>
-                            <span>Sedang Servis</span>
+                            <span>{{ __('Sedang Servis') }}</span>
                         </div>
                         <div class="card-grad-icon"><i class="bi bi-wrench-adjustable-caps"></i></div>
                     </div>
                     <div class="d-flex align-items-baseline justify-content-between">
                         <h2 class="mb-0 fw-extrabold display-6 text-white">{{ $sedangServis }}</h2>
-                        <span class="badge bg-warning text-dark border border-warning-subtle fw-bold" style="font-size:0.68rem; letter-spacing: 0.5px; text-transform: uppercase; padding: 3px 8px; border-radius: 12px; background: rgba(245,158,11,0.7) !important;">Bengkel</span>
+                        <span class="badge bg-warning text-dark border border-warning-subtle fw-bold" style="font-size:0.68rem; letter-spacing: 0.5px; text-transform: uppercase; padding: 3px 8px; border-radius: 12px; background: rgba(245,158,11,0.7) !important;">{{ __('Bengkel') }}</span>
                     </div>
                 </div>
                 <div class="mt-3">
                     <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
-                        <span class="text-white-50">Proses Perbaikan</span>
+                        <span class="text-white-50">{{ __('Proses Perbaikan') }}</span>
                         <span class="fw-bold text-white">{{ $totalKendaraan > 0 ? round(($sedangServis / $totalKendaraan) * 100) : 0 }}%</span>
                     </div>
                     <div class="progress" style="height: 4px; border-radius: 10px; background: rgba(255, 255, 255, 0.22);">
@@ -1048,18 +1212,18 @@
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div class="card-grad-title d-flex align-items-center gap-2">
                             <span class="pulse-dot-green"></span>
-                            <span>Selesai / Siap Pakai</span>
+                            <span>{{ __('Selesai / Siap Pakai') }}</span>
                         </div>
                         <div class="card-grad-icon"><i class="bi bi-check2-circle"></i></div>
                     </div>
                     <div class="d-flex align-items-baseline justify-content-between">
                         <h2 class="mb-0 fw-extrabold display-6 text-white">{{ $selesaiServis }}</h2>
-                        <span class="badge font-normal text-white" style="background: rgba(255, 255, 255, 0.22) !important; font-size:0.75rem;">Siap Jalan</span>
+                        <span class="badge font-normal text-white" style="background: rgba(255, 255, 255, 0.22) !important; font-size:0.75rem;">{{ __('Siap Jalan') }}</span>
                     </div>
                 </div>
                 <div class="mt-3">
                     <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
-                        <span class="text-white-50">Rasio Kesiapan Armada</span>
+                        <span class="text-white-50">{{ __('Rasio Kesiapan Armada') }}</span>
                         <span class="fw-bold text-white">{{ $totalKendaraan > 0 ? round(($selesaiServis / $totalKendaraan) * 100) : 100 }}%</span>
                     </div>
                     <div class="progress" style="height: 4px; border-radius: 10px; background: rgba(255, 255, 255, 0.22);">
@@ -1086,7 +1250,7 @@
                             <i class="bi bi-cash-stack"></i>
                         </div>
                         <div>
-                            <small class="text-muted d-block" style="font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Biaya Bulan Ini</small>
+                            <small class="text-muted d-block" style="font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">{{ __('Biaya Bulan Ini') }}</small>
                             <span class="fw-extrabold text-dark" style="font-size: 1.1rem;">Rp {{ number_format($totalBiayaBulanIni, 0, ',', '.') }}</span>
                         </div>
                     </div>
@@ -1099,8 +1263,8 @@
                             <i class="bi bi-calendar-x-fill"></i>
                         </div>
                         <div>
-                            <small class="text-muted d-block" style="font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">KIR Lewat Tempo</small>
-                            <span class="fw-extrabold text-danger" style="font-size: 1.1rem;">{{ $kendaraanBermasalah }} Unit</span>
+                            <small class="text-muted d-block" style="font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">{{ __('KIR Lewat Tempo') }}</small>
+                            <span class="fw-extrabold text-danger" style="font-size: 1.1rem;">{{ $kendaraanBermasalah }} {{ __('Unit') }}</span>
                         </div>
                     </div>
                 </div>
@@ -1112,8 +1276,8 @@
                             <i class="bi bi-hourglass-split"></i>
                         </div>
                         <div>
-                            <small class="text-muted d-block" style="font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Mendekati Tempo</small>
-                            <span class="fw-extrabold text-warning" style="font-size: 1.1rem;">{{ $kendaraanMendekatiJatuhTempo }} Unit</span>
+                            <small class="text-muted d-block" style="font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">{{ __('Mendekati Tempo') }}</small>
+                            <span class="fw-extrabold text-warning" style="font-size: 1.1rem;">{{ $kendaraanMendekatiJatuhTempo }} {{ __('Unit') }}</span>
                         </div>
                     </div>
                 </div>
@@ -1125,8 +1289,8 @@
                             <i class="bi bi-exclamation-triangle-fill"></i>
                         </div>
                         <div>
-                            <small class="text-muted d-block" style="font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">Servis Lewat Jadwal</small>
-                            <span class="fw-extrabold text-info" style="font-size: 1.1rem;">{{ $perluServis->count() }} Unit</span>
+                            <small class="text-muted d-block" style="font-size:0.72rem; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">{{ __('Servis Lewat Jadwal') }}</small>
+                            <span class="fw-extrabold text-info" style="font-size: 1.1rem;">{{ $perluServis->count() }} {{ __('Unit') }}</span>
                         </div>
                     </div>
                 </div>
@@ -1203,7 +1367,7 @@
                                 <div class="card-grad-title">Laporan Keluhan</div>
                                 <div class="card-grad-icon"><i class="bi bi-chat-left-text-fill"></i></div>
                             @else
-                                <div class="card-grad-title">KIR Lewat Tempo</div>
+                                <div class="card-grad-title">{{ __('KIR Lewat Tempo') }}</div>
                                 <div class="card-grad-icon"><i class="bi bi-exclamation-octagon-fill"></i></div>
                             @endif
                         </div>
@@ -1346,9 +1510,9 @@
             <div class="card-header d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-warning-subtle text-warning-emphasis rounded p-1.5"><i class="bi bi-clock-history fs-5"></i></div>
-                    <span class="fw-bold">Pengajuan Anggaran Perlu Persetujuan</span>
+                    <span class="fw-bold">{{ __('Pengajuan Anggaran Perlu Persetujuan') }}</span>
                 </div>
-                <span class="badge bg-warning-subtle text-warning-emphasis fw-bold">{{ $menungguPersetujuan->count() }} Menunggu</span>
+                <span class="badge bg-warning-subtle text-warning-emphasis fw-bold">{{ $menungguPersetujuan->count() }} {{ __('Menunggu') }}</span>
             </div>
             <div class="card-body p-4 d-flex flex-column justify-content-start" style="min-height: 280px;">
                 @forelse ($menungguPersetujuan as $e)
@@ -1356,9 +1520,9 @@
                     <div>
                         <div class="d-flex align-items-center gap-2 mb-1">
                             <span class="badge bg-dark text-white font-monospace" style="letter-spacing: 0.5px; border-radius: 6px; font-size: 0.72rem; padding: 4px 8px;">{{ $e->vehicle->plat_nomor ?? 'N/A' }}</span>
-                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size:0.7rem; padding: 4px 8px; border-radius: 6px;">{{ $e->jenis_pengeluaran }}</span>
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle" style="font-size:0.7rem; padding: 4px 8px; border-radius: 6px;">{{ __($e->jenis_pengeluaran) }}</span>
                         </div>
-                        <h6 class="fw-bold text-dark mb-1" style="font-size:0.875rem;">{{ $e->keterangan ?? 'Tanpa keterangan' }}</h6>
+                        <h6 class="fw-bold text-dark mb-1" style="font-size:0.875rem;">{{ $e->keterangan ?? __('Tanpa keterangan') }}</h6>
                         <small class="text-secondary" style="font-size:0.75rem;"><i class="bi bi-calendar3 me-1"></i> {{ $e->tanggal->format('d M Y') }}</small>
                     </div>
                     <div class="text-end ms-3">
@@ -1366,10 +1530,10 @@
                         <form action="{{ route('expenses.approve', $e) }}" method="POST" class="d-flex gap-2 justify-content-end">
                             @csrf @method('PUT')
                             <button type="submit" name="status_approval" value="Disetujui" class="btn btn-sm btn-success d-inline-flex align-items-center gap-1 shadow-sm px-3" style="font-size:0.75rem; border-radius:8px; font-weight: 600;">
-                                <i class="bi bi-check-lg"></i> Setuju
+                                <i class="bi bi-check-lg"></i> {{ __('Setuju') }}
                             </button>
                             <button type="submit" name="status_approval" value="Ditolak" class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1 px-3" style="font-size:0.75rem; border-radius:8px; font-weight: 600;">
-                                <i class="bi bi-x-lg"></i> Tolak
+                                <i class="bi bi-x-lg"></i> {{ __('Tolak') }}
                             </button>
                         </form>
                     </div>
@@ -1379,8 +1543,8 @@
                     <div class="premium-pulse-success mb-3 mx-auto">
                         <i class="bi bi-check-lg text-success" style="font-size: 1.8rem;"></i>
                     </div>
-                    <h6 class="fw-extrabold text-dark mb-1">Semua Anggaran Disetujui</h6>
-                    <p class="text-muted mb-0" style="font-size: 0.8rem;">Tidak ada klaim biaya yang tertunda.</p>
+                    <h6 class="fw-extrabold text-dark mb-1">{{ __('Semua Anggaran Disetujui') }}</h6>
+                    <p class="text-muted mb-0" style="font-size: 0.8rem;">{{ __('Tidak ada klaim biaya yang tertunda.') }}</p>
                 </div>
                 @endforelse
             </div>
@@ -1391,9 +1555,9 @@
             <div class="card-header d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-danger-subtle text-danger rounded p-1.5"><i class="bi bi-exclamation-square-fill fs-5"></i></div>
-                    <span class="fw-bold">Laporan Keluhan Baru Dari Pengemudi</span>
+                    <span class="fw-bold">{{ __('Laporan Keluhan Baru Dari Pengemudi') }}</span>
                 </div>
-                <a href="{{ route('complaints.index') }}" class="btn btn-xs btn-outline-primary px-2.5 py-1" style="font-size:0.78rem;">Lihat Semua</a>
+                <a href="{{ route('complaints.index') }}" class="btn btn-xs btn-outline-primary px-2.5 py-1" style="font-size:0.78rem;">{{ __('Lihat Semua') }}</a>
             </div>
             <div class="card-body p-4 d-flex flex-column justify-content-start" style="min-height: 280px;">
                 @forelse ($keluhanBaru as $k)
@@ -1401,7 +1565,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <div class="d-flex align-items-center gap-2">
                             <span class="badge bg-dark text-white font-monospace" style="letter-spacing: 0.5px; border-radius: 6px; font-size: 0.72rem; padding: 4px 8px;">{{ $k->vehicle->plat_nomor ?? 'N/A' }}</span>
-                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="font-size:0.68rem; padding: 3px 6px; border-radius: 5px;">Baru</span>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="font-size:0.68rem; padding: 3px 6px; border-radius: 5px;">{{ __('Baru') }}</span>
                         </div>
                         <div class="d-flex align-items-center gap-1.5 text-muted" style="font-size:0.75rem;">
                             <div class="rounded-circle overflow-hidden bg-slate-100 d-flex align-items-center justify-content-center border" style="width: 22px; height: 22px; font-size: 0.65rem; font-weight: 700;">
@@ -1416,7 +1580,7 @@
                     <div class="d-flex justify-content-between align-items-center mt-2">
                         <small class="text-secondary" style="font-size:0.72rem;"><i class="bi bi-clock me-1"></i>{{ $k->created_at ? $k->created_at->diffForHumans() : '-' }}</small>
                         <a href="{{ route('complaints.index') }}" class="btn btn-xs btn-outline-primary px-3 py-1 d-inline-flex align-items-center gap-1" style="font-size: 0.72rem; border-radius: 6px; font-weight: 600;">
-                            Proses <i class="bi bi-arrow-right"></i>
+                            {{ __('Proses') }} <i class="bi bi-arrow-right"></i>
                         </a>
                     </div>
                 </div>
@@ -1425,8 +1589,8 @@
                     <div class="premium-pulse-success mb-3 mx-auto">
                         <i class="bi bi-shield-check text-success" style="font-size: 1.8rem;"></i>
                     </div>
-                    <h6 class="fw-extrabold text-dark mb-1">Armada Bebas Masalah</h6>
-                    <p class="text-muted mb-0" style="font-size: 0.8rem;">Belum ada keluhan baru hari ini.</p>
+                    <h6 class="fw-extrabold text-dark mb-1">{{ __('Armada Bebas Masalah') }}</h6>
+                    <p class="text-muted mb-0" style="font-size: 0.8rem;">{{ __('Belum ada keluhan baru hari ini.') }}</p>
                 </div>
                 @endforelse
             </div>
@@ -1436,35 +1600,59 @@
 @endif
 
 {{-- WIDGET AGENDA KALENDER & EXPORTER LAPORAN --}}
-<div class="row g-4 mb-4">
+<div class="row g-4 mb-4" id="calendarSection">
     <!-- Col 1: Agenda Kalender Servis & KIR -->
-    <div class="col-lg-12">
-        <div class="card calendar-card-custom h-100 overflow-hidden" id="calendarSection">
-            <div class="card-header d-flex align-items-center justify-content-between" style="background-color: transparent !important; border-bottom: 1px solid rgba(79, 70, 229, 0.15) !important;">
+    <div class="col-lg-8 col-12">
+        <div class="card calendar-card-custom h-100 overflow-hidden">
+            <div class="card-header d-flex align-items-center justify-content-between" style="background-color: transparent !important; border-bottom: 1px solid rgba(14, 48, 84, 0.08) !important;">
                 <div class="d-flex align-items-center gap-2">
-                    <div class="bg-primary-subtle text-primary rounded p-1.5"><i class="bi bi-calendar3 fs-5"></i></div>
+                    <div class="bg-info-subtle text-info rounded p-1.5" style="background-color: rgba(8, 145, 178, 0.08) !important; color: #0891b2 !important;"><i class="bi bi-calendar3 fs-5"></i></div>
                     <div>
-                        <span class="fw-bold d-block">Agenda Pemeliharaan &amp; KIR</span>
-                        <small class="text-muted" style="font-size:0.75rem;">Jadwal jatuh tempo dokumen &amp; rencana servis bulan ini</small>
+                        <span class="fw-bold d-block text-dark dark-text-white">{{ __('Agenda Pemeliharaan & KIR') }}</span>
+                        <small class="text-muted" style="font-size:0.75rem;">{{ __('Jadwal jatuh tempo dokumen & rencana servis bulan ini') }}</small>
                     </div>
                 </div>
                 <div class="d-flex gap-1">
                     <button class="btn btn-xs btn-outline-secondary px-2.5 py-1" id="btnPrevMonth" style="font-size:0.72rem; border-radius:6px;"><i class="bi bi-chevron-left"></i></button>
-                    <span class="fw-bold px-2 align-self-center text-dark" id="calendarMonthTitle" style="font-size:0.82rem;">Agustus 2026</span>
+                    <span class="fw-bold px-2 align-self-center text-dark dark-text-white" id="calendarMonthTitle" style="font-size:0.82rem;">Agustus 2026</span>
                     <button class="btn btn-xs btn-outline-secondary px-2.5 py-1" id="btnNextMonth" style="font-size:0.72rem; border-radius:6px;"><i class="bi bi-chevron-right"></i></button>
                 </div>
             </div>
             <div class="card-body p-3">
                 <div class="calendar-container" id="calendarContainer">
                     <!-- Day Headers -->
-                    <div class="calendar-day-header">Min</div>
-                    <div class="calendar-day-header">Sen</div>
-                    <div class="calendar-day-header">Sel</div>
-                    <div class="calendar-day-header">Rab</div>
-                    <div class="calendar-day-header">Kam</div>
-                    <div class="calendar-day-header">Jum</div>
-                    <div class="calendar-day-header">Sab</div>
+                    <div class="calendar-day-header">{{ __('Min') }}</div>
+                    <div class="calendar-day-header">{{ __('Sen') }}</div>
+                    <div class="calendar-day-header">{{ __('Sel') }}</div>
+                    <div class="calendar-day-header">{{ __('Rab') }}</div>
+                    <div class="calendar-day-header">{{ __('Kam') }}</div>
+                    <div class="calendar-day-header">{{ __('Jum') }}</div>
+                    <div class="calendar-day-header">{{ __('Sab') }}</div>
                     <!-- Cells will be generated dynamically by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Col 2: Detail Agenda Harian -->
+    <div class="col-lg-4 col-12">
+        <div class="card calendar-card-custom h-100 overflow-hidden" id="agendaCard">
+            <div class="card-header d-flex align-items-center justify-content-between" style="background-color: transparent !important; border-bottom: 1px solid rgba(14, 48, 84, 0.08) !important;">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary-subtle text-primary rounded p-1.5" style="background-color: rgba(14, 48, 84, 0.08) !important; color: #0e3054 !important;"><i class="bi bi-clock-history fs-5"></i></div>
+                    <div>
+                        <span class="fw-bold d-block text-dark dark-text-white">{{ __('Agenda Harian') }}</span>
+                        <small class="text-muted" style="font-size:0.75rem;">{{ __('Jadwal operasional & rencana aksi') }}</small>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-3 text-start">
+                <div class="mb-3">
+                    <span class="text-secondary fw-bold small text-uppercase d-block mb-1" style="font-size: 0.72rem; letter-spacing: 0.5px;">{{ __('Tanggal Terpilih') }}</span>
+                    <h6 class="fw-extrabold text-dark dark-text-white mb-0" id="agendaSelectedDate">{{ __('Memuat agenda...') }}</h6>
+                </div>
+                <div class="agenda-scroll" id="agendaListContainer" style="max-height: 420px; overflow-y: auto; padding-right: 5px;">
+                    <!-- Agenda items will load dynamically here -->
                 </div>
             </div>
         </div>
@@ -1478,7 +1666,7 @@
             <div class="card-header d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-primary-subtle text-primary rounded p-1.5"><i class="bi bi-pie-chart-fill fs-5"></i></div>
-                    <span class="fw-bold">Distribusi Status Armada</span>
+                    <span class="fw-bold">{{ __('Distribusi Status Armada') }}</span>
                 </div>
             </div>
             <div class="card-body d-flex align-items-center justify-content-center p-4">
@@ -1494,9 +1682,9 @@
             <div class="card-header d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-indigo-subtle text-indigo rounded p-1.5" style="background:#e0e7ff; color:#4f46e5;"><i class="bi bi-graph-up-arrow fs-5"></i></div>
-                    <span class="fw-bold">Tren Pengeluaran Biaya (6 Bulan Terakhir)</span>
+                    <span class="fw-bold">{{ __('Tren Pengeluaran Biaya (6 Bulan Terakhir)') }}</span>
                 </div>
-                <span class="badge bg-light text-secondary border">Agregat Bulanan</span>
+                <span class="badge bg-light text-secondary border">{{ __('Agregat Bulanan') }}</span>
             </div>
             <div class="card-body p-4">
                 <div style="position: relative; height: 320px; width: 100%;">
@@ -1514,7 +1702,7 @@
         <div class="card dashboard-card">
             <div class="card-header d-flex align-items-center gap-2">
                 <div class="bg-warning-subtle text-warning-emphasis rounded p-1.5"><i class="bi bi-bar-chart-line-fill fs-5"></i></div>
-                <span class="fw-bold">Top 5 Kendaraan Dengan Biaya Perawatan/BBM Tertinggi</span>
+                <span class="fw-bold">{{ __('Top 5 Kendaraan Dengan Biaya Perawatan/BBM Tertinggi') }}</span>
             </div>
             <div class="card-body p-4">
                 <div style="position: relative; height: 260px; width: 100%;">
@@ -1605,17 +1793,21 @@
                 <img src="{{ $v->foto_url }}" alt="{{ $v->plat_nomor }}" class="rounded-3 border object-fit-cover shadow-xs" style="width: 64px; height: 48px;">
                 <div>
                     <span class="fw-bold font-monospace fs-5 text-dark d-block">{{ $v->plat_nomor }}</span>
-                    <small class="text-muted">{{ $v->jenis_kendaraan }} - {{ $v->merek }}</small>
+                    <small class="text-muted d-block mb-1">{{ $v->jenis_kendaraan }} - {{ $v->merek }}</small>
+                    <a href="{{ route('checklist.create', ['vehicle_id' => $v->id]) }}" class="btn btn-xs btn-outline-info py-0.5 px-2 fw-semibold" style="font-size: 0.72rem; border-radius: 6px;">
+                        <i class="bi bi-clipboard2-check"></i> {{ __('Mulai Pengecekan') }}
+                    </a>
                 </div>
             </div>
-            <div>
+            <div class="text-end">
                 @if ($v->status_kir === 'merah')
-                    <span class="badge bg-danger">Lewat Tempo</span>
+                    <span class="badge bg-danger mb-1 d-inline-block">KIR: Lewat Tempo</span>
                 @elseif ($v->status_kir === 'kuning')
-                    <span class="badge bg-warning text-dark">Mendekati</span>
+                    <span class="badge bg-warning text-dark mb-1 d-inline-block">KIR: Mendekati</span>
                 @else
-                    <span class="badge bg-success">Aman</span>
+                    <span class="badge bg-success mb-1 d-inline-block">KIR: Aman</span>
                 @endif
+                <small class="text-muted d-block" style="font-size:0.75rem;">Odo: {{ number_format($v->odometer_terkini, 0, ',', '.') }} km</small>
             </div>
         </div>
     </div>
@@ -1718,7 +1910,6 @@
                 lat = defaultLat + Math.sin(angle) * radius;
                 lng = defaultLng + Math.cos(angle) * radius;
             }
-
             // Determine Status Group Class for styling
             let markerType = 'marker-ready'; // Default green
             if (v.status === 'Sedang Diservis') {
@@ -1820,10 +2011,17 @@
     gradSelesai.addColorStop(0, '#6366f1');
     gradSelesai.addColorStop(1, '#818cf8');
 
+    const translatedStatusLabels = (chartPayload.status.labels || []).map(label => {
+        if (label === 'Siap Pakai') return "{{ __('Siap Pakai') }}";
+        if (label === 'Sedang Diservis') return "{{ __('Sedang Diservis') }}";
+        if (label === 'Selesai') return "{{ __('Selesai') }}";
+        return label;
+    });
+
     const chartStatus = new Chart(ctxStatus, {
         type: 'doughnut',
         data: {
-            labels: chartPayload.status.labels,
+            labels: translatedStatusLabels,
             datasets: [{
                 data: chartPayload.status.data,
                 backgroundColor: [gradSiap, gradServis, gradSelesai],
@@ -1860,19 +2058,19 @@
         lineGradient.addColorStop(0, '#3b82f6');
         lineGradient.addColorStop(0.5, '#6366f1');
         lineGradient.addColorStop(1, '#a855f7');
-
+ 
         // Smooth fading area fill
         const gradientTren = ctxTren.createLinearGradient(0, 0, 0, 300);
         gradientTren.addColorStop(0, 'rgba(99, 102, 241, 0.35)');
         gradientTren.addColorStop(0.5, 'rgba(168, 85, 247, 0.1)');
         gradientTren.addColorStop(1, 'rgba(168, 85, 247, 0.0)');
-
+ 
         const chartTren = new Chart(ctxTren, {
             type: 'line',
             data: {
                 labels: chartPayload.tren.labels,
                 datasets: [{
-                    label: 'Biaya (Rp)',
+                    label: "{{ __('Biaya (Rp)') }}",
                     data: chartPayload.tren.data,
                     borderColor: lineGradient,
                     backgroundColor: gradientTren,
@@ -1918,7 +2116,7 @@
         });
         chartInstances.push(chartTren);
     }
-
+ 
     // 3. Top 5 Expense Vehicles Chart (Bar) with modern warning gradient (Purple -> Rose -> Coral)
     if (chartPayload.boros) {
         const ctxBoros = document.getElementById('chartBoros').getContext('2d');
@@ -1927,13 +2125,13 @@
         gradientBoros.addColorStop(0, '#8b5cf6'); // Violet
         gradientBoros.addColorStop(0.5, '#ec4899'); // Rose Pink
         gradientBoros.addColorStop(1, '#f97316'); // Coral Orange
-
+ 
         const chartBoros = new Chart(ctxBoros, {
             type: 'bar',
             data: {
                 labels: chartPayload.boros.labels,
                 datasets: [{
-                    label: 'Total Biaya (Rp)',
+                    label: "{{ __('Total Biaya (Rp)') }}",
                     data: chartPayload.boros.data,
                     backgroundColor: gradientBoros,
                     borderRadius: 8,
@@ -2054,7 +2252,76 @@
         var currentDate = new Date();
         var currentMonth = currentDate.getMonth();
         var currentYear = currentDate.getFullYear();
-        var monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        var monthNames = [
+            "{{ __('Januari') }}", "{{ __('Februari') }}", "{{ __('Maret') }}", "{{ __('April') }}",
+            "{{ __('Mei') }}", "{{ __('Juni') }}", "{{ __('Juli') }}", "{{ __('Agustus') }}",
+            "{{ __('September') }}", "{{ __('Oktober') }}", "{{ __('November') }}", "{{ __('Desember') }}"
+        ];
+        const currentLocale = '{{ App::getLocale() === 'en' ? 'en-US' : 'id-ID' }}';
+
+        function showAgendaForDate(dateStr) {
+            const parsedDate = new Date(dateStr);
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            const formattedDate = parsedDate.toLocaleDateString(currentLocale, options);
+            
+            const dateTitle = document.getElementById('agendaSelectedDate');
+            if (dateTitle) dateTitle.textContent = formattedDate;
+            
+            const container = document.getElementById('agendaListContainer');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            const events = (chartPayload.calendarEvents || []).filter(e => e.date === dateStr);
+            
+            if (events.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-5 my-3">
+                        <div class="mb-3 mx-auto text-muted d-flex align-items-center justify-content-center rounded-circle" style="width: 56px; height: 56px; background-color: rgba(8, 145, 178, 0.08) !important;">
+                            <i class="bi bi-calendar-check text-info fs-4" style="color: #0891b2 !important;"></i>
+                        </div>
+                        <h6 class="fw-bold text-dark dark-text-white mb-1">${"{{ __('Bebas Operasional') }}"}</h6>
+                        <p class="text-muted small mb-0" style="font-size: 0.78rem;">${"{{ __('Tidak ada jadwal servis atau KIR untuk armada pada tanggal ini.') }}"}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            events.forEach(ev => {
+                const isKir = ev.type === 'kir';
+                const icon = isKir ? 'bi-shield-check' : 'bi-wrench-adjustable';
+                const bgClass = isKir ? 'bg-soft-info text-info' : 'bg-soft-primary text-primary';
+                const label = isKir ? "{{ __('Jatuh Tempo KIR') }}" : "{{ __('Rencana Servis') }}";
+                
+                const vehicle = (chartPayload.vehicles || []).find(v => v.plat_nomor === ev.plat_nomor);
+                const url = vehicle ? `/vehicles/${vehicle.id}` : '#';
+                
+                const itemHtml = `
+                    <div class="p-3 mb-3 rounded-3 border d-flex align-items-center justify-content-between hover-lift" style="border-radius: 12px; background: #ffffff; border: 1px solid rgba(0, 0, 0, 0.08) !important; transition: transform 0.2s;">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="icon-box d-flex align-items-center justify-content-center ${bgClass} rounded-3" style="width: 42px; height: 42px; font-size: 1.2rem; flex-shrink: 0; background-color: ${isKir ? 'rgba(8, 145, 178, 0.1)' : 'rgba(79, 70, 229, 0.1)'}; color: ${isKir ? '#0891b2' : '#4f46e5'};">
+                                <i class="bi ${icon}"></i>
+                            </div>
+                            <div class="text-start">
+                                <span class="badge mb-1" style="font-size: 0.65rem; font-weight: 700; background-color: ${ev.color}20; color: ${ev.color}; border: 1px solid ${ev.color}40;">
+                                    ${label}
+                                </span>
+                                <h6 class="fw-extrabold text-dark dark-text-white mb-0.5 font-monospace" style="font-size: 0.9rem; letter-spacing: -0.3px;">${ev.plat_nomor}</h6>
+                                <small class="text-muted d-block" style="font-size: 0.75rem; line-height: 1.2;">${ev.merek || "{{ __('Detail Unit') }}"}</small>
+                            </div>
+                        </div>
+                        <div>
+                            ${vehicle ? `
+                            <a href="${url}" class="btn btn-sm px-3 py-1.5 text-white fw-bold rounded-pill" style="font-size: 0.72rem; background: linear-gradient(to right, #0891b2, #0e3054); border: none;">
+                                ${"{{ __('Detail') }}"} <i class="bi bi-chevron-right ms-0.5" style="font-size: 0.65rem;"></i>
+                            </a>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', itemHtml);
+            });
+        }
 
         function renderCalendar(month, year) {
             var firstDay = new Date(year, month, 1).getDay();
@@ -2064,34 +2331,31 @@
             
             if (!calendarContainer || !monthTitle) return;
 
-            // Clear old dates (keep day headers)
             var headersHtml = `
-                <div class="calendar-day-header">Min</div>
-                <div class="calendar-day-header">Sen</div>
-                <div class="calendar-day-header">Sel</div>
-                <div class="calendar-day-header">Rab</div>
-                <div class="calendar-day-header">Kam</div>
-                <div class="calendar-day-header">Jum</div>
-                <div class="calendar-day-header">Sab</div>
+                <div class="calendar-day-header">${"{{ __('Min') }}"}</div>
+                <div class="calendar-day-header">${"{{ __('Sen') }}"}</div>
+                <div class="calendar-day-header">${"{{ __('Sel') }}"}</div>
+                <div class="calendar-day-header">${"{{ __('Rab') }}"}</div>
+                <div class="calendar-day-header">${"{{ __('Kam') }}"}</div>
+                <div class="calendar-day-header">${"{{ __('Jum') }}"}</div>
+                <div class="calendar-day-header">${"{{ __('Sab') }}"}</div>
             `;
             calendarContainer.innerHTML = headersHtml;
             monthTitle.textContent = monthNames[month] + " " + year;
 
-            // Render empty cells for offset
             for (let i = 0; i < firstDay; i++) {
                 var emptyCell = document.createElement('div');
                 emptyCell.className = 'calendar-cell-empty';
                 calendarContainer.appendChild(emptyCell);
             }
 
-            // Render days of the month
             for (let day = 1; day <= daysInMonth; day++) {
                 var cell = document.createElement('div');
                 cell.className = 'calendar-cell';
                 
                 var dateStr = year + "-" + String(month + 1).padStart(2, '0') + "-" + String(day).padStart(2, '0');
+                cell.setAttribute('data-date', dateStr);
                 
-                // Highlight today
                 var isToday = (day === currentDate.getDate() && month === currentDate.getMonth() && year === currentDate.getFullYear());
                 if (isToday) {
                     cell.classList.add('today');
@@ -2102,32 +2366,52 @@
                 cellHeader.textContent = day;
                 cell.appendChild(cellHeader);
 
-                // Add events/dots for this date
                 if (chartPayload.calendarEvents) {
                     var dayEvents = chartPayload.calendarEvents.filter(function(e) {
                         return e.date === dateStr;
                     });
 
                     if (dayEvents.length > 0) {
-                        var dotsContainer = document.createElement('div');
-                        dotsContainer.className = 'd-flex gap-1 justify-content-start flex-wrap mt-1';
+                        var eventsContainer = document.createElement('div');
+                        eventsContainer.className = 'd-flex flex-column gap-1 w-100 mt-1';
                         
+                        dayEvents.forEach(function(ev) {
+                            var isKir = ev.type === 'kir';
+                            var badge = document.createElement('div');
+                            badge.className = 'calendar-event-badge d-none d-md-flex align-items-center gap-1';
+                            badge.style.backgroundColor = isKir ? 'rgba(8, 145, 178, 0.1)' : 'rgba(79, 70, 229, 0.1)';
+                            badge.style.color = isKir ? '#0891b2' : '#4f46e5';
+                            badge.style.border = '1px solid ' + (isKir ? 'rgba(8, 145, 178, 0.2)' : 'rgba(79, 70, 229, 0.2)');
+                            badge.innerHTML = `<i class="bi ${isKir ? 'bi-shield-check' : 'bi-wrench-adjustable'}" style="font-size:0.6rem;"></i> <span class="text-truncate" style="max-width: 100%;">${ev.plat_nomor}</span>`;
+                            
+                            badge.setAttribute('data-bs-toggle', 'tooltip');
+                            badge.setAttribute('data-bs-title', ev.title);
+                            eventsContainer.appendChild(badge);
+                        });
+                        
+                        var dotsContainer = document.createElement('div');
+                        dotsContainer.className = 'd-flex d-md-none gap-1 justify-content-start flex-wrap mt-0.5';
                         dayEvents.forEach(function(ev) {
                             var dot = document.createElement('span');
                             dot.className = 'calendar-event-dot';
                             dot.style.backgroundColor = ev.color;
-                            dot.setAttribute('data-bs-toggle', 'tooltip');
-                            dot.setAttribute('data-bs-title', ev.title);
                             dotsContainer.appendChild(dot);
                         });
-                        cell.appendChild(dotsContainer);
+                        eventsContainer.appendChild(dotsContainer);
+                        
+                        cell.appendChild(eventsContainer);
                     }
                 }
+
+                cell.addEventListener('click', function() {
+                    document.querySelectorAll('.calendar-cell').forEach(c => c.classList.remove('selected-date'));
+                    this.classList.add('selected-date');
+                    showAgendaForDate(this.getAttribute('data-date'));
+                });
 
                 calendarContainer.appendChild(cell);
             }
 
-            // Render empty cells at the end to complete the grid layout
             var totalCells = firstDay + daysInMonth;
             var nextMultipleOf7 = Math.ceil(totalCells / 7) * 7;
             var emptyCellsAtEnd = nextMultipleOf7 - totalCells;
@@ -2137,10 +2421,21 @@
                 calendarContainer.appendChild(emptyCell);
             }
 
-            // Re-initialize Bootstrap tooltips for new dots
             if (typeof bootstrap !== 'undefined') {
-                var tooltipTriggerList = document.querySelectorAll('.calendar-event-dot');
+                var tooltipTriggerList = document.querySelectorAll('.calendar-event-badge');
                 [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+            }
+
+            var todayCell = calendarContainer.querySelector('.calendar-cell.today');
+            if (todayCell) {
+                todayCell.classList.add('selected-date');
+                showAgendaForDate(todayCell.getAttribute('data-date'));
+            } else {
+                var firstCell = calendarContainer.querySelector('.calendar-cell');
+                if (firstCell) {
+                    firstCell.classList.add('selected-date');
+                    showAgendaForDate(firstCell.getAttribute('data-date'));
+                }
             }
         }
 
@@ -2229,9 +2524,10 @@
         });
     });
 
-    // Real-time Indonesian clock for live dashboard feel
+    // Real-time clock with dynamic locale support
     function updateClock() {
         const now = new Date();
+        const locale = '{{ app()->getLocale() === "en" ? "en-US" : "id-ID" }}';
         const options = { 
             weekday: 'long', 
             year: 'numeric', 
@@ -2244,7 +2540,8 @@
         };
         const clockEl = document.getElementById('liveClock');
         if (clockEl) {
-            clockEl.textContent = '• ' + now.toLocaleDateString('id-ID', options) + ' WIB';
+            const timeZoneSuffix = locale === 'en-US' ? ' (WIB)' : ' WIB';
+            clockEl.textContent = '• ' + now.toLocaleDateString(locale, options) + timeZoneSuffix;
         }
     }
     setInterval(updateClock, 1000);

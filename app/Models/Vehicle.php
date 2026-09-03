@@ -37,15 +37,32 @@ class Vehicle extends Model
         if ($this->foto) {
             return asset('storage/'.$this->foto);
         }
-        if (str_contains($this->jenis_kendaraan, 'Boks')) {
-            return asset('images/box_truck.png');
-        } elseif (str_contains($this->jenis_kendaraan, 'Pick Up') || str_contains($this->jenis_kendaraan, 'Pickup')) {
-            return asset('images/pickup_truck.png');
-        } elseif (str_contains($this->jenis_kendaraan, 'Motor')) {
-            return asset('images/courier_motorcycle.png');
+        
+        $brandType = strtolower($this->merek . ' ' . $this->tipe);
+        $type = strtolower($this->jenis_kendaraan . ' ' . $this->tipe);
+        
+        if (str_contains($brandType, 'bmw')) {
+            return asset('images/bmw_320i.jpg');
+        } elseif (str_contains($brandType, 'vario')) {
+            return asset('images/honda_vario.jpg');
+        }
+        
+        // Check Boks/Canter/Elf/Dutro
+        if (str_contains($type, 'boks') || str_contains($type, 'canter') || str_contains($type, 'elf') || str_contains($type, 'dutro')) {
+            return asset('images/box_truck_real.jpg');
+        }
+        
+        // Check Pick Up/Carry/Hilux/Gran Max
+        if (str_contains($type, 'pick up') || str_contains($type, 'pickup') || str_contains($type, 'carry') || str_contains($type, 'hilux') || str_contains($type, 'gran max')) {
+            return asset('images/pickup_truck_real.jpg');
+        }
+        
+        // Check Motor/Kurir/Yamaha/Honda
+        if (str_contains($type, 'motor') || str_contains($type, 'kurir') || str_contains($type, 'yamaha') || str_contains($type, 'honda')) {
+            return asset('images/courier_motorcycle_real.jpg');
         }
 
-        return asset('images/box_truck.png');
+        return asset('images/box_truck_real.jpg');
     }
 
     protected $casts = [
@@ -58,14 +75,34 @@ class Vehicle extends Model
         return $this->hasMany(DailyChecklist::class);
     }
 
+    public function latestChecklist()
+    {
+        return $this->hasOne(DailyChecklist::class)->latestOfMany('tanggal');
+    }
+
     public function expenses()
     {
         return $this->hasMany(Expense::class);
     }
 
+    public function lastServiceExpense()
+    {
+        return $this->hasOne(Expense::class)
+            ->where(function ($q) {
+                $q->where('jenis_pengeluaran', 'Bengkel')
+                    ->orWhere('jenis_pengeluaran', 'like', '%Servis%');
+            })
+            ->latestOfMany('tanggal');
+    }
+
     public function histories()
     {
         return $this->hasMany(VehicleHistory::class)->orderByDesc('tanggal');
+    }
+
+    public function complaints()
+    {
+        return $this->hasMany(Complaint::class);
     }
 
     /**
@@ -94,27 +131,92 @@ class Vehicle extends Model
 
     public function getOdometerTerkiniAttribute(): int
     {
-        $lastChecklist = $this->checklists()->latest('tanggal')->first();
+        $lastChecklist = $this->relationLoaded('latestChecklist')
+            ? $this->latestChecklist
+            : $this->checklists()->latest('tanggal')->first();
 
         return $lastChecklist->odometer ?? $this->odometer_awal;
     }
 
     /**
+     * Menghitung tanggal servis terakhir berdasarkan Expense (Bengkel/Servis),
+     * VehicleHistory, atau manual override tanggal_servis_manual (dikurangi 3 bulan).
+     */
+    public function getTanggalServisTerakhirAttribute(): ?Carbon
+    {
+        $dates = collect();
+
+        // 1. Dari Expense Bengkel / Servis
+        $lastExpense = $this->expenses()
+            ->where(function ($q) {
+                $q->where('jenis_pengeluaran', 'Bengkel')
+                  ->orWhere('jenis_pengeluaran', 'like', '%Servis%');
+            })
+            ->latest('tanggal')
+            ->first();
+        if ($lastExpense) {
+            $dates->push(Carbon::parse($lastExpense->tanggal));
+        }
+
+        // 2. Dari VehicleHistory
+        $lastHistory = $this->histories()->latest('tanggal')->first();
+        if ($lastHistory) {
+            $dates->push(Carbon::parse($lastHistory->tanggal));
+        }
+
+        // 3. Estimasi dari manual override (tanggal_servis_manual - 3 bulan)
+        if ($this->tanggal_servis_manual) {
+            $dates->push(Carbon::parse($this->tanggal_servis_manual)->subMonths(3));
+        }
+
+        if ($dates->isEmpty()) {
+            return null;
+        }
+
+        return $dates->max();
+    }
+
+    /**
+     * Odometer kendaraan saat servis terakhir dilakukan.
+     */
+    public function getOdometerSaatServisTerakhirAttribute(): int
+    {
+        $tglServis = $this->tanggal_servis_terakhir;
+        if (! $tglServis) {
+            return $this->odometer_awal;
+        }
+
+        // Cari checklist terakhir pada atau sebelum tanggal servis terakhir
+        $checklist = $this->checklists()
+            ->where('tanggal', '<=', $tglServis->toDateString())
+            ->latest('tanggal')
+            ->first();
+
+        if ($checklist) {
+            return max((int) $checklist->odometer, (int) $this->odometer_awal);
+        }
+
+        return $this->odometer_awal;
+    }
+
+    /**
      * Jarak (km) tersisa menuju servis berikutnya.
-     * Aturan: servis wajib setiap kelipatan 5.000 KM.
+     * Dihitung dari odometer saat servis terakhir + 5.000 KM.
      */
     public function getKmMenujuServisAttribute(): int
     {
         $interval = 5000;
         $odoSekarang = $this->odometer_terkini;
-        $kmServisBerikutnya = ceil(($odoSekarang + 1) / $interval) * $interval;
+        $odoSaatServis = $this->odometer_saat_servis_terakhir;
+
+        $kmServisBerikutnya = $odoSaatServis + $interval;
 
         return (int) ($kmServisBerikutnya - $odoSekarang);
     }
 
     /**
      * Tanggal servis berikutnya berdasarkan aturan 3 bulan sejak servis terakhir.
-     * Servis terakhir dicek dari pengeluaran berjenis "Bengkel" paling baru;
+     * Servis terakhir dicek dari tanggal_servis_terakhir helper;
      * kalau belum pernah servis, dihitung dari tanggal kendaraan didaftarkan.
      */
     public function getTanggalServisBerikutnyaAttribute(): Carbon
@@ -123,17 +225,8 @@ class Vehicle extends Model
             return Carbon::parse($this->tanggal_servis_manual);
         }
 
-        $servisTerakhir = $this->expenses()
-            ->where(function ($q) {
-                $q->where('jenis_pengeluaran', 'Bengkel')
-                    ->orWhere('jenis_pengeluaran', 'like', '%Servis%');
-            })
-            ->latest('tanggal')
-            ->first();
-
-        $tanggalDasar = $servisTerakhir
-            ? Carbon::parse($servisTerakhir->tanggal)
-            : Carbon::parse($this->created_at);
+        $servisTerakhir = $this->tanggal_servis_terakhir;
+        $tanggalDasar = $servisTerakhir ?: Carbon::parse($this->created_at);
 
         return $tanggalDasar->copy()->addMonths(3);
     }

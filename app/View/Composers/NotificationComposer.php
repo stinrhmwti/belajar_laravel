@@ -21,15 +21,17 @@ class NotificationComposer
         $user = Auth::user();
         $items = [];
 
-        $vehicles = Vehicle::all();
-        $lewatTempo = $vehicles->filter(fn ($v) => $v->status_kir === 'merah');
+        $vehicles = Vehicle::with(['latestChecklist', 'lastServiceExpense'])->get();
 
         if (in_array($user->role, ['superadmin', 'admin', 'pimpinan'])) {
             $menunggu = Expense::where('status_approval', 'Menunggu Persetujuan')->with('vehicle')->latest('tanggal')->get();
             foreach ($menunggu as $e) {
                 $items[] = [
                     'icon' => 'bi-hourglass-split text-warning',
-                    'text' => "Pengeluaran {$e->jenis_pengeluaran} kendaraan {$e->vehicle->plat_nomor} menunggu persetujuan",
+                    'text' => __("Pengeluaran :jenis kendaraan :plat menunggu persetujuan", [
+                        'jenis' => $e->jenis_pengeluaran,
+                        'plat' => $e->vehicle->plat_nomor ?? 'N/A'
+                    ]),
                     'link' => route('expenses.index'),
                 ];
             }
@@ -38,12 +40,14 @@ class NotificationComposer
             foreach ($keluhanBaru as $k) {
                 $items[] = [
                     'icon' => 'bi-flag-fill text-danger',
-                    'text' => "Keluhan baru untuk kendaraan {$k->vehicle->plat_nomor}",
+                    'text' => __("Keluhan baru untuk kendaraan :plat", [
+                        'plat' => $k->vehicle->plat_nomor ?? 'N/A'
+                    ]),
                     'link' => route('complaints.index'),
                 ];
             }
 
-            // Notifikasi biaya perbaikan bengkel baru yang dicatat oleh teknisi (3 hari terakhir) - pimpinan tidak wajib menerima notif ini
+            // Notifikasi biaya perbaikan bengkel baru yang dicatat oleh teknisi (3 hari terakhir)
             if (in_array($user->role, ['superadmin', 'admin'])) {
                 $biayaBaru = Expense::where('jenis_pengeluaran', 'Bengkel')
                     ->where('created_at', '>=', now()->subDays(3))
@@ -53,7 +57,10 @@ class NotificationComposer
                 foreach ($biayaBaru as $e) {
                     $items[] = [
                         'icon' => 'bi-cash-coin text-success',
-                        'text' => "Biaya perbaikan kendaraan {$e->vehicle->plat_nomor} dicatat: Rp ".number_format($e->jumlah_biaya, 0, ',', '.'),
+                        'text' => __("Biaya perbaikan kendaraan :plat dicatat: Rp :biaya", [
+                            'plat' => $e->vehicle->plat_nomor ?? 'N/A',
+                            'biaya' => number_format($e->jumlah_biaya, 0, ',', '.')
+                        ]),
                         'link' => route('expenses.index'),
                     ];
                 }
@@ -65,7 +72,10 @@ class NotificationComposer
             foreach ($keluhanAktif as $k) {
                 $items[] = [
                     'icon' => 'bi-flag-fill text-danger',
-                    'text' => "Keluhan {$k->status} - kendaraan {$k->vehicle->plat_nomor}",
+                    'text' => __("Keluhan :status - kendaraan :plat", [
+                        'status' => $k->status,
+                        'plat' => $k->vehicle->plat_nomor ?? 'N/A'
+                    ]),
                     'link' => route('complaints.index'),
                 ];
             }
@@ -79,7 +89,10 @@ class NotificationComposer
                 $statusKeluhan = $k->status === 'Selesai' ? 'Selesai Diperbaiki' : 'Sedang Diproses';
                 $items[] = [
                     'icon' => $k->status === 'Selesai' ? 'bi-check2-circle text-success' : 'bi-tools text-warning',
-                    'text' => "Laporan keluhan Anda untuk {$k->vehicle->plat_nomor} {$statusKeluhan}!",
+                    'text' => __("Laporan keluhan Anda untuk :plat :status!", [
+                        'plat' => $k->vehicle->plat_nomor ?? 'N/A',
+                        'status' => $statusKeluhan
+                    ]),
                     'link' => route('complaints.index'),
                 ];
             }
@@ -90,13 +103,19 @@ class NotificationComposer
                 if ($v->status_kir === 'merah') {
                     $items[] = [
                         'icon' => 'bi-exclamation-octagon-fill text-danger',
-                        'text' => "Dokumen KIR kendaraan Anda ({$v->plat_nomor}) sudah lewat jatuh tempo!",
+                        'text' => __("Dokumen KIR kendaraan Anda (:plat) sudah lewat jatuh tempo! (Jatuh tempo: :tanggal)", [
+                            'plat' => $v->plat_nomor,
+                            'tanggal' => $v->jatuh_tempo_kir ? $v->jatuh_tempo_kir->translatedFormat('d M Y') : '-'
+                        ]),
                         'link' => route('vehicles.show', $v),
                     ];
                 } elseif ($v->status_kir === 'kuning') {
                     $items[] = [
                         'icon' => 'bi-hourglass-split text-warning',
-                        'text' => "Dokumen KIR kendaraan Anda ({$v->plat_nomor}) akan segera jatuh tempo",
+                        'text' => __("Dokumen KIR kendaraan Anda (:plat) akan segera jatuh tempo (Jatuh tempo: :tanggal)", [
+                            'plat' => $v->plat_nomor,
+                            'tanggal' => $v->jatuh_tempo_kir ? $v->jatuh_tempo_kir->translatedFormat('d M Y') : '-'
+                        ]),
                         'link' => route('vehicles.show', $v),
                     ];
                 }
@@ -105,57 +124,93 @@ class NotificationComposer
                 if ($v->status_servis_berkala === 'merah') {
                     $items[] = [
                         'icon' => 'bi-wrench-adjustable-circle-fill text-danger',
-                        'text' => "Kendaraan Anda ({$v->plat_nomor}) sudah LEWAT jadwal servis berkala!",
+                        'text' => __("Kendaraan Anda (:plat) sudah LEWAT jadwal servis berkala! (Target: :target)", [
+                            'plat' => $v->plat_nomor,
+                            'target' => $v->tanggal_servis_berikutnya ? $v->tanggal_servis_berikutnya->translatedFormat('d M Y') : '-'
+                        ]),
                         'link' => route('vehicles.show', $v),
                     ];
                 } elseif ($v->status_servis_berkala === 'kuning') {
                     $items[] = [
                         'icon' => 'bi-wrench-adjustable-circle-fill text-warning',
-                        'text' => "Kendaraan Anda ({$v->plat_nomor}) mendekati jadwal servis berkala",
+                        'text' => __("Kendaraan Anda (:plat) mendekati jadwal servis berkala (Target: :target)", [
+                            'plat' => $v->plat_nomor,
+                            'target' => $v->tanggal_servis_berikutnya ? $v->tanggal_servis_berikutnya->translatedFormat('d M Y') : '-'
+                        ]),
                         'link' => route('vehicles.show', $v),
                     ];
                 }
 
                 // Notifikasi Checklist Harian Bermasalah
-                $lastChecklist = $v->checklists()->latest('tanggal')->first();
+                $lastChecklist = $v->latestChecklist;
                 if ($lastChecklist && $lastChecklist->ada_masalah) {
                     $items[] = [
                         'icon' => 'bi-exclamation-triangle-fill text-danger',
-                        'text' => "Ada parameter 'Not OK' pada pemeriksaan harian kendaraan Anda ({$v->plat_nomor})!",
+                        'text' => __("Ada parameter 'Not OK' pada pemeriksaan harian kendaraan Anda (:plat)!", ['plat' => $v->plat_nomor]),
                         'link' => route('vehicles.show', $v),
                     ];
                 }
             }
         }
 
-        // Notifikasi umum untuk admin, superadmin, teknisi, & pimpinan: kendaraan lewat jatuh tempo dokumen KIR
+        // Notifikasi umum untuk admin, superadmin, teknisi, & pimpinan: kendaraan lewat/mendekati jatuh tempo KIR
         if (in_array($user->role, ['superadmin', 'admin', 'teknisi', 'pimpinan'])) {
-            foreach ($lewatTempo as $v) {
-                $items[] = [
-                    'icon' => 'bi-exclamation-octagon-fill text-danger',
-                    'text' => "Kendaraan {$v->plat_nomor} sudah lewat jatuh tempo KIR",
-                    'link' => route('vehicles.show', $v),
-                ];
+            foreach ($vehicles as $v) {
+                if ($v->status_kir === 'merah') {
+                    $items[] = [
+                        'icon' => 'bi-exclamation-octagon-fill text-danger',
+                        'text' => __("Kendaraan :plat sudah lewat jatuh tempo KIR (Jatuh tempo: :tanggal)", [
+                            'plat' => $v->plat_nomor,
+                            'tanggal' => $v->jatuh_tempo_kir ? $v->jatuh_tempo_kir->translatedFormat('d M Y') : '-'
+                        ]),
+                        'link' => route('vehicles.show', $v),
+                    ];
+                } elseif ($v->status_kir === 'kuning') {
+                    $items[] = [
+                        'icon' => 'bi-hourglass-split text-warning',
+                        'text' => __("Dokumen KIR kendaraan :plat akan segera jatuh tempo (Jatuh tempo: :tanggal)", [
+                            'plat' => $v->plat_nomor,
+                            'tanggal' => $v->jatuh_tempo_kir ? $v->jatuh_tempo_kir->translatedFormat('d M Y') : '-'
+                        ]),
+                        'link' => route('vehicles.show', $v),
+                    ];
+                }
             }
         }
 
-        // ===== NOTIFIKASI TERPISAH: SERVIS BERKALA (khusus Admin, Superadmin, Teknisi, & Pimpinan) =====
+        // ===== NOTIFIKASI SERVIS BERKALA (khusus Admin, Superadmin, Teknisi, & Pimpinan) =====
         if (in_array($user->role, ['superadmin', 'admin', 'teknisi', 'pimpinan'])) {
             foreach ($vehicles as $v) {
-                $hariTersisa = now()->diffInDays($v->tanggal_servis_berikutnya, false);
-
-                if ($hariTersisa <= -7) {
-                    // Sudah lewat servis lebih dari 1 minggu
+                if ($v->status_servis_berkala === 'merah') {
                     $items[] = [
                         'icon' => 'bi-wrench-adjustable-circle-fill text-danger',
-                        'text' => "Kendaraan {$v->plat_nomor} sudah LEWAT servis lebih dari 1 minggu (".abs((int) $hariTersisa).' hari)',
+                        'text' => __("Kendaraan :plat sudah LEWAT jadwal servis berkala! (Target: :target)", [
+                            'plat' => $v->plat_nomor,
+                            'target' => $v->tanggal_servis_berikutnya ? $v->tanggal_servis_berikutnya->translatedFormat('d M Y') : '-'
+                        ]),
                         'link' => route('vehicles.show', $v),
                     ];
-                } elseif ($hariTersisa > -7 && $hariTersisa <= 7) {
-                    // Kurang dari seminggu menuju/lewat sedikit jadwal servis
+                } elseif ($v->status_servis_berkala === 'kuning') {
                     $items[] = [
                         'icon' => 'bi-wrench-adjustable-circle-fill text-warning',
-                        'text' => "Kendaraan {$v->plat_nomor} jadwal servis kurang dari seminggu lagi",
+                        'text' => __("Kendaraan :plat mendekati jadwal servis berkala (Target: :target)", [
+                            'plat' => $v->plat_nomor,
+                            'target' => $v->tanggal_servis_berikutnya ? $v->tanggal_servis_berikutnya->translatedFormat('d M Y') : '-'
+                        ]),
+                        'link' => route('vehicles.show', $v),
+                    ];
+                }
+            }
+        }
+
+        // ===== NOTIFIKASI CHECKLIST HARIAN BERMASALAH (khusus Admin, Superadmin, & Teknisi) =====
+        if (in_array($user->role, ['superadmin', 'admin', 'teknisi'])) {
+            foreach ($vehicles as $v) {
+                $lastChecklist = $v->latestChecklist;
+                if ($lastChecklist && $lastChecklist->ada_masalah) {
+                    $items[] = [
+                        'icon' => 'bi-exclamation-triangle-fill text-danger',
+                        'text' => __("Kendaraan :plat melaporkan kendala pada pemeriksaan harian!", ['plat' => $v->plat_nomor]),
                         'link' => route('vehicles.show', $v),
                     ];
                 }

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ __('Masuk Sistem Armada') }} - FleetMaintenance</title>
+    <title>{{ __('Setel Ulang Password') }} - FleetMaintenance</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -32,7 +32,6 @@
             color: var(--text-light);
         }
 
-        /* Ambient Glow Background Spheres */
         .bg-glow-1 {
             position: absolute;
             top: -15%;
@@ -56,7 +55,6 @@
             z-index: 1;
         }
 
-        /* Header Navbar */
         .navbar-brand-custom {
             display: flex;
             align-items: center;
@@ -85,7 +83,7 @@
             margin: 0;
             line-height: 1;
         }
-        .brand-subtitle {
+        .brand-sub {
             font-size: 0.65rem;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.55);
@@ -94,7 +92,6 @@
             margin-top: 2px;
         }
 
-        /* Hero Left Side */
         .hero-section {
             padding: 3rem 0;
             position: relative;
@@ -130,7 +127,6 @@
             max-width: 520px;
         }
 
-        /* Glassmorphism Login Card (Right Side) */
         .login-card-wrapper {
             position: relative;
             z-index: 2;
@@ -177,7 +173,6 @@
             color: var(--brand-primary);
         }
 
-        /* Buttons styling */
         .btn-submit {
             background: linear-gradient(135deg, var(--brand-primary) 0%, #1d0fb0 100%);
             border: none;
@@ -218,21 +213,11 @@
             color: #ffffff;
         }
 
-        /* Quick Roles Hint Container */
-        .quick-hint {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 12px 14px;
-            font-size: 0.78rem;
-            color: #64748b;
-        }
-
         /* WhatsApp Floating Help Widget */
         .whatsapp-widget {
             position: fixed;
             bottom: 24px;
-            left: 24px; /* Repositioned to left side to prevent overlap with login card */
+            left: 24px;
             z-index: 100;
             display: flex;
             align-items: center;
@@ -259,7 +244,6 @@
             justify-content: center;
         }
 
-        /* Background image decorative */
         .truck-backdrop {
             position: absolute;
             right: -10%;
@@ -268,7 +252,7 @@
             width: 55%;
             pointer-events: none;
             z-index: 1;
-            transform: scaleX(-1); /* Flip horizontally to look towards form */
+            transform: scaleX(-1);
         }
 
         @media (max-width: 991.98px) {
@@ -294,7 +278,6 @@
             }
         }
         
-        /* Pulsing animation for WhatsApp icon */
         .pulse-animation {
             animation: pulse-green 2s infinite;
         }
@@ -321,7 +304,7 @@
 
 <!-- Top Alert Bar -->
 <div class="w-100 text-center py-2 px-3 fw-medium" style="background: rgba(255, 255, 255, 0.08); font-size: 0.8rem; letter-spacing: 0.3px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); position: relative; z-index: 5;">
-    <i class="bi bi-geo-alt-fill me-1 text-warning"></i> {{ __('Izinkan lokasi pada browser Anda untuk pemantauan GPS armada secara real-time') }}
+    <i class="bi bi-shield-lock-fill me-1 text-warning"></i> {{ __('Buat Password Baru Anda') }}
 </div>
 
 <!-- Main Wrapper Container -->
@@ -332,13 +315,9 @@
         <a href="/" class="navbar-brand-custom">
             <div class="brand-logo-container">
                 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Wrench (Gold/Amber) -->
                     <path d="M19.7 4.3a2.5 2.5 0 0 0-3.5 0l-2 2 3.5 3.5 2-2a2.5 2.5 0 0 0 0-3.5ZM12.7 7.8l-8.5 8.5a1.2 1.2 0 0 0 0 1.7l1.3 1.3a1.2 1.2 0 0 0 1.7 0l8.5-8.5-3-3Z" fill="#fbbf24" />
-                    <!-- Truck Silhouette (Solid Indigo) -->
                     <path d="M 2.5,5.5 H 12.5 V 7.5 H 15.5 L 18.5,10.5 V 13.5 H 2.5 Z" fill="#0891b2" stroke="#1e1b4b" stroke-width="1.2" stroke-linejoin="round" />
-                    <!-- Cab Window -->
                     <path d="M 13.5,8.5 H 15.2 L 16.8,10.5 H 13.5 Z" fill="#1e1b4b" />
-                    <!-- Wheels -->
                     <circle cx="6" cy="13.5" r="2" fill="#1e1b4b" stroke="#ffffff" stroke-width="1.2" />
                     <circle cx="15" cy="13.5" r="2" fill="#1e1b4b" stroke="#ffffff" stroke-width="1.2" />
                 </svg>
@@ -348,76 +327,27 @@
                 <div class="brand-sub">{{ __('Sistem Manajemen Armada') }}</div>
             </div>
         </a>
-        
-        <div class="d-none d-md-flex align-items-center gap-2">
-            <div class="dropdown me-2">
-                <button class="btn btn-outline-light dropdown-toggle py-1.5 px-3 rounded-pill fw-semibold d-flex align-items-center gap-2" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.72rem; border-color: rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.05); color: #ffffff;">
-                    <i class="bi bi-translate"></i>
-                    <span>{{ App::getLocale() === 'en' ? '🇺🇸 English' : '🇮🇩 Indonesian' }}</span>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end py-1 shadow-sm border-slate-150" aria-labelledby="languageDropdown" style="border-radius: 12px; font-size: 0.82rem; min-width: 140px;">
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 fw-semibold {{ App::getLocale() === 'id' ? 'text-primary' : 'text-dark' }}" href="{{ route('set-locale', 'id') }}">
-                            <span>🇮🇩 Indonesia</span>
-                            @if(App::getLocale() === 'id')
-                                <i class="bi bi-check-lg text-primary"></i>
-                            @endif
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item d-flex align-items-center justify-content-between py-2 px-3 fw-semibold {{ App::getLocale() === 'en' ? 'text-primary' : 'text-dark' }}" href="{{ route('set-locale', 'en') }}">
-                            <span>🇺🇸 English</span>
-                            @if(App::getLocale() === 'en')
-                                <i class="bi bi-check-lg text-primary"></i>
-                            @endif
-                        </a>
-                    </li>
-                </ul>
-            </div>
-
-            <span class="badge bg-success-subtle text-success py-1.5 px-3 border border-success-subtle rounded-pill d-flex align-items-center gap-2" style="font-size: 0.72rem;">
-                <span class="bg-success rounded-circle" style="width:6px; height:6px; display:inline-block; box-shadow: 0 0 8px #22c55e;"></span>
-                {{ __('Server Aktif') }}
-            </span>
-        </div>
     </header>
 
     <!-- Content Hero & Form Row -->
     <div class="row align-items-center g-4 my-auto">
         
         <!-- Left Side: Hero Info -->
-        <div class="col-lg-6 hero-section">
-            <span class="badge-digital">{{ __('Booking & Perawatan Digital') }}</span>
-            <h2 class="hero-title">{{ __('Pemantauan & Servis Armada Jadi') }} <span>{{ __('Lebih Mudah') }}</span></h2>
+        <div class="col-lg-6 hero-section text-center text-lg-start">
+            <span class="badge-digital">{{ __('Pemulihan Akun') }}</span>
+            <h2 class="hero-title">{{ __('Setel Ulang') }} <br><span>{{ __('Password Baru') }}</span></h2>
             <p class="hero-desc">
-                {{ __('Sistem informasi terpadu untuk memantau kelayakan KIR, estimasi jadwal servis berkala otomatis (setiap 5.000 KM / 3 bulan), pengisian checklist harian, dan pelaporan kendala jalan dari supir secara real-time.') }}
+                {{ __('Silakan buat password baru yang kuat untuk akun Anda. Jangan gunakan password yang sama dengan layanan eksternal lainnya.') }}
             </p>
-            <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-lg-start">
-                <a href="#panduanAdmin" class="btn-outline-custom" data-bs-toggle="modal" data-bs-target="#quickGuideModal">
-                    <i class="bi bi-book-half"></i> {{ __('Panduan Peran (Role)') }}
-                </a>
-                <a href="#whatsappModal" class="btn-outline-custom" data-bs-toggle="modal" data-bs-target="#whatsappModal">
-                    <i class="bi bi-whatsapp"></i> {{ __('Hubungi IT / Support') }}
-                </a>
-            </div>
         </div>
 
-        <!-- Right Side: Login Form Box -->
+        <!-- Right Side: Reset Form Box -->
         <div class="col-lg-5 offset-lg-1 login-card-wrapper">
             <div class="login-card">
                 <div class="text-center mb-4">
-                    <h3 class="fw-extrabold text-dark mb-1">{{ __('Masuk Sistem Armada') }}</h3>
-                    <p class="text-secondary small">{{ __('Masukkan username/email dan password Anda untuk masuk ke sistem.') }}</p>
+                    <h3 class="fw-extrabold text-dark mb-1">{{ __('Setel Password') }}</h3>
+                    <p class="text-secondary small">{{ __('Lengkapi form di bawah ini untuk memperbarui password Anda.') }}</p>
                 </div>
-
-                @if (session('status'))
-                    <div class="alert alert-success border-0 shadow-sm rounded-3 py-2.5 px-3 mb-4" style="background-color: #f0fdf4; color: #166534; font-size: 0.825rem;">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="bi bi-check-circle-fill text-success fs-5"></i>
-                            <div>{{ session('status') }}</div>
-                        </div>
-                    </div>
-                @endif
 
                 @if ($errors->any())
                     <div class="alert alert-danger border-0 shadow-sm rounded-3 py-2 px-3 mb-4" style="background-color: #fef2f2; color: #991b1b; font-size: 0.825rem;">
@@ -432,20 +362,25 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('login') }}" id="loginForm">
+                <form method="POST" action="{{ route('password.update') }}" id="resetPasswordForm">
                     @csrf
+                    
+                    <input type="hidden" name="token" value="{{ $token }}">
+
+                    <!-- Email Input (Prefilled and Readonly for safety) -->
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('Email atau Username') }}</label>
+                        <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('Alamat Email') }}</label>
                         <div class="input-icon-wrapper">
-                            <input type="text" name="login" class="form-control-custom w-100" value="{{ old('login') }}" required autofocus>
-                            <i class="bi bi-person input-icon"></i>
+                            <input type="email" name="email" class="form-control-custom w-100 bg-light" value="{{ $email ?? old('email') }}" readonly required autocomplete="email">
+                            <i class="bi bi-envelope input-icon"></i>
                         </div>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('Password') }}</label>
+                    <!-- Password Baru Input -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('Password Baru') }}</label>
                         <div class="input-icon-wrapper position-relative">
-                            <input type="password" id="password" name="password" class="form-control-custom w-100" placeholder="••••••••" style="padding-right: 44px;" required>
+                            <input type="password" id="password" name="password" class="form-control-custom w-100" placeholder="Min. 8 karakter" style="padding-right: 44px;" required autocomplete="new-password" autofocus>
                             <i class="bi bi-lock input-icon"></i>
                             <button type="button" id="togglePassword" class="btn p-0 border-0 position-absolute" style="right: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; z-index: 5; background: transparent; outline: none; box-shadow: none;">
                                 <i class="bi bi-eye-slash" id="togglePasswordIcon" style="font-size: 1.15rem;"></i>
@@ -453,22 +388,27 @@
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div class="form-check m-0">
-                            <input type="checkbox" name="remember" class="form-check-input" id="remember" style="border-radius: 4px;">
-                            <label class="form-check-label text-secondary" for="remember" style="font-size: 0.8rem; font-weight: 500;">{{ __('Ingat sesi masuk saya') }}</label>
+                    <!-- Konfirmasi Password Input -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('Konfirmasi Password Baru') }}</label>
+                        <div class="input-icon-wrapper position-relative">
+                            <input type="password" id="password_confirmation" name="password_confirmation" class="form-control-custom w-100" placeholder="••••••••" style="padding-right: 44px;" required autocomplete="new-password">
+                            <i class="bi bi-lock-fill input-icon"></i>
+                            <button type="button" id="toggleConfirmPassword" class="btn p-0 border-0 position-absolute" style="right: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; z-index: 5; background: transparent; outline: none; box-shadow: none;">
+                                <i class="bi bi-eye-slash" id="toggleConfirmPasswordIcon" style="font-size: 1.15rem;"></i>
+                            </button>
                         </div>
-                        <a href="{{ route('password.request') }}" class="text-decoration-none small fw-semibold" style="color: var(--brand-primary); font-size: 0.8rem;">{{ __('Lupa Password?') }}</a>
                     </div>
 
                     <button type="submit" id="btnSubmit" class="btn btn-submit w-100 d-flex align-items-center justify-content-center gap-2 mb-3">
-                        <span>{{ __('Masuk ke Dashboard') }}</span>
-                        <i class="bi bi-arrow-right-short fs-4"></i>
+                        <span>{{ __('Reset Password') }}</span>
+                        <i class="bi bi-check-circle-fill fs-6 ms-1"></i>
                     </button>
 
-                    <div class="quick-hint d-flex align-items-start gap-2.5">
-                        <i class="bi bi-info-circle-fill text-primary fs-6 mt-0.5"></i>
-                        <span>{{ __('Akses terbatas untuk akun terdaftar. Supir / Driver dapat masuk dengan menggunakan username masing-masing.') }}</span>
+                    <div class="text-center mt-3">
+                        <a href="{{ route('login') }}" class="text-decoration-none small fw-semibold" style="color: var(--brand-primary);">
+                            <i class="bi bi-arrow-left me-1"></i> {{ __('Kembali ke Halaman Login') }}
+                        </a>
                     </div>
                 </form>
             </div>
@@ -482,10 +422,6 @@
     <!-- Footer Copyright -->
     <footer class="d-flex flex-column flex-md-row justify-content-between align-items-center pt-4 mt-4 border-top" style="border-color: rgba(255, 255, 255, 0.08) !important; font-size: 0.75rem; color: var(--text-muted-light);">
         <p class="mb-2 mb-md-0">&copy; {{ date('Y') }} FleetMaintenance System &bull; {{ __('Versi 2.5 Premium Active.') }}</p>
-        <div class="d-flex gap-3">
-            <a href="#" class="text-white-50 text-decoration-none">{{ __('Ketentuan Layanan') }}</a>
-            <a href="#" class="text-white-50 text-decoration-none">{{ __('Kebijakan Privasi') }}</a>
-        </div>
     </footer>
 
 </div>
@@ -495,50 +431,6 @@
     <div class="whatsapp-icon-bg"><i class="bi bi-whatsapp"></i></div>
     <span>{{ __('Butuh bantuan?') }}</span>
 </a>
-
-<!-- Quick Guide Modal -->
-<div class="modal fade" id="quickGuideModal" tabindex="-1" aria-labelledby="quickGuideModalLabel" aria-hidden="true" style="color: #1e293b;">
-    <div class="modal-dialog modal-dialog-centered modal-md">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold" id="quickGuideModalLabel">
-                    <i class="bi bi-book text-primary me-2"></i> {{ __('Panduan Peran Akun') }}
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body py-4">
-                <p class="text-muted small mb-4">{{ __('Sistem ini membagi akses menjadi beberapa peran demi tertib administrasi armada:') }}</p>
-                
-                <div class="d-flex align-items-start gap-3 mb-3 pb-3 border-bottom">
-                    <div class="badge bg-dark px-2.5 py-1.5 rounded-3"><i class="bi bi-person-fill-lock fs-5"></i></div>
-                    <div>
-                        <strong class="text-dark d-block" style="font-size:0.9rem;">{{ __('Superadmin / Admin Fleet') }}</strong>
-                        <small class="text-muted">{{ __('Akses penuh mengelola master data kendaraan, mengelola user/akun, dan memberikan approval anggaran perbaikan.') }}</small>
-                    </div>
-                </div>
-
-                <div class="d-flex align-items-start gap-3 mb-3 pb-3 border-bottom">
-                    <div class="badge bg-primary px-2.5 py-1.5 rounded-3"><i class="bi bi-wrench-adjustable fs-5"></i></div>
-                    <div>
-                        <strong class="text-dark d-block" style="font-size:0.9rem;">{{ __('Teknisi / Mekanik') }}</strong>
-                        <small class="text-muted">{{ __('Mengisi checklist harian kondisi fisik kendaraan, menindaklanjuti keluhan driver, dan mencatatkan biaya perbaikan.') }}</small>
-                    </div>
-                </div>
-
-                <div class="d-flex align-items-start gap-3">
-                    <div class="badge bg-success px-2.5 py-1.5 rounded-3"><i class="bi bi-car-front fs-5"></i></div>
-                    <div>
-                        <strong class="text-dark d-block" style="font-size:0.9rem;">{{ __('Driver / Pengemudi') }}</strong>
-                        <small class="text-muted">{{ __('Melihat status unit kendaraan penugasan pribadi dan melaporkan keluhan kerusakan lengkap dengan bukti foto/video.') }}</small>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer border-0 pt-0">
-                <button type="button" class="btn btn-secondary py-2 px-4 w-100" data-bs-dismiss="modal" style="border-radius:10px; font-weight:600;">{{ __('Mengerti') }}</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- WhatsApp Support Modal -->
 <div class="modal fade" id="whatsappModal" tabindex="-1" aria-labelledby="whatsappModalLabel" aria-hidden="true" style="color: #1e293b;">
@@ -560,11 +452,10 @@
                 </p>
                 <!-- Issue Category Dropdown -->
                 <div class="mb-3 text-start">
-                    <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('Pilih Kendala Login:') }}</label>
+                    <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('Pilih Kendala:') }}</label>
                     <select id="whatsappIssueSelect" class="form-select border shadow-none" style="border-radius: 10px; font-size: 0.88rem; padding: 10px;" onchange="toggleCustomIssueInput()">
-                        <option value="Saya tidak bisa masuk ke sistem (Akun Salah/Password Salah)">{{ __('Saya tidak bisa masuk ke sistem (Akun Salah/Password Salah)') }}</option>
-                        <option value="Akun saya belum terdaftar di sistem armada">{{ __('Akun saya belum terdaftar di sistem armada') }}</option>
-                        <option value="Saya mengalami lupa password akun saya">{{ __('Saya mengalami lupa password akun saya') }}</option>
+                        <option value="Saya tidak bisa menyetel ulang password saya">{{ __('Saya tidak bisa menyetel ulang password saya') }}</option>
+                        <option value="Link reset password telah kedaluwarsa">{{ __('Link reset password telah kedaluwarsa') }}</option>
                         <option value="Halaman web memunculkan pesan error / lambat">{{ __('Halaman web memunculkan pesan error / lambat') }}</option>
                         <option value="custom">{{ __('Masalah Lainnya (Tulis Masalah Sendiri)') }}</option>
                     </select>
@@ -581,7 +472,7 @@
                         <i class="bi bi-box-arrow-up-right"></i> {{ __('Lanjutkan ke WhatsApp') }}
                     </button>
                     <button type="button" class="btn btn-outline-secondary py-2.5 fw-semibold" data-bs-dismiss="modal" style="border-radius: 10px;">
-                        {{ __('Kembali ke Halaman Login') }}
+                        {{ __('Kembali') }}
                     </button>
                 </div>
             </div>
@@ -604,13 +495,11 @@
             {{ __('Kami sedang membuka chat WhatsApp dengan Administrator (0877-3856-5383) di tab baru. Silakan selesaikan chat Anda di sana.') }}
         </p>
         
-        <!-- Action Buttons -->
         <div class="d-flex flex-column gap-3">
             <button onclick="hideWhatsappRedirectScreen()" class="btn btn-light py-3 px-4 fw-bold d-flex align-items-center justify-content-center gap-2" style="border-radius: 12px; color: #1e293b; box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);">
-                <i class="bi bi-arrow-left"></i> Batal &amp; {{ __('Kembali ke Halaman Login') }}
+                <i class="bi bi-arrow-left"></i> Batal &amp; {{ __('Kembali') }}
             </button>
-            
-            <a id="whatsappManualLink" href="https://wa.me/6287738565383?text=Halo%20Admin,%20saya%20butuh%20bantuan%20terkait%20login%20FleetMaintenance" target="_blank" class="text-white text-decoration-none small opacity-75 hover-opacity-100 mt-2">
+            <a id="whatsappManualLink" href="https://wa.me/6287738565383?text=Halo%20Admin" target="_blank" class="text-white text-decoration-none small opacity-75 hover-opacity-100 mt-2">
                 {{ __('WhatsApp tidak terbuka otomatis?') }} <span class="text-warning fw-bold text-decoration-underline">{{ __('Klik di sini untuk membuka manual') }}</span>
             </a>
         </div>
@@ -620,72 +509,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    function toggleCustomIssueInput() {
-        const selectEl = document.getElementById('whatsappIssueSelect');
-        const customWrapper = document.getElementById('customIssueWrapper');
-        if (selectEl && customWrapper) {
-            if (selectEl.value === 'custom') {
-                customWrapper.classList.remove('d-none');
-            } else {
-                customWrapper.classList.add('d-none');
-            }
-        }
-    }
-
-    function showWhatsappRedirectScreen() {
-        // Get issue text
-        const selectEl = document.getElementById('whatsappIssueSelect');
-        let issueText = selectEl ? selectEl.value : '';
-        
-        if (issueText === 'custom') {
-            const textareaEl = document.getElementById('whatsappCustomIssueText');
-            issueText = textareaEl ? textareaEl.value.trim() : '';
-            if (!issueText) {
-                issueText = "Kendala Teknis Lainnya di Halaman Login";
-            }
-        }
-        
-        // Construct pre-filled message text
-        const baseMessage = "Halo Admin, saya mengalami kendala pada halaman login FleetMaintenance.\n\nMasalah: " + issueText;
-        const encodedMessage = encodeURIComponent(baseMessage);
-        const waUrl = "https://wa.me/6287738565383?text=" + encodedMessage;
-        
-        // Hide WhatsApp modal first
-        const waModalEl = document.getElementById('whatsappModal');
-        let waModal = bootstrap.Modal.getInstance(waModalEl);
-        if (!waModal) {
-            waModal = new bootstrap.Modal(waModalEl);
-        }
-        waModal.hide();
-        
-        // Show redirect screen overlay
-        const redirectScreen = document.getElementById('whatsappRedirectScreen');
-        if (redirectScreen) {
-            redirectScreen.classList.remove('d-none');
-            // Force flex display
-            redirectScreen.style.setProperty('display', 'flex', 'important');
-        }
-        
-        // Open WhatsApp URL in new tab
-        window.open(waUrl, "_blank");
-        
-        // Update the manual link in redirect screen in case popup is blocked
-        const manualLink = document.getElementById('whatsappManualLink');
-        if (manualLink) {
-            manualLink.href = waUrl;
-        }
-    }
-    
-    function hideWhatsappRedirectScreen() {
-        const redirectScreen = document.getElementById('whatsappRedirectScreen');
-        if (redirectScreen) {
-            redirectScreen.classList.add('d-none');
-            redirectScreen.style.setProperty('display', 'none', 'important');
-        }
-    }
-
-    // Toggle Password Visibility & Form submit loading state
     document.addEventListener('DOMContentLoaded', function () {
+        // Toggle Password Baru
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('password');
         const togglePasswordIcon = document.getElementById('togglePasswordIcon');
@@ -704,12 +529,32 @@
             });
         }
 
-        const loginForm = document.getElementById('loginForm');
+        // Toggle Konfirmasi Password
+        const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+        const confirmPasswordInput = document.getElementById('password_confirmation');
+        const toggleConfirmPasswordIcon = document.getElementById('toggleConfirmPasswordIcon');
+
+        if (toggleConfirmPassword && confirmPasswordInput && toggleConfirmPasswordIcon) {
+            toggleConfirmPassword.addEventListener('click', function () {
+                const type = confirmPasswordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                confirmPasswordInput.setAttribute('type', type);
+                if (type === 'password') {
+                    toggleConfirmPasswordIcon.classList.remove('bi-eye');
+                    toggleConfirmPasswordIcon.classList.add('bi-eye-slash');
+                } else {
+                    toggleConfirmPasswordIcon.classList.remove('bi-eye-slash');
+                    toggleConfirmPasswordIcon.classList.add('bi-eye');
+                }
+            });
+        }
+
+        // Form Submit Loading State
+        const resetPasswordForm = document.getElementById('resetPasswordForm');
         const btnSubmit = document.getElementById('btnSubmit');
 
-        if (loginForm && btnSubmit) {
-            loginForm.addEventListener('submit', function (event) {
-                if (!loginForm.checkValidity()) {
+        if (resetPasswordForm && btnSubmit) {
+            resetPasswordForm.addEventListener('submit', function (event) {
+                if (!resetPasswordForm.checkValidity()) {
                     return;
                 }
                 
@@ -721,6 +566,59 @@
             });
         }
     });
+
+    function toggleCustomIssueInput() {
+        const selectEl = document.getElementById('whatsappIssueSelect');
+        const customWrapper = document.getElementById('customIssueWrapper');
+        if (selectEl && customWrapper) {
+            if (selectEl.value === 'custom') {
+                customWrapper.classList.remove('d-none');
+            } else {
+                customWrapper.classList.add('d-none');
+            }
+        }
+    }
+
+    function showWhatsappRedirectScreen() {
+        const selectEl = document.getElementById('whatsappIssueSelect');
+        let issueText = selectEl ? selectEl.value : '';
+        
+        if (issueText === 'custom') {
+            const textareaEl = document.getElementById('whatsappCustomIssueText');
+            issueText = textareaEl ? textareaEl.value.trim() : '';
+            if (!issueText) {
+                issueText = "Kendala Reset Password";
+            }
+        }
+        
+        const baseMessage = "Halo Admin, saya mengalami kendala reset password pada FleetMaintenance.\n\nMasalah: " + issueText;
+        const waUrl = "https://wa.me/6287738565383?text=" + encodeURIComponent(baseMessage);
+        
+        const waModalEl = document.getElementById('whatsappModal');
+        let waModal = bootstrap.Modal.getInstance(waModalEl);
+        if (waModal) waModal.hide();
+        
+        const redirectScreen = document.getElementById('whatsappRedirectScreen');
+        if (redirectScreen) {
+            redirectScreen.classList.remove('d-none');
+            redirectScreen.style.setProperty('display', 'flex', 'important');
+        }
+        
+        window.open(waUrl, "_blank");
+        
+        const manualLink = document.getElementById('whatsappManualLink');
+        if (manualLink) {
+            manualLink.href = waUrl;
+        }
+    }
+    
+    function hideWhatsappRedirectScreen() {
+        const redirectScreen = document.getElementById('whatsappRedirectScreen');
+        if (redirectScreen) {
+            redirectScreen.classList.add('d-none');
+            redirectScreen.style.setProperty('display', 'none', 'important');
+        }
+    }
 </script>
 </body>
 </html>

@@ -10,14 +10,28 @@ class DailyChecklistController extends Controller
 {
     public function index()
     {
-        $checklists = DailyChecklist::with('vehicle')->latest('tanggal')->get();
+        $query = DailyChecklist::with('vehicle');
+
+        // Jika peran pengguna adalah 'user' (Driver), batasi hanya kendaraan mereka sendiri
+        if (auth()->user()->role === 'user') {
+            $query->whereHas('vehicle', function ($q) {
+                $q->where('supir_utama', auth()->user()->name);
+            });
+        }
+
+        $checklists = $query->latest('tanggal')->get();
 
         return view('checklist.index', compact('checklists'));
     }
 
     public function create()
     {
-        $vehicles = Vehicle::orderBy('plat_nomor')->get();
+        // Jika peran pengguna adalah 'user' (Driver), hanya tampilkan kendaraan milik mereka
+        if (auth()->user()->role === 'user') {
+            $vehicles = Vehicle::where('supir_utama', auth()->user()->name)->orderBy('plat_nomor')->get();
+        } else {
+            $vehicles = Vehicle::orderBy('plat_nomor')->get();
+        }
 
         return view('checklist.create', compact('vehicles'));
     }
@@ -38,6 +52,14 @@ class DailyChecklistController extends Controller
             'catatan_tambahan' => 'nullable|string',
         ]);
 
+        // Proteksi tambahan untuk Driver agar tidak memanipulasi vehicle_id ke kendaraan lain
+        if (auth()->user()->role === 'user') {
+            $vehicle = Vehicle::find($validated['vehicle_id']);
+            if (!$vehicle || $vehicle->supir_utama !== auth()->user()->name) {
+                return redirect()->back()->withErrors(['vehicle_id' => 'Anda hanya diperbolehkan melakukan checklist untuk kendaraan penugasan Anda sendiri.'])->withInput();
+            }
+        }
+
         DailyChecklist::create($validated);
 
         if (! empty($validated['odometer'])) {
@@ -55,6 +77,11 @@ class DailyChecklistController extends Controller
 
     public function destroy($id)
     {
+        // Hanya superadmin, admin, dan teknisi yang boleh menghapus checklist
+        if (!in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi'])) {
+            return redirect()->route('checklist.index')->with('error', 'Anda tidak memiliki hak akses untuk menghapus data checklist.');
+        }
+
         $checklist = DailyChecklist::findOrFail($id);
         $checklist->delete();
 
