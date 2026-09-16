@@ -10,7 +10,7 @@ Selamat datang di direktori dokumentasi resmi **Fleet Management System (Sistem 
    *Dokumentasi Utama & Analisis Lengkap Sistem* yang memuat:
    * **Ikhtisar Sistem & 8 Fitur Unggulan**: Live GPS Fleet Tracking, Trip Dispatcher & ETA Telemetry, Smart Maintenance Alert, Rekap Biaya & Export CSV, Quick BBM Odometer Sync, Otorisasi Anggaran Berjenjang, Pemulihan Sandi OTP, dan Multi-role RBAC.
    * **10 Modul Fungsional Lengkap**: Alur bisnis, validasi, dan controller terkait.
-   * **Matriks Hak Akses Peran (RBAC)** untuk 5 tingkatan user (`superadmin`, `admin`, `teknisi`, `pimpinan`, `user/driver`).
+   * **Matriks Hak Akses Peran (RBAC)** untuk 3 peran utama (`admin`, `teknisi`, `user`/driver).
    * **Kamus Data & Skema Database**: Detail 7 tabel utama (`users`, `vehicles`, `daily_checklists`, `expenses`, `complaints`, `vehicle_histories`, `password_reset_tokens`).
    * **Diagram Arsitektur Mermaid**: Entity Relationship Diagram (ERD), Sequence Diagram Alur Servis & Keuangan, Sequence Diagram Reset Password OTP, dan Component Architecture.
    * **Tabel Lengkap Seluruh Endpoint Rute HTTP (Routing Table)**.
@@ -47,7 +47,6 @@ Buka browser di HP yang terhubung ke Wi-Fi yang sama: `http://<IP_PC_ANDA>:8000`
 
 | Peran | Username | Email |
 | :--- | :--- | :--- |
-| **Admin Fleet** | `admin_fleet` | `admin@fleet.com` |
-| **Teknisi Utama** | `teknisi_utama` | `teknisi@fleet.com` |
-| **Driver Utama** | `driver_utama` | `user@fleet.com` |
-| **Pimpinan** | `sitirahmawati` | `sitirahmawati083@gmail.com` |
+| **Admin** | `admin_fleet` | `admin@fleet.com` |
+| **Teknisi** | `teknisi_utama` | `teknisi@fleet.com` |
+| **User (Driver)** | `driver_utama` | `user@fleet.com` |

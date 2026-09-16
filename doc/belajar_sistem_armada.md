@@ -222,25 +222,25 @@ Dokumentasi ini menyajikan panduan arsitektur, daftar modul fungsional, kamus da
 
 ## 3. MATRIKS HAK AKSES PERAN (ROLE-BASED ACCESS CONTROL)
 
-Sistem menggunakan 5 peran (*roles*) dengan pembagian wewenang yang tegas:
+Sistem menggunakan 3 peran utama (*roles*) dengan pembagian wewenang yang tegas:
 
-| Modul / Fitur | Super Admin | Admin Fleet | Teknisi | Pimpinan (Manager) | Driver (User) |
-| :--- | :---: | :---: | :---: | :---: | :---: |
-| **Dashboard Analytics** | ✅ Lengkap | ✅ Lengkap | ✅ Operasional | ✅ Finansial & KPI | ✅ Armada Saya |
-| **Live GPS Tracking & Dispatcher** | ✅ Akses Penuh | ✅ Akses Penuh | ✅ Akses | ✅ Akses | ✅ Akses / Unit Sendiri |
-| **Penugasan Rute & Selesai Antar** | ✅ Ya | ✅ Ya | ✅ Ya | ❌ Tidak | ✅ Ya |
-| **Data Kendaraan (Lihat)** | ✅ Ya | ✅ Ya | ✅ Ya | ✅ Ya | ✅ Ya |
-| **Data Kendaraan (Tambah/Edit/Hapus)**| ✅ Ya | ✅ Ya | ❌ Tidak | ❌ Tidak | ❌ Tidak |
-| **Ubah Status & Odometer Cepat** | ✅ Ya | ✅ Ya | ✅ Ya | ❌ Tidak | ✅ Ya |
-| **Input Daily Checklist** | ✅ Ya | ✅ Ya | ✅ Ya | ❌ Tidak | ✅ Ya |
-| **Hapus Daily Checklist** | ✅ Ya | ✅ Ya | ✅ Ya | ❌ Tidak | ❌ Tidak |
-| **Rekap Biaya (Lihat/Tambah/Export)** | ✅ Ya | ✅ Ya | ✅ Tambah/Export | ✅ Lihat/Export | ❌ Tidak |
-| **Approval Anggaran Biaya Besar** | ✅ Ya | ✅ Ya | ❌ Tidak | ✅ Ya | ❌ Tidak |
-| **Buat Laporan Keluhan** | ✅ Ya | ✅ Ya | ✅ Ya | ✅ Ya | ✅ Ya |
-| **Update Status & Progress Keluhan** | ✅ Ya | ✅ Ya | ✅ Ya | ❌ Tidak | ❌ Tidak |
-| **Kelola Riwayat Servis (CRUD)** | ✅ Ya | ✅ Ya | ✅ Ya | ❌ Tidak | ❌ Tidak |
-| **Kelola Akun Pengguna & SIM (CRUD)** | ✅ Ya | ✅ Ya | ❌ Tidak | ❌ Tidak | ❌ Tidak |
-| **Update Profil & Avatar Mandiri** | ✅ Ya | ✅ Ya | ✅ Ya | ✅ Ya | ✅ Ya |
+| Modul / Fitur | Admin (Fleet Control) | Teknisi (Bengkel) | User (Driver / Pengemudi) |
+| :--- | :---: | :---: | :---: |
+| **Dashboard Analytics** | ✅ Lengkap & Finansial | ✅ Operasional Servis | ✅ Armada Saya |
+| **Live GPS Tracking & Dispatcher** | ✅ Akses Penuh & Dispatch | ✅ Akses Peta | ✅ Akses / Unit Sendiri |
+| **Penugasan Rute & Selesai Antar** | ✅ Ya | ✅ Ya | ✅ Ya |
+| **Data Kendaraan (Lihat)** | ✅ Ya | ✅ Ya | ✅ Ya |
+| **Data Kendaraan (Tambah/Edit/Hapus)**| ✅ Ya | ❌ Tidak | ❌ Tidak |
+| **Ubah Status & Odometer Cepat** | ✅ Ya | ✅ Ya | ✅ Ya |
+| **Input Daily Checklist** | ✅ Ya | ✅ Ya | ✅ Ya |
+| **Hapus Daily Checklist** | ✅ Ya | ✅ Ya | ❌ Tidak |
+| **Rekap Biaya (Lihat/Tambah/Export)** | ✅ Ya (Termasuk Export CSV) | ✅ Tambah/Lihat/Export | ❌ Tidak |
+| **Approval Anggaran Biaya Besar** | ✅ Ya (Otorisasi Penuh) | ❌ Tidak | ❌ Tidak |
+| **Buat Laporan Keluhan** | ✅ Ya | ✅ Ya | ✅ Ya |
+| **Update Status & Progress Keluhan** | ✅ Ya | ✅ Ya | ❌ Tidak |
+| **Kelola Riwayat Servis (CRUD)** | ✅ Ya | ✅ Ya | ❌ Tidak |
+| **Kelola Akun Pengguna & SIM (CRUD)** | ✅ Ya | ❌ Tidak | ❌ Tidak |
+| **Update Profil & Avatar Mandiri** | ✅ Ya | ✅ Ya | ✅ Ya |
 
 ---
 
@@ -683,9 +683,6 @@ Tersedia skrip otomatis `jalankan_di_hp.bat` di root direktori project. Cukup kl
 
 | Peran (Role) | Username | Email | Kegunaan Pengujian |
 | :--- | :--- | :--- | :--- |
-| **Admin Fleet** | `admin_fleet` | `admin@fleet.com` | Akses penuh inventaris armada, user, trip dispatcher, approval pengeluaran |
-| **Teknisi Utama** | `teknisi_utama` | `teknisi@fleet.com` | Penanganan keluhan, update progress servis, isi checklist harian |
-| **Driver Utama** | `driver_utama` | `user@fleet.com` | Lapor keluhan foto/video, pelacakan armada saya, update odometer |
-| **Teknisi Budi** | `teknisi_budi` | `budi.teknisi@fleet.com`| Leaderboard perbaikan, manajemen logbook riwayat servis |
-| **Driver Dedi** | `driver_dedi` | `dedi.driver@fleet.com` | Simulasi pengemudi unit armada B 9821 TXT |
-| **Pimpinan** | `sitirahmawati` | `sitirahmawati083@gmail.com` | Hak otorisasi anggaran belanja perbaikan besar |
+| **Admin** | `admin_fleet` | `admin@fleet.com` | Akses penuh inventaris armada, trip dispatcher, approval pengeluaran, kelola user & SIM |
+| **Teknisi** | `teknisi_utama` | `teknisi@fleet.com` | Penanganan keluhan, update progress servis, isi checklist harian |
+| **User (Driver)** | `driver_utama` | `user@fleet.com` | Lapor keluhan foto/video, inspeksi checklist harian & sinkronisasi odometer, pelacakan armada saya |

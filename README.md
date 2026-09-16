@@ -62,7 +62,7 @@ Sistem ini didesain responsif untuk memudahkan pengemudi (*driver*) mengakses le
 - **Pemulihan Kata Sandi 6-Digit OTP:** Pengguna dapat meminta kode OTP 6 digit via email notification yang berlaku selama 15 menit.
 
 ### 🌐 8. Multi-Role RBAC & Localization
-- **5 Tingkatan Hak Akses:** `Super Admin`, `Admin Fleet`, `Teknisi`, `Pimpinan (Manager)`, dan `Driver (User)`.
+- **3 Tingkatan Hak Akses Utama:** `Admin` (Manajemen & Fleet Control), `Teknisi` (Bengkel & Perawatan), dan `User` (Driver / Pengemudi).
 - **Dukungan Dwibahasa:** Bahasa Indonesia (`id`) & Bahasa Inggris (`en`).
 
 ---
@@ -135,11 +135,9 @@ Tersedia skrip instan `jalankan_di_hp.bat` di folder utama. Cukup klik ganda fil
 
 | Peran (Role) | Username | Email | Hak Akses Utama |
 | :--- | :--- | :--- | :--- |
-| **Admin Fleet** | `admin_fleet` | `admin@fleet.com` | Akses penuh master armada, user, trip dispatcher, approval biaya |
-| **Teknisi Utama** | `teknisi_utama` | `teknisi@fleet.com` | Update progress perbaikan keluhan, ubah status servis, input checklist |
-| **Driver Utama** | `driver_utama` | `user@fleet.com` | Lapor kendala kerusakan foto/video, pelacakan armada saya, update odometer |
-| **Teknisi 2** | `teknisi_budi` | `budi.teknisi@fleet.com` | Leaderboard teknisi & logbook riwayat servis |
-| **Pimpinan** | `sitirahmawati` | `sitirahmawati083@gmail.com` | Review dan approval pengeluaran anggaran besar (> Rp 1 Juta) |
+| **Admin** | `admin_fleet` | `admin@fleet.com` | Kontrol penuh master armada, user & SIM, trip dispatcher, approval pengeluaran, ekspor CSV |
+| **Teknisi** | `teknisi_utama` | `teknisi@fleet.com` | Penanganan keluhan, update progress perbaikan, ubah status servis, input checklist harian |
+| **User (Driver)** | `driver_utama` | `user@fleet.com` | Lapor kerusakan foto/video, inspeksi checklist harian & sinkronisasi odometer, pelacakan armada saya |
 
 ---
 
