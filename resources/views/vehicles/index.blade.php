@@ -203,9 +203,11 @@
         <p class="text-secondary mb-0" style="font-size: 0.95rem;">{{ __('Kelola armada perusahaan, pantau odometer real-time, dan jadwalkan pemeliharaan terpadu.') }}</p>
     </div>
     <div class="d-flex align-items-center gap-2">
+        @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
         <a href="{{ route('tracking.index') }}" class="btn btn-outline-primary d-inline-flex align-items-center gap-2 px-3 py-2" style="border-radius: 8px; font-weight: 600;">
             <i class="bi bi-geo-alt-fill"></i> {{ __('Peta Pelacakan Armada') }}
         </a>
+        @endif
         @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin']))
             <a href="{{ route('vehicles.create') }}" class="btn btn-primary d-inline-flex align-items-center gap-2 px-3 py-2" style="border-radius: 8px; font-weight: 600;">
                 <i class="bi bi-plus-circle"></i> {{ __('Tambah Kendaraan') }}
@@ -517,9 +519,11 @@
                                 <a href="https://wa.me/?text={{ urlencode($cardWa) }}" target="_blank" class="btn btn-sm btn-outline-success d-inline-flex align-items-center justify-content-center shadow-xs" style="border-radius: 8px; width: 34px; height: 34px; padding: 0;" title="{{ __('Kirim Pengingat via WhatsApp') }}">
                                     <i class="bi bi-whatsapp"></i>
                                 </a>
+                                @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
                                 <a href="{{ route('tracking.index', ['vehicle_id' => $v->id]) }}" class="btn btn-sm btn-outline-info d-inline-flex align-items-center justify-content-center shadow-xs" style="border-radius: 8px; width: 34px; height: 34px; padding: 0;" title="{{ __('Lacak lokasi armada di peta') }}">
                                     <i class="bi bi-geo-alt-fill"></i>
                                 </a>
+                                @endif
                                 @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin']))
                                     <a href="{{ route('vehicles.edit', $v) }}" class="btn btn-sm btn-outline-warning d-inline-flex align-items-center justify-content-center shadow-xs" style="border-radius: 8px; width: 34px; height: 34px; padding: 0;" title="{{ __('Edit Kendaraan') }}">
                                         <i class="bi bi-pencil-fill"></i>

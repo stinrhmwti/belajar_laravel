@@ -30,12 +30,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // ============ PELACAKAN KENDARAAN (LIVE GPS TRACKING) ============
-    Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking.index');
-    Route::get('/tracking/api/vehicles', [TrackingController::class, 'apiVehicles'])->name('tracking.api');
-    Route::post('/tracking/{vehicle}/location', [TrackingController::class, 'updateLocation'])->name('tracking.updateLocation');
-    Route::put('/vehicles/{vehicle}/location', [TrackingController::class, 'updateLocation'])->name('vehicles.updateLocation');
-    Route::post('/tracking/{vehicle}/trip', [TrackingController::class, 'assignTrip'])->name('tracking.assignTrip');
-    Route::post('/tracking/{vehicle}/complete-trip', [TrackingController::class, 'completeTrip'])->name('tracking.completeTrip');
+    Route::middleware(['role:superadmin,admin,teknisi'])->group(function () {
+        Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking.index');
+        Route::get('/tracking/api/vehicles', [TrackingController::class, 'apiVehicles'])->name('tracking.api');
+        Route::post('/tracking/{vehicle}/location', [TrackingController::class, 'updateLocation'])->name('tracking.updateLocation');
+        Route::put('/vehicles/{vehicle}/location', [TrackingController::class, 'updateLocation'])->name('vehicles.updateLocation');
+        Route::post('/tracking/{vehicle}/trip', [TrackingController::class, 'assignTrip'])->name('tracking.assignTrip');
+        Route::post('/tracking/{vehicle}/complete-trip', [TrackingController::class, 'completeTrip'])->name('tracking.completeTrip');
+    });
 
     // ============ VEHICLES ============
     Route::get('/vehicles', [VehicleController::class, 'index'])->name('vehicles.index');

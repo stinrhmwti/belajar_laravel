@@ -1074,12 +1074,14 @@
                 {{ __('Kendaraan') }}
             </a>
         </li>
+        @if(auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
         <li class="nav-item">
             <a href="{{ route('tracking.index') }}" class="nav-link {{ request()->routeIs('tracking*') ? 'active' : '' }}">
                 <div class="nav-icon"><i class="bi bi-geo-alt-fill"></i></div>
                 {{ __('Pelacakan Kendaraan') }}
             </a>
         </li>
+        @endif
         @if(auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi', 'user']))
         <li class="nav-item">
             <a href="{{ route('checklist.index') }}" class="nav-link {{ request()->routeIs('checklist*') ? 'active' : '' }}">
@@ -1515,6 +1517,7 @@
                             <small class="text-muted" style="font-size: 0.78rem;">{{ __('Lihat daftar mobil, masa berlaku KIR, dan status jalan') }}</small>
                         </div>
                     </a>
+                    @if(auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
                     <a href="{{ route('tracking.index') }}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center gap-3 border-0">
                         <div class="rounded-3 bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; flex-shrink: 0;"><i class="bi bi-geo-alt-fill fs-5"></i></div>
                         <div>
@@ -1522,6 +1525,7 @@
                             <small class="text-muted" style="font-size: 0.78rem;">{{ __('Pantau posisi geografis dan rute armada secara real-time') }}</small>
                         </div>
                     </a>
+                    @endif
                     <a href="{{ route('checklist.index') }}" class="list-group-item list-group-item-action py-3 px-4 d-flex align-items-center gap-3 border-0">
                         <div class="rounded-3 bg-info-subtle text-info d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; flex-shrink: 0;"><i class="bi bi-clipboard-check-fill fs-5"></i></div>
                         <div>

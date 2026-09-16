@@ -230,9 +230,11 @@
             </div>
         </div>
         <div class="d-flex align-items-center gap-2">
+            @if(auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
             <a href="{{ route('tracking.index', ['vehicle_id' => $vehicle->id]) }}" class="btn btn-sm btn-primary d-flex align-items-center gap-2" style="border-radius: 8px; font-size: 0.8rem; padding: 6px 12px;">
                 <i class="bi bi-geo-alt-fill"></i> {{ __('Buka Peta Pelacakan Lengkap') }}
             </a>
+            @endif
             @if ($vehicle->latitude && $vehicle->longitude)
                 <a href="https://www.google.com/maps/dir/?api=1&origin={{ $vehicle->latitude }},{{ $vehicle->longitude }}&destination={{ $vehicle->tujuan_latitude ?? $vehicle->latitude }},{{ $vehicle->tujuan_longitude ?? $vehicle->longitude }}" target="_blank" class="btn btn-sm btn-outline-primary d-flex align-items-center gap-2" style="border-radius: 8px; font-size: 0.8rem; padding: 6px 12px;">
                     <i class="bi bi-map-fill"></i> {{ __('Navigasi Google Maps') }}
