@@ -21,7 +21,8 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0e3054 0%, #06182c 100%);
+            background: #0b1e36 url('{{ asset('images/fleet_showroom_bg.jpg') }}') no-repeat center center fixed;
+            background-size: cover;
             min-height: 100vh;
             margin: 0;
             display: flex;
@@ -32,25 +33,14 @@
             color: var(--text-light);
         }
 
-        .bg-glow-1 {
-            position: absolute;
-            top: -15%;
-            left: -10%;
-            width: 650px;
-            height: 650px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(15, 23, 42, 0) 70%);
-            pointer-events: none;
-            z-index: 1;
-        }
-        .bg-glow-2 {
-            position: absolute;
-            bottom: -20%;
-            right: -10%;
-            width: 700px;
-            height: 700px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(6, 182, 212, 0.25) 0%, rgba(15, 23, 42, 0) 70%);
+        /* Subtle modern backdrop overlay */
+        .bg-backdrop-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(8, 24, 48, 0.78) 0%, rgba(9, 30, 58, 0.52) 45%, rgba(12, 28, 50, 0.28) 100%);
             pointer-events: none;
             z-index: 1;
         }
@@ -244,17 +234,6 @@
             justify-content: center;
         }
 
-        .truck-backdrop {
-            position: absolute;
-            right: -10%;
-            bottom: 0;
-            opacity: 0.12;
-            width: 55%;
-            pointer-events: none;
-            z-index: 1;
-            transform: scaleX(-1);
-        }
-
         @media (max-width: 991.98px) {
             .hero-section {
                 text-align: center;
@@ -263,9 +242,6 @@
             .hero-desc {
                 margin-left: auto;
                 margin-right: auto;
-            }
-            .truck-backdrop {
-                display: none;
             }
             .login-card {
                 padding: 2rem;
@@ -299,11 +275,10 @@
 </head>
 <body>
 
-<div class="bg-glow-1"></div>
-<div class="bg-glow-2"></div>
+<div class="bg-backdrop-overlay"></div>
 
 <!-- Top Alert Bar -->
-<div class="w-100 text-center py-2 px-3 fw-medium" style="background: rgba(255, 255, 255, 0.08); font-size: 0.8rem; letter-spacing: 0.3px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); position: relative; z-index: 5;">
+<div class="w-100 text-center py-2 px-3 fw-medium" style="background: rgba(7, 24, 48, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); font-size: 0.8rem; letter-spacing: 0.3px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: relative; z-index: 5;">
     <i class="bi bi-shield-lock-fill me-1 text-warning"></i> {{ __('Buat Password Baru Anda') }}
 </div>
 
@@ -349,8 +324,11 @@
                     <p class="text-secondary small">{{ __('Lengkapi form di bawah ini untuk memperbarui password Anda.') }}</p>
                 </div>
 
+                <!-- Container untuk alert respons dinamis (AJAX) -->
+                <div id="dynamicAlertContainer"></div>
+
                 @if ($errors->any())
-                    <div class="alert alert-danger border-0 shadow-sm rounded-3 py-2 px-3 mb-4" style="background-color: #fef2f2; color: #991b1b; font-size: 0.825rem;">
+                    <div id="serverErrorAlert" class="alert alert-danger border-0 shadow-sm rounded-3 py-2 px-3 mb-4" style="background-color: #fef2f2; color: #991b1b; font-size: 0.825rem;">
                         <div class="d-flex align-items-center gap-2">
                             <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
                             <div>
@@ -373,6 +351,15 @@
                         <div class="input-icon-wrapper">
                             <input type="email" name="email" class="form-control-custom w-100 bg-light" value="{{ $email ?? old('email') }}" readonly required autocomplete="email">
                             <i class="bi bi-envelope input-icon"></i>
+                        </div>
+                    </div>
+
+                    <!-- Kode OTP Input -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('Kode OTP (6 Digit)') }}</label>
+                        <div class="input-icon-wrapper">
+                            <input type="text" name="otp" id="otpInput" class="form-control-custom w-100 fw-bold" value="{{ $token ?? old('otp') }}" placeholder="6 Digit Kode OTP" required maxlength="6" inputmode="numeric" style="letter-spacing: 4px; font-family: monospace;">
+                            <i class="bi bi-shield-check input-icon"></i>
                         </div>
                     </div>
 
@@ -548,21 +535,91 @@
             });
         }
 
-        // Form Submit Loading State
+        // Form Submit Loading State & Fast Async Processing
         const resetPasswordForm = document.getElementById('resetPasswordForm');
         const btnSubmit = document.getElementById('btnSubmit');
+        const alertContainer = document.getElementById('dynamicAlertContainer');
+        const serverErrorAlert = document.getElementById('serverErrorAlert');
 
         if (resetPasswordForm && btnSubmit) {
+            const originalBtnHtml = btnSubmit.innerHTML;
+
             resetPasswordForm.addEventListener('submit', function (event) {
                 if (!resetPasswordForm.checkValidity()) {
                     return;
                 }
                 
+                event.preventDefault();
+
+                if (serverErrorAlert) serverErrorAlert.style.display = 'none';
+                if (alertContainer) alertContainer.innerHTML = '';
+
                 btnSubmit.disabled = true;
                 btnSubmit.innerHTML = `
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    <span>Memproses...</span>
+                    <span>{{ __('Menyimpan Password...') }}</span>
                 `;
+
+                const formData = new FormData(resetPasswordForm);
+
+                fetch(resetPasswordForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(async (response) => {
+                    const data = await response.json().catch(() => ({}));
+                    if (!response.ok || !data.success) {
+                        throw data;
+                    }
+                    
+                    btnSubmit.innerHTML = `
+                        <i class="bi bi-check2-circle fs-6"></i>
+                        <span>{{ __('Berhasil Diperbarui') }}</span>
+                    `;
+                    btnSubmit.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                    } else {
+                        window.location.href = '{{ route("login") }}';
+                    }
+                })
+                .catch((error) => {
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = originalBtnHtml;
+
+                    let errorMsg = 'Terjadi kesalahan saat memproses permintaan. Silakan coba lagi.';
+                    if (error && error.errors) {
+                        const messages = [];
+                        for (const key in error.errors) {
+                            if (Array.isArray(error.errors[key])) {
+                                messages.push(...error.errors[key]);
+                            } else {
+                                messages.push(error.errors[key]);
+                            }
+                        }
+                        if (messages.length > 0) {
+                            errorMsg = messages.join('<br>');
+                        }
+                    } else if (error && error.message) {
+                        errorMsg = error.message;
+                    }
+
+                    if (alertContainer) {
+                        alertContainer.innerHTML = `
+                            <div class="alert alert-danger border-0 shadow-sm rounded-3 py-2 px-3 mb-4" style="background-color: #fef2f2; color: #991b1b; font-size: 0.825rem;">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+                                    <div>${errorMsg}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
             });
         }
     });

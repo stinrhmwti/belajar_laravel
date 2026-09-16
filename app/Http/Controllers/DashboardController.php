@@ -22,6 +22,11 @@ class DashboardController extends Controller
 
         // Statistik Cepat untuk Dashboard
         $keluhanHariIni = Complaint::whereDate('tanggal', now()->toDateString())->count();
+        $totalKeluhanAktif = Complaint::whereIn('status', ['Baru', 'Diproses'])->count();
+        $keluhanBaruCount = Complaint::where('status', 'Baru')->count();
+        $keluhanDiprosesCount = Complaint::where('status', 'Diproses')->count();
+        $keluhanSelesaiCount = Complaint::where('status', 'Selesai')->count();
+
         $sedangServis = $vehicles->where('status', 'Sedang Diservis')->count();
         $selesaiServis = $vehicles->where('status', 'Siap Pakai')->count() + $vehicles->where('status', 'Selesai')->count();
 
@@ -126,6 +131,10 @@ class DashboardController extends Controller
             'kendaraanBermasalah',
             'kendaraanMendekatiJatuhTempo',
             'keluhanHariIni',
+            'totalKeluhanAktif',
+            'keluhanBaruCount',
+            'keluhanDiprosesCount',
+            'keluhanSelesaiCount',
             'sedangServis',
             'selesaiServis',
             'totalBiayaBulanIni',
@@ -139,7 +148,11 @@ class DashboardController extends Controller
         if (in_array($user->role, ['superadmin', 'admin', 'pimpinan'])) {
             $data['menungguPersetujuan'] = Expense::where('status_approval', 'Menunggu Persetujuan')
                 ->with('vehicle')->latest('tanggal')->get();
-            $data['keluhanBaru'] = Complaint::where('status', 'Baru')->with(['vehicle', 'user'])->latest('tanggal')->take(5)->get();
+            $data['keluhanBaru'] = Complaint::whereIn('status', ['Baru', 'Diproses'])
+                ->with(['vehicle', 'user'])
+                ->latest('tanggal')
+                ->take(6)
+                ->get();
 
             $topBoros = Expense::selectRaw('vehicle_id, SUM(jumlah_biaya) as total')
                 ->whereMonth('tanggal', now()->month)
@@ -176,14 +189,19 @@ class DashboardController extends Controller
 
         if ($user->role === 'teknisi') {
             $data['checklistHariIni'] = DailyChecklist::whereDate('tanggal', now()->toDateString())->count();
-            $data['keluhanPerluDitangani'] = Complaint::whereIn('status', ['Baru', 'Diproses'])->with(['vehicle', 'user'])->latest('tanggal')->take(5)->get();
+            $data['keluhanPerluDitangani'] = Complaint::whereIn('status', ['Baru', 'Diproses'])
+                ->with(['vehicle', 'user'])
+                ->latest('tanggal')
+                ->take(6)
+                ->get();
         }
 
         if ($user->role === 'user') {
-            $data['kendaraanSaya'] = $vehicles->filter(fn ($v) => $v->supir_utama === $user->name);
+            $data['kendaraanSaya'] = $vehicles->filter(fn ($v) => $v->driver_id === $user->id || $v->supir_utama === $user->name);
             $data['kendaraanSiapPakai'] = $vehicles->where('status', 'Siap Pakai');
-            $data['keluhanSaya'] = Complaint::where('user_id', $user->id)->latest('tanggal')->take(5)->get();
+            $data['keluhanSaya'] = Complaint::where('user_id', $user->id)->with('vehicle')->latest('tanggal')->take(5)->get();
             $data['totalKeluhanSaya'] = Complaint::where('user_id', $user->id)->count();
+            $data['totalKeluhanAktifSaya'] = Complaint::where('user_id', $user->id)->whereIn('status', ['Baru', 'Diproses'])->count();
             $data['totalKeluhanSelesaiSaya'] = Complaint::where('user_id', $user->id)->where('status', 'Selesai')->count();
         }
 

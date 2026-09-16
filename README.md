@@ -1,59 +1,155 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="public/images/car_lineup.png" alt="Fleet Management System Banner" width="700" style="border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.12);">
 </p>
 
-## About Laravel
+<h1 align="center">🚛 Fleet Management System (Sistem Manajemen Armada)</h1>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<p align="center">
+  <strong>Platform Terintegrasi Manajemen Operasional, Pelacakan GPS Real-Time, Pemeliharaan Kendaraan, dan Efisiensi Logistik Berbasis Laravel 12</strong>
+</p>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+<p align="center">
+  <a href="https://laravel.com"><img src="https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel 12"></a>
+  <a href="https://php.net"><img src="https://img.shields.io/badge/PHP-%3E%3D%208.2-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP 8.2+"></a>
+  <a href="https://getbootstrap.com"><img src="https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white" alt="Bootstrap 5"></a>
+  <a href="https://leafletjs.com"><img src="https://img.shields.io/badge/Leaflet.js-Interactive%20Maps-199900?style=for-the-badge&logo=leaflet&logoColor=white" alt="Leaflet Maps"></a>
+  <a href="https://mysql.com"><img src="https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL"></a>
+</p>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🌟 Tentang Proyek
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+**Fleet Management System** adalah aplikasi web komprehensif untuk mengelola seluruh siklus operasional kendaraan perusahaan, mulai dari pemantauan aset, pelacakan rute pengiriman real-time, inspeksi harian kelaikan jalan, penanganan keluhan kerusakan, hingga rekapitulasi keuangan dan jadwal servis berkala otomatis.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Sistem ini didesain responsif untuk memudahkan pengemudi (*driver*) mengakses lewat *smartphone*, teknisi bengkel di lapangan, serta tim manajemen dan admin di kantor pusat.
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## ✨ Fitur-Fitur Unggulan
 
-### Premium Partners
+### 📍 1. Pelacakan GPS Real-Time & Trip Dispatcher
+- **Interactive Map (Leaflet.js):** Pemantauan posisi seluruh unit armada di peta interaktif dengan marker dinamis berdasarkan tipe kendaraan dan status kesiapan.
+- **Trip Dispatcher & Telemetri Rute:** Penugasan rute perjalanan baru (`lokasi_asal`, `lokasi_tujuan`, koordinat tujuan, estimasi kecepatan) dengan perhitungan otomatis sisa jarak darat (*km*) dan estimasi waktu tiba (*ETA*).
+- **Tombol Selesaikan Pengantaran (*Complete Delivery*):** Memindahkan posisi armada langsung ke titik tujuan drop-off dan memperbarui status perjalanan menjadi `Selesai Mengantar`.
+- **Live GPS Update:** Sinkronisasi koordinat GPS instan langsung dari sensor GPS *smartphone* atau browser pengemudi.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 🔔 2. Smart Maintenance Alert (Servis & Dokumen)
+- **Deteksi Otomatis Servis Berkala:** Peringatan otomatis servis berkala berdasarkan jarak tempuh (kelipatan 5.000 KM) dan waktu (interval 3 bulan atau H-7).
+- **Pemantauan Pajak & KIR:** Indikator visual jatuh tempo Pajak Tahunan, Pajak 5 Tahunan (Ganti Plat), dan Uji KIR Kendaraan (🟢 Aman, 🟡 Waspada $\le 30$ hari, 🔴 Jatuh Tempo).
 
-## Contributing
+### 📋 3. Pemeriksaan Harian (Daily Inspection Checklist)
+- **6 Parameter Kelaikan Fisik:** Pengecekan Oli Mesin, Air Radiator, Minyak Rem, Ban & Rem, Lampu & Klakson, serta Kebersihan Unit.
+- **Sinkronisasi Odometer Otomatis:** Angka odometer yang diinput pada formulir checklist harian secara otomatis menyinkronkan data odometer master armada.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 🛠️ 4. Manajemen Keluhan & Siklus Perbaikan (Complaint Flow)
+- **Pelaporan Kendala oleh Driver:** Driver dapat mengirim laporan keluhan kerusakan yang dilengkapi dengan bukti foto dan video.
+- **Tracking Progress Teknisi:** Teknisi dapat memperbarui persentase *progress* perbaikan (0% - 100%).
+- **Integrasi Otomatis:** Saat status keluhan diubah menjadi `Selesai`, sistem secara otomatis mencatat pengeluaran bengkel di rekap biaya dan memasukkan log ke *timeline* riwayat servis kendaraan.
 
-## Code of Conduct
+### 💰 5. Rekap Biaya Operasional, Ekspor CSV & Quick BBM
+- **Kategori Biaya Lengkap:** Pencatatan BBM, Tol, Bengkel/Servis, Parkir, Pajak, Sparepart, dan Biaya Lainnya.
+- **Ekspor Laporan CSV:** Unduhan laporan pengeluaran siap pakai yang kompatibel dengan Microsoft Excel (menggunakan *UTF-8 BOM*).
+- **Modal Quick BBM:** Pencatatan cepat pengisian bahan bakar (liter BBM + nominal) yang langsung memperbarui angka odometer kendaraan.
+- **Otorisasi Anggaran Berjenjang:** Pengeluaran berbiaya besar di atas Rp 1.000.000 otomatis berstatus `Menunggu Persetujuan` dan membutuhkan approval dari Pimpinan/Admin.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 🪪 6. Manajemen Pengemudi & Lisensi SIM
+- **Penugasan Akun Driver:** Relasi langsung `driver_id` ke armada kendaraan.
+- **Pendataan Lisensi SIM:** Nomor kontak telepon, nomor SIM, golongan SIM (SIM A, SIM B1, SIM B2, SIM C, Lainnya), dan batas akhir masa berlaku SIM.
 
-## Security Vulnerabilities
+### 🔐 7. Keamanan Akun & Pemulihan Sandi OTP
+- **Rate Limiting Login:** Pembatasan otomatis maksimal 5 percobaan gagal per 60 detik untuk mencegah serangan *brute force*.
+- **Pemulihan Kata Sandi 6-Digit OTP:** Pengguna dapat meminta kode OTP 6 digit via email notification yang berlaku selama 15 menit.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 🌐 8. Multi-Role RBAC & Localization
+- **5 Tingkatan Hak Akses:** `Super Admin`, `Admin Fleet`, `Teknisi`, `Pimpinan (Manager)`, dan `Driver (User)`.
+- **Dukungan Dwibahasa:** Bahasa Indonesia (`id`) & Bahasa Inggris (`en`).
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🏗️ Arsitektur Sistem
+
+```mermaid
+graph TD
+    Client["📱 Smartphone Driver / 💻 Browser Admin"] -->|HTTP / HTTPS| Server["Web Server / Laravel 12 App"]
+    
+    subgraph Core Features
+        Server --> AuthModule["🔐 Autentikasi, Role Middleware & OTP Reset"]
+        Server --> TrackingModule["📍 Live GPS Tracking & Trip Dispatcher"]
+        Server --> VehicleModule["🚗 Master Armada, Pajak & Smart Servis Alert"]
+        Server --> ChecklistModule["📋 Daily Inspection & Odometer Sync"]
+        Server --> ExpenseModule["💰 Rekap Biaya, Approval & Export CSV"]
+        Server --> ComplaintModule["🛠️ Laporan Keluhan & Logbook Servis"]
+    end
+
+    subgraph Storage & Persistence
+        Server --> MySQL[("🗄️ MySQL Database")]
+        Server --> LocalDisk["📁 Public Storage (Foto Unit, Video Bukti, Avatar)"]
+        Server --> MailServer["📧 Mailer / SMTP (Email OTP)"]
+    end
+```
+
+---
+
+## 🚀 Panduan Instalasi & Menjalankan Sistem
+
+### 1. Kebutuhan Sistem (*Prerequisites*)
+- PHP $\ge$ 8.2 (dengan ekstensi `pdo_mysql`, `mbstring`, `fileinfo`, `gd`/`imagick`, `curl`)
+- MySQL / MariaDB $\ge$ 8.0 (atau XAMPP / Laragon aktif)
+- Composer $\ge$ 2.x
+- Git
+
+### 2. Langkah Instalasi
+
+```bash
+# 1. Clone repositori
+git clone https://github.com/stinrhmwti/belajar_laravel.git
+cd belajar_laravel
+
+# 2. Install dependensi composer
+composer install
+
+# 3. Buat berkas environment (.env)
+copy .env.example .env
+
+# 4. Generate Application Key
+php artisan key:generate
+
+# 5. Konfigurasikan database di file .env, lalu jalankan migrasi & seeder
+php artisan migrate --seed
+
+# 6. Buat link symbolic storage publik untuk media upload
+php artisan storage:link
+
+# 7. Jalankan web server lokal
+php artisan serve
+```
+Akses di browser: `http://127.0.0.1:8000`
+
+### 3. Menjalankan untuk Akses Handphone / Jaringan Wi-Fi
+Tersedia skrip instan `jalankan_di_hp.bat` di folder utama. Cukup klik ganda file tersebut untuk otomatis mendeteksi IP PC lokal dan menyalakan server dengan host `0.0.0.0:8000`.
+
+---
+
+## 👥 Akun Demo Pengujian (Password: `password`)
+
+| Peran (Role) | Username | Email | Hak Akses Utama |
+| :--- | :--- | :--- | :--- |
+| **Admin Fleet** | `admin_fleet` | `admin@fleet.com` | Akses penuh master armada, user, trip dispatcher, approval biaya |
+| **Teknisi Utama** | `teknisi_utama` | `teknisi@fleet.com` | Update progress perbaikan keluhan, ubah status servis, input checklist |
+| **Driver Utama** | `driver_utama` | `user@fleet.com` | Lapor kendala kerusakan foto/video, pelacakan armada saya, update odometer |
+| **Teknisi 2** | `teknisi_budi` | `budi.teknisi@fleet.com` | Leaderboard teknisi & logbook riwayat servis |
+| **Pimpinan** | `sitirahmawati` | `sitirahmawati083@gmail.com` | Review dan approval pengeluaran anggaran besar (> Rp 1 Juta) |
+
+---
+
+## 📂 Dokumentasi Lengkap
+
+Dokumentasi arsitektur mendalam, kamus data skema tabel database, matriks RBAC lengkap, serta tabel seluruh endpoint rute HTTP dapat dipelajari di:
+👉 **[doc/belajar_sistem_armada.md](doc/belajar_sistem_armada.md)**
+
+---
+
+## 📄 Lisensi
+
+Proyek ini dirilis di bawah lisensi [MIT License](LICENSE).

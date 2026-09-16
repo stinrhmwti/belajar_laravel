@@ -24,6 +24,8 @@ class VehicleController extends Controller
             $q->latest('tanggal')->take(10);
         }, 'histories' => function ($q) {
             $q->with('teknisi')->orderByDesc('tanggal');
+        }, 'complaints' => function ($q) {
+            $q->with('user')->latest('tanggal');
         }]);
 
         // Riwayat 7 hari terakhir
@@ -66,7 +68,8 @@ class VehicleController extends Controller
 
     public function create()
     {
-        return view('vehicles.create');
+        $drivers = \App\Models\User::where('role', 'user')->orderBy('name')->get();
+        return view('vehicles.create', compact('drivers'));
     }
 
     public function store(Request $request)
@@ -78,6 +81,12 @@ class VehicleController extends Controller
             'tahun' => 'required|integer|min:1900|max:'.(date('Y') + 1),
             'plat_nomor' => 'required|string|max:20|unique:vehicles,plat_nomor',
             'lokasi_pool' => 'nullable|string|max:255',
+            'lokasi_asal' => 'nullable|string|max:255',
+            'lokasi_tujuan' => 'nullable|string|max:255',
+            'status_perjalanan' => 'nullable|string|max:100',
+            'kecepatan_kmh' => 'nullable|integer|min:0|max:160',
+            'catatan_perjalanan' => 'nullable|string|max:1000',
+            'driver_id' => 'nullable|exists:users,id',
             'supir_utama' => 'nullable|string|max:255',
             'odometer_awal' => 'required|integer|min:0',
             'pajak_tahunan' => 'nullable|numeric|min:0',
@@ -106,6 +115,13 @@ class VehicleController extends Controller
             ],
         ]);
 
+        if (!empty($validated['driver_id']) && empty($validated['supir_utama'])) {
+            $driverUser = \App\Models\User::find($validated['driver_id']);
+            if ($driverUser) {
+                $validated['supir_utama'] = $driverUser->name;
+            }
+        }
+
         if ($request->hasFile('foto')) {
             $validated['foto'] = $request->file('foto')->store('vehicles', 'public');
         }
@@ -117,7 +133,8 @@ class VehicleController extends Controller
 
     public function edit(Vehicle $vehicle)
     {
-        return view('vehicles.edit', compact('vehicle'));
+        $drivers = \App\Models\User::where('role', 'user')->orderBy('name')->get();
+        return view('vehicles.edit', compact('vehicle', 'drivers'));
     }
 
     public function update(Request $request, Vehicle $vehicle)
@@ -129,6 +146,12 @@ class VehicleController extends Controller
             'tahun' => 'required|integer|min:1900|max:'.(date('Y') + 1),
             'plat_nomor' => 'required|string|max:20|unique:vehicles,plat_nomor,'.$vehicle->id,
             'lokasi_pool' => 'nullable|string|max:255',
+            'lokasi_asal' => 'nullable|string|max:255',
+            'lokasi_tujuan' => 'nullable|string|max:255',
+            'status_perjalanan' => 'nullable|string|max:100',
+            'kecepatan_kmh' => 'nullable|integer|min:0|max:160',
+            'catatan_perjalanan' => 'nullable|string|max:1000',
+            'driver_id' => 'nullable|exists:users,id',
             'supir_utama' => 'nullable|string|max:255',
             'odometer_awal' => 'required|integer|min:0',
             'pajak_tahunan' => 'nullable|numeric|min:0',
@@ -167,6 +190,13 @@ class VehicleController extends Controller
             unset($validated['foto']);
         }
 
+        if (!empty($validated['driver_id']) && empty($validated['supir_utama'])) {
+            $driverUser = \App\Models\User::find($validated['driver_id']);
+            if ($driverUser) {
+                $validated['supir_utama'] = $driverUser->name;
+            }
+        }
+
         $vehicle->update($validated);
 
         return redirect()->route('vehicles.index')->with('success', 'Data kendaraan berhasil diperbarui.');
@@ -188,6 +218,38 @@ class VehicleController extends Controller
         $vehicle->update($validated);
 
         return redirect()->back()->with('success', 'Status kendaraan '.$vehicle->plat_nomor.' berhasil diperbarui.');
+    }
+
+    public function updateOdometer(Request $request, Vehicle $vehicle)
+    {
+        $validated = $request->validate([
+            'odometer' => 'required|integer|min:0',
+        ]);
+
+        $newOdo = (int) $validated['odometer'];
+
+        // Update odometer master
+        $vehicle->update([
+            'odometer_awal' => $newOdo,
+        ]);
+
+        // Jika ada checklist terbaru, sinkronkan juga agar tidak ada konflik data
+        $latestChecklist = $vehicle->checklists()->latest('tanggal')->first();
+        if ($latestChecklist && $latestChecklist->odometer < $newOdo) {
+            $latestChecklist->update(['odometer' => $newOdo]);
+        }
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'status' => 'success',
+                'message' => "Odometer armada {$vehicle->plat_nomor} berhasil diperbarui menjadi " . number_format($newOdo, 0, ',', '.') . " KM.",
+                'odometer' => $newOdo,
+                'odometer_formatted' => number_format($newOdo, 0, ',', '.'),
+                'vehicle_id' => $vehicle->id,
+            ]);
+        }
+
+        return redirect()->back()->with('success', "Odometer armada {$vehicle->plat_nomor} berhasil diperbarui.");
     }
 
     public function readNotification(Vehicle $vehicle)

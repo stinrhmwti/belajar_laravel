@@ -223,10 +223,10 @@
             <thead>
                 <tr>
                     <th class="ps-4">{{ __('Pengguna') }}</th>
-                    <th>{{ __('NIP / ID Karyawan') }}</th>
-                    <th>{{ __('Username') }}</th>
-                    <th>{{ __('Email') }}</th>
+                    <th>{{ __('Kontak / NIP') }}</th>
+                    <th>{{ __('Username & Email') }}</th>
                     <th>{{ __('Role & Hak Akses') }}</th>
+                    <th>{{ __('Lisensi Driver (SIM)') }}</th>
                     <th class="pe-4 text-end" data-orderable="false">{{ __('Aksi') }}</th>
                 </tr>
             </thead>
@@ -259,14 +259,18 @@
                         </div>
                     </td>
                     <td>
-                        <span class="fw-semibold text-dark font-monospace" style="font-size:0.88rem;">{{ $u->nis ?? '—' }}</span>
+                        @if($u->no_telepon)
+                            <div class="d-flex align-items-center gap-1.5 text-dark fw-semibold mb-1" style="font-size:0.85rem;">
+                                <i class="bi bi-telephone text-success"></i>
+                                <span>{{ $u->no_telepon }}</span>
+                            </div>
+                        @endif
+                        <span class="text-muted font-monospace" style="font-size:0.78rem;">ID: {{ $u->nis ?? '—' }}</span>
                     </td>
                     <td>
-                        <span class="font-monospace fw-semibold text-secondary" style="font-size:0.85rem;">@<span>{{ $u->username }}</span></span>
-                    </td>
-                    <td>
-                        <div class="d-flex align-items-center gap-2 text-secondary" style="font-size:0.875rem;">
-                            <i class="bi bi-envelope text-muted"></i>
+                        <span class="font-monospace fw-semibold text-secondary d-block" style="font-size:0.85rem;">@<span>{{ $u->username }}</span></span>
+                        <div class="d-flex align-items-center gap-1.5 text-muted" style="font-size:0.8rem;">
+                            <i class="bi bi-envelope"></i>
                             <span>{{ $u->email }}</span>
                         </div>
                     </td>
@@ -275,6 +279,32 @@
                             <i class="bi {{ $roleIcon }}"></i>
                             {{ $roleLabel }}
                         </span>
+                    </td>
+                    <td>
+                        @if($u->nomor_sim || $u->jenis_sim)
+                            <div class="d-flex flex-column gap-1">
+                                <span class="fw-bold text-dark" style="font-size: 0.82rem;">
+                                    <i class="bi bi-card-heading text-primary me-1"></i>{{ $u->jenis_sim ?: 'SIM' }}: {{ $u->nomor_sim ?: '—' }}
+                                </span>
+                                @if($u->masa_berlaku_sim)
+                                    @if($u->status_sim === 'merah')
+                                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-0.5" style="font-size: 0.72rem;">
+                                            <i class="bi bi-exclamation-octagon-fill me-1"></i>Exp: {{ $u->masa_berlaku_sim->format('d/m/Y') }} (Habis)
+                                        </span>
+                                    @elseif($u->status_sim === 'kuning')
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-0.5" style="font-size: 0.72rem;">
+                                            <i class="bi bi-clock-history me-1"></i>Exp: {{ $u->masa_berlaku_sim->format('d/m/Y') }} (< 30 hari)
+                                        </span>
+                                    @else
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-0.5" style="font-size: 0.72rem;">
+                                            <i class="bi bi-check-circle me-1"></i>Exp: {{ $u->masa_berlaku_sim->format('d/m/Y') }}
+                                        </span>
+                                    @endif
+                                @endif
+                            </div>
+                        @else
+                            <span class="text-muted" style="font-size: 0.8rem;">—</span>
+                        @endif
                     </td>
                     <td class="pe-4 text-end">
                         <div class="d-inline-flex gap-1">

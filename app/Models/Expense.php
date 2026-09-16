@@ -14,6 +14,8 @@ class Expense extends Model
         'tanggal',
         'jenis_pengeluaran',
         'jumlah_biaya',
+        'liter_bbm',
+        'odometer_pengisian',
         'keterangan',
         'status_approval',
         'catatan_admin',
@@ -21,6 +23,9 @@ class Expense extends Model
 
     protected $casts = [
         'tanggal' => 'date',
+        'liter_bbm' => 'float',
+        'odometer_pengisian' => 'integer',
+        'jumlah_biaya' => 'float',
     ];
 
     public function vehicle()

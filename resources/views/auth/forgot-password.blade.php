@@ -21,7 +21,8 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0e3054 0%, #06182c 100%);
+            background: #0b1e36 url('{{ asset('images/fleet_showroom_bg.jpg') }}') no-repeat center center fixed;
+            background-size: cover;
             min-height: 100vh;
             margin: 0;
             display: flex;
@@ -32,25 +33,14 @@
             color: var(--text-light);
         }
 
-        .bg-glow-1 {
-            position: absolute;
-            top: -15%;
-            left: -10%;
-            width: 650px;
-            height: 650px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(15, 23, 42, 0) 70%);
-            pointer-events: none;
-            z-index: 1;
-        }
-        .bg-glow-2 {
-            position: absolute;
-            bottom: -20%;
-            right: -10%;
-            width: 700px;
-            height: 700px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(6, 182, 212, 0.25) 0%, rgba(15, 23, 42, 0) 70%);
+        /* Subtle modern backdrop overlay */
+        .bg-backdrop-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(8, 24, 48, 0.78) 0%, rgba(9, 30, 58, 0.52) 45%, rgba(12, 28, 50, 0.28) 100%);
             pointer-events: none;
             z-index: 1;
         }
@@ -244,17 +234,6 @@
             justify-content: center;
         }
 
-        .truck-backdrop {
-            position: absolute;
-            right: -10%;
-            bottom: 0;
-            opacity: 0.12;
-            width: 55%;
-            pointer-events: none;
-            z-index: 1;
-            transform: scaleX(-1);
-        }
-
         @media (max-width: 991.98px) {
             .hero-section {
                 text-align: center;
@@ -263,9 +242,6 @@
             .hero-desc {
                 margin-left: auto;
                 margin-right: auto;
-            }
-            .truck-backdrop {
-                display: none;
             }
             .login-card {
                 padding: 2rem;
@@ -299,11 +275,10 @@
 </head>
 <body>
 
-<div class="bg-glow-1"></div>
-<div class="bg-glow-2"></div>
+<div class="bg-backdrop-overlay"></div>
 
 <!-- Top Alert Bar -->
-<div class="w-100 text-center py-2 px-3 fw-medium" style="background: rgba(255, 255, 255, 0.08); font-size: 0.8rem; letter-spacing: 0.3px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); position: relative; z-index: 5;">
+<div class="w-100 text-center py-2 px-3 fw-medium" style="background: rgba(7, 24, 48, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); font-size: 0.8rem; letter-spacing: 0.3px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: relative; z-index: 5;">
     <i class="bi bi-shield-lock-fill me-1 text-warning"></i> {{ __('Pemulihan Akses Akun FleetMaintenance') }}
 </div>
 
@@ -344,22 +319,28 @@
         <!-- Right Side: Request Form Box -->
         <div class="col-lg-5 offset-lg-1 login-card-wrapper">
             <div class="login-card">
-                <div class="text-center mb-4">
-                    <h3 class="fw-extrabold text-dark mb-1">{{ __('Minta Link Reset') }}</h3>
-                    <p class="text-secondary small">{{ __('Kami akan mengirimkan instruksi pemulihan ke email Anda.') }}</p>
-                </div>
+
+                <!-- Container untuk alert respons cepat (AJAX) -->
+                <div id="dynamicAlertContainer"></div>
 
                 @if (session('status'))
-                    <div class="alert alert-success border-0 shadow-sm rounded-3 py-2.5 px-3 mb-4" style="background-color: #f0fdf4; color: #166534; font-size: 0.825rem;">
-                        <div class="d-flex align-items-center gap-2">
+                    <div id="serverStatusAlert" class="alert alert-success border-0 shadow-sm rounded-3 py-3 px-3 mb-4" style="background-color: #f0fdf4; color: #166534; font-size: 0.85rem;">
+                        <div class="d-flex align-items-center gap-2 mb-2">
                             <i class="bi bi-check-circle-fill text-success fs-5"></i>
-                            <div>{{ session('status') }}</div>
+                            <div class="fw-semibold">{{ session('status') }}</div>
                         </div>
+                        @if (session('resetUrl'))
+                            <div class="mt-2 pt-2 border-top border-success-subtle">
+                                <a href="{{ session('resetUrl') }}" class="btn btn-sm btn-success text-white w-100 py-2 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-xs" style="border-radius: 10px; font-size: 0.84rem;">
+                                    <i class="bi bi-key-fill"></i> {{ __('Klik di Sini untuk Buat Password Baru') }} &rarr;
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 @endif
 
                 @if ($errors->any())
-                    <div class="alert alert-danger border-0 shadow-sm rounded-3 py-2 px-3 mb-4" style="background-color: #fef2f2; color: #991b1b; font-size: 0.825rem;">
+                    <div id="serverErrorAlert" class="alert alert-danger border-0 shadow-sm rounded-3 py-2 px-3 mb-4" style="background-color: #fef2f2; color: #991b1b; font-size: 0.825rem;">
                         <div class="d-flex align-items-center gap-2">
                             <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
                             <div>
@@ -371,37 +352,113 @@
                     </div>
                 @endif
 
-                <form method="POST" action="{{ route('password.email') }}" id="forgotPasswordForm">
-                    @csrf
-                    <div class="mb-4">
-                        <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('Alamat Email') }}</label>
-                        <div class="input-icon-wrapper">
-                            <input type="email" name="email" class="form-control-custom w-100" placeholder="nama@perusahaan.com" value="{{ old('email') }}" required autofocus autocomplete="email">
-                            <i class="bi bi-envelope input-icon"></i>
+                <!-- STEP 1: Masukkan Email untuk Kirim Kode OTP -->
+                <div id="step1Container">
+                    <div class="text-center mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" style="width: 54px; height: 54px; background: rgba(8, 145, 178, 0.1); color: var(--brand-primary);">
+                            <i class="bi bi-shield-lock-fill fs-3"></i>
                         </div>
+                        <h3 class="fw-extrabold text-dark mb-1">{{ __('Kirim Kode OTP') }}</h3>
+                        <p class="text-secondary small">{{ __('Kami akan mengirimkan 6 digit Kode OTP pemulihan ke email Anda.') }}</p>
                     </div>
 
-                    <button type="submit" id="btnSubmit" class="btn btn-submit w-100 d-flex align-items-center justify-content-center gap-2 mb-3">
-                        <span>{{ __('Kirim Link Reset Password') }}</span>
-                        <i class="bi bi-send-fill fs-6 ms-1"></i>
-                    </button>
+                    <form method="POST" action="{{ route('password.email') }}" id="sendOtpForm">
+                        @csrf
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('Alamat Email / Username') }}</label>
+                            <div class="input-icon-wrapper">
+                                <input type="text" name="email" id="emailStep1" class="form-control-custom w-100" placeholder="nama@email.com atau username" value="{{ old('email') }}" required autofocus autocomplete="username email">
+                                <i class="bi bi-envelope input-icon"></i>
+                            </div>
+                            <div class="form-text small text-muted mt-1">
+                                <i class="bi bi-info-circle me-1"></i> Masukkan email akun Anda atau username yang digunakan saat login.
+                            </div>
+                        </div>
 
-                    <div class="text-center mt-3">
-                        <a href="{{ route('login') }}" class="text-decoration-none small fw-semibold" style="color: var(--brand-primary);">
-                            <i class="bi bi-arrow-left me-1"></i> {{ __('Kembali ke Halaman Login') }}
-                        </a>
+                        <button type="submit" id="btnSendOtp" class="btn btn-submit w-100 d-flex align-items-center justify-content-center gap-2 mb-3">
+                            <span>{{ __('Kirim Kode OTP ke Email') }}</span>
+                            <i class="bi bi-send-fill fs-6 ms-1"></i>
+                        </button>
+
+                        <div class="text-center mt-3">
+                            <a href="{{ route('login') }}" class="text-decoration-none small fw-semibold" style="color: var(--brand-primary);">
+                                <i class="bi bi-arrow-left me-1"></i> {{ __('Kembali ke Halaman Login') }}
+                            </a>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- STEP 2: Verifikasi Kode OTP & Buat Password Baru (Muncul setelah OTP terkirim) -->
+                <div id="step2Container" class="d-none">
+                    <div class="text-center mb-4">
+                        <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" style="width: 54px; height: 54px; background: rgba(16, 185, 129, 0.12); color: #059669;">
+                            <i class="bi bi-key-fill fs-3"></i>
+                        </div>
+                        <h3 class="fw-extrabold text-dark mb-1">{{ __('Verifikasi Kode OTP') }}</h3>
+                        <p class="text-secondary small mb-1">{{ __('Masukkan 6 digit kode OTP yang dikirimkan ke:') }}</p>
+                        <span id="targetEmailBadge" class="badge bg-light text-dark border px-3 py-1.5 fw-bold" style="font-size: 0.82rem;"></span>
                     </div>
-                </form>
+
+                    <form method="POST" action="{{ route('password.update') }}" id="verifyOtpForm">
+                        @csrf
+                        <input type="hidden" name="email" id="emailStep2">
+
+                        <!-- Input Kode OTP -->
+                        <div class="mb-3 text-center">
+                            <label class="form-label fw-bold text-secondary mb-1.5 d-block text-start" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('Kode OTP (6 Digit)') }}</label>
+                            <input type="text" name="otp" id="otpInput" class="form-control text-center fw-extrabold" placeholder="• • • • • •" maxlength="6" inputmode="numeric" pattern="[0-9]*" style="font-size: 1.5rem; letter-spacing: 10px; border-radius: 12px; border: 2px solid #cbd5e1; height: 54px; font-family: monospace;" required autocomplete="one-time-code">
+                            <div class="form-text small text-muted text-start mt-1">
+                                <i class="bi bi-clock-history me-1"></i> Kode OTP berlaku selama 15 menit.
+                            </div>
+                        </div>
+
+                        <!-- Password Baru -->
+                        <div class="mb-3">
+                            <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('Password Baru') }}</label>
+                            <div class="input-icon-wrapper position-relative">
+                                <input type="password" id="newPassword" name="password" class="form-control-custom w-100" placeholder="Min. 8 karakter" style="padding-right: 44px;" required autocomplete="new-password">
+                                <i class="bi bi-lock input-icon"></i>
+                                <button type="button" id="toggleNewPassword" class="btn p-0 border-0 position-absolute" style="right: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; z-index: 5; background: transparent; outline: none; box-shadow: none;">
+                                    <i class="bi bi-eye-slash" id="toggleNewPasswordIcon" style="font-size: 1.15rem;"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Konfirmasi Password Baru -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('Konfirmasi Password Baru') }}</label>
+                            <div class="input-icon-wrapper position-relative">
+                                <input type="password" id="newPasswordConfirm" name="password_confirmation" class="form-control-custom w-100" placeholder="Ulangi password baru" style="padding-right: 44px;" required autocomplete="new-password">
+                                <i class="bi bi-lock-fill input-icon"></i>
+                                <button type="button" id="toggleNewPasswordConfirm" class="btn p-0 border-0 position-absolute" style="right: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8; z-index: 5; background: transparent; outline: none; box-shadow: none;">
+                                    <i class="bi bi-eye-slash" id="toggleNewPasswordConfirmIcon" style="font-size: 1.15rem;"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btnVerifyOtp" class="btn btn-submit w-100 d-flex align-items-center justify-content-center gap-2 mb-3">
+                            <span>{{ __('Verifikasi OTP & Reset Password') }}</span>
+                            <i class="bi bi-check-circle-fill fs-6 ms-1"></i>
+                        </button>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top text-muted small">
+                            <button type="button" onclick="switchToStep1()" class="btn btn-link p-0 text-decoration-none small text-secondary fw-semibold">
+                                <i class="bi bi-arrow-left me-1"></i> {{ __('Ganti Email') }}
+                            </button>
+                            <button type="button" id="btnResendOtp" onclick="resendOtpCode()" class="btn btn-link p-0 text-decoration-none small fw-bold text-primary">
+                                {{ __('Kirim Ulang OTP') }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
             </div>
         </div>
 
     </div>
 
-    <!-- Decorative Box Truck Image Background -->
-    <img src="{{ asset('images/box_truck.png') }}" class="truck-backdrop" alt="Box Truck Decoration">
-
     <!-- Footer Copyright -->
-    <footer class="d-flex flex-column flex-md-row justify-content-between align-items-center pt-4 mt-4 border-top" style="border-color: rgba(255, 255, 255, 0.08) !important; font-size: 0.75rem; color: var(--text-muted-light);">
+    <footer class="d-flex flex-column flex-md-row justify-content-between align-items-center pt-4 mt-4 border-top" style="border-color: rgba(255, 255, 255, 0.12) !important; font-size: 0.75rem; color: var(--text-muted-light);">
         <p class="mb-2 mb-md-0">&copy; {{ date('Y') }} FleetMaintenance System &bull; {{ __('Versi 2.5 Premium Active.') }}</p>
     </footer>
 
@@ -435,9 +492,9 @@
                 <div class="mb-3 text-start">
                     <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('Pilih Kendala:') }}</label>
                     <select id="whatsappIssueSelect" class="form-select border shadow-none" style="border-radius: 10px; font-size: 0.88rem; padding: 10px;" onchange="toggleCustomIssueInput()">
-                        <option value="Saya lupa password akun saya dan link reset tidak terkirim">{{ __('Saya lupa password akun saya dan link reset tidak terkirim') }}</option>
+                        <option value="Saya tidak menerima kode OTP di email saya">{{ __('Saya tidak menerima kode OTP di email saya') }}</option>
+                        <option value="Kode OTP saya dinyatakan salah atau kedaluwarsa">{{ __('Kode OTP saya dinyatakan salah atau kedaluwarsa') }}</option>
                         <option value="Email saya belum terdaftar di sistem armada">{{ __('Email saya belum terdaftar di sistem armada') }}</option>
-                        <option value="Halaman web memunculkan pesan error / lambat">{{ __('Halaman web memunculkan pesan error / lambat') }}</option>
                         <option value="custom">{{ __('Masalah Lainnya (Tulis Masalah Sendiri)') }}</option>
                     </select>
                 </div>
@@ -490,25 +547,343 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // Form Submit Loading State
-    document.addEventListener('DOMContentLoaded', function () {
-        const forgotPasswordForm = document.getElementById('forgotPasswordForm');
-        const btnSubmit = document.getElementById('btnSubmit');
+    let resendTimer = null;
 
-        if (forgotPasswordForm && btnSubmit) {
-            forgotPasswordForm.addEventListener('submit', function (event) {
-                if (!forgotPasswordForm.checkValidity()) {
+    document.addEventListener('DOMContentLoaded', function () {
+        // Toggle Password Baru Step 2
+        const toggleNewPassword = document.getElementById('toggleNewPassword');
+        const newPassword = document.getElementById('newPassword');
+        const toggleNewPasswordIcon = document.getElementById('toggleNewPasswordIcon');
+
+        if (toggleNewPassword && newPassword && toggleNewPasswordIcon) {
+            toggleNewPassword.addEventListener('click', function () {
+                const type = newPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+                newPassword.setAttribute('type', type);
+                toggleNewPasswordIcon.classList.toggle('bi-eye');
+                toggleNewPasswordIcon.classList.toggle('bi-eye-slash');
+            });
+        }
+
+        // Toggle Konfirmasi Password Baru Step 2
+        const toggleNewPasswordConfirm = document.getElementById('toggleNewPasswordConfirm');
+        const newPasswordConfirm = document.getElementById('newPasswordConfirm');
+        const toggleNewPasswordConfirmIcon = document.getElementById('toggleNewPasswordConfirmIcon');
+
+        if (toggleNewPasswordConfirm && newPasswordConfirm && toggleNewPasswordConfirmIcon) {
+            toggleNewPasswordConfirm.addEventListener('click', function () {
+                const type = newPasswordConfirm.getAttribute('type') === 'password' ? 'text' : 'password';
+                newPasswordConfirm.setAttribute('type', type);
+                toggleNewPasswordConfirmIcon.classList.toggle('bi-eye');
+                toggleNewPasswordConfirmIcon.classList.toggle('bi-eye-slash');
+            });
+        }
+
+        // Otomatis fokus dan filter angka saja pada input OTP
+        const otpInput = document.getElementById('otpInput');
+        if (otpInput) {
+            otpInput.addEventListener('input', function () {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        }
+
+        // ==================== STEP 1: KIRIM KODE OTP ====================
+        const sendOtpForm = document.getElementById('sendOtpForm');
+        const btnSendOtp = document.getElementById('btnSendOtp');
+        const alertContainer = document.getElementById('dynamicAlertContainer');
+        const serverStatusAlert = document.getElementById('serverStatusAlert');
+        const serverErrorAlert = document.getElementById('serverErrorAlert');
+
+        if (sendOtpForm && btnSendOtp) {
+            const originalSendBtnHtml = btnSendOtp.innerHTML;
+
+            sendOtpForm.addEventListener('submit', function (event) {
+                if (!sendOtpForm.checkValidity()) {
                     return;
                 }
                 
-                btnSubmit.disabled = true;
-                btnSubmit.innerHTML = `
+                event.preventDefault();
+
+                if (serverStatusAlert) serverStatusAlert.style.display = 'none';
+                if (serverErrorAlert) serverErrorAlert.style.display = 'none';
+                if (alertContainer) alertContainer.innerHTML = '';
+
+                btnSendOtp.disabled = true;
+                btnSendOtp.innerHTML = `
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    <span>Memproses...</span>
+                    <span>{{ __('Mengirim Kode OTP...') }}</span>
                 `;
+
+                const formData = new FormData(sendOtpForm);
+
+                fetch(sendOtpForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(async (response) => {
+                    const data = await response.json().catch(() => ({}));
+                    if (!response.ok || !data.success) {
+                        throw data;
+                    }
+                    
+                    btnSendOtp.disabled = false;
+                    btnSendOtp.innerHTML = originalSendBtnHtml;
+
+                    const userEmail = formData.get('email');
+                    
+                    // Pindah ke Step 2
+                    switchToStep2(userEmail, data);
+                })
+                .catch((error) => {
+                    btnSendOtp.disabled = false;
+                    btnSendOtp.innerHTML = originalSendBtnHtml;
+
+                    let errorMsg = 'Terjadi kesalahan saat memproses permintaan. Silakan coba lagi.';
+                    if (error && error.errors && error.errors.email) {
+                        errorMsg = Array.isArray(error.errors.email) ? error.errors.email.join('<br>') : error.errors.email;
+                    } else if (error && error.message) {
+                        errorMsg = error.message;
+                    }
+
+                    if (alertContainer) {
+                        alertContainer.innerHTML = `
+                            <div class="alert alert-danger border-0 shadow-sm rounded-3 py-2 px-3 mb-4" style="background-color: #fef2f2; color: #991b1b; font-size: 0.825rem;">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+                                    <div>${errorMsg}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+            });
+        }
+
+        // ==================== STEP 2: VERIFIKASI OTP & RESET PASSWORD ====================
+        const verifyOtpForm = document.getElementById('verifyOtpForm');
+        const btnVerifyOtp = document.getElementById('btnVerifyOtp');
+
+        if (verifyOtpForm && btnVerifyOtp) {
+            const originalVerifyBtnHtml = btnVerifyOtp.innerHTML;
+
+            verifyOtpForm.addEventListener('submit', function (event) {
+                if (!verifyOtpForm.checkValidity()) {
+                    return;
+                }
+                
+                event.preventDefault();
+
+                if (alertContainer) alertContainer.innerHTML = '';
+
+                btnVerifyOtp.disabled = true;
+                btnVerifyOtp.innerHTML = `
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span>{{ __('Memverifikasi & Menyimpan...') }}</span>
+                `;
+
+                const formData = new FormData(verifyOtpForm);
+
+                fetch(verifyOtpForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(async (response) => {
+                    const data = await response.json().catch(() => ({}));
+                    if (!response.ok || !data.success) {
+                        throw data;
+                    }
+                    
+                    btnVerifyOtp.innerHTML = `
+                        <i class="bi bi-check2-circle fs-6"></i>
+                        <span>{{ __('Password Berhasil Direset') }}</span>
+                    `;
+                    btnVerifyOtp.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+
+                    if (alertContainer) {
+                        alertContainer.innerHTML = `
+                            <div class="alert alert-success border-0 shadow-sm rounded-3 py-3 px-3 mb-4" style="background-color: #f0fdf4; color: #166534; font-size: 0.85rem;">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                                    <div class="fw-semibold">${data.message || 'Password Anda berhasil direset! Mengalihkan ke halaman login...'}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    setTimeout(() => {
+                        window.location.href = data.redirect || '{{ route("login") }}';
+                    }, 1200);
+                })
+                .catch((error) => {
+                    btnVerifyOtp.disabled = false;
+                    btnVerifyOtp.innerHTML = originalVerifyBtnHtml;
+
+                    let errorMsg = 'Kode OTP salah atau terjadi kesalahan.';
+                    if (error && error.errors) {
+                        const msgs = [];
+                        for (let k in error.errors) {
+                            msgs.push(Array.isArray(error.errors[k]) ? error.errors[k].join('<br>') : error.errors[k]);
+                        }
+                        if (msgs.length > 0) errorMsg = msgs.join('<br>');
+                    } else if (error && error.message) {
+                        errorMsg = error.message;
+                    }
+
+                    if (alertContainer) {
+                        alertContainer.innerHTML = `
+                            <div class="alert alert-danger border-0 shadow-sm rounded-3 py-2 px-3 mb-4" style="background-color: #fef2f2; color: #991b1b; font-size: 0.825rem;">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-exclamation-triangle-fill text-danger fs-5"></i>
+                                    <div>${errorMsg}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
             });
         }
     });
+
+    function switchToStep2(email, data) {
+        const step1Container = document.getElementById('step1Container');
+        const step2Container = document.getElementById('step2Container');
+        const emailStep2 = document.getElementById('emailStep2');
+        const targetEmailBadge = document.getElementById('targetEmailBadge');
+        const alertContainer = document.getElementById('dynamicAlertContainer');
+        const otpInput = document.getElementById('otpInput');
+
+        if (step1Container && step2Container) {
+            step1Container.classList.add('d-none');
+            step2Container.classList.remove('d-none');
+        }
+
+        if (emailStep2) emailStep2.value = email;
+        if (targetEmailBadge) targetEmailBadge.textContent = email;
+
+        if (alertContainer) {
+            let otpBadgeHtml = '';
+            if (data && data.otp) {
+                otpBadgeHtml = `
+                    <div class="mt-2 pt-2 border-top border-success-subtle d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <div class="small fw-semibold text-dark">
+                            <i class="bi bi-shield-lock text-success me-1"></i> Kode OTP: 
+                            <span class="badge bg-success text-white px-2.5 py-1 fs-6 font-monospace" style="letter-spacing: 2px;">${data.otp}</span>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-success py-1 px-2.5 fw-bold" style="font-size: 0.75rem; border-radius: 6px;" onclick="document.getElementById('otpInput').value='${data.otp}';">
+                            <i class="bi bi-clipboard-check me-1"></i> {{ __('Isi Otomatis') }}
+                        </button>
+                    </div>
+                `;
+            }
+
+            alertContainer.innerHTML = `
+                <div class="alert alert-success border-0 shadow-sm rounded-3 py-3 px-3 mb-4" style="background-color: #f0fdf4; color: #166534; font-size: 0.85rem;">
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                        <div class="fw-semibold">{{ __('Kode OTP Berhasil Dibuat & Dikirim!') }}</div>
+                    </div>
+                    <div class="small">${data && data.message ? data.message : 'Silakan periksa kotak masuk atau folder spam email Anda.'}</div>
+                    ${otpBadgeHtml}
+                </div>
+            `;
+        }
+
+        if (otpInput) {
+            if (data && data.otp) {
+                otpInput.value = data.otp;
+            }
+            setTimeout(() => {
+                const newPasswordInput = document.getElementById('newPassword');
+                if (newPasswordInput) newPasswordInput.focus();
+                else otpInput.focus();
+            }, 300);
+        }
+
+        startResendTimer();
+    }
+
+    function switchToStep1() {
+        const step1Container = document.getElementById('step1Container');
+        const step2Container = document.getElementById('step2Container');
+        const alertContainer = document.getElementById('dynamicAlertContainer');
+
+        if (step1Container && step2Container) {
+            step2Container.classList.add('d-none');
+            step1Container.classList.remove('d-none');
+        }
+        if (alertContainer) alertContainer.innerHTML = '';
+        if (resendTimer) clearInterval(resendTimer);
+    }
+
+    function startResendTimer() {
+        const btnResend = document.getElementById('btnResendOtp');
+        if (!btnResend) return;
+
+        let seconds = 60;
+        btnResend.disabled = true;
+        btnResend.classList.add('text-muted');
+        btnResend.classList.remove('text-primary');
+
+        if (resendTimer) clearInterval(resendTimer);
+
+        resendTimer = setInterval(() => {
+            seconds--;
+            if (seconds <= 0) {
+                clearInterval(resendTimer);
+                btnResend.disabled = false;
+                btnResend.classList.remove('text-muted');
+                btnResend.classList.add('text-primary');
+                btnResend.textContent = '{{ __("Kirim Ulang OTP") }}';
+            } else {
+                btnResend.textContent = `Kirim Ulang OTP (${seconds}s)`;
+            }
+        }, 1000);
+    }
+
+    function resendOtpCode() {
+        const email = document.getElementById('emailStep2').value;
+        if (!email) return;
+
+        const btnResend = document.getElementById('btnResendOtp');
+        btnResend.disabled = true;
+        btnResend.textContent = 'Mengirim ulang...';
+
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('_token', '{{ csrf_token() }}');
+
+        fetch('{{ route("password.email") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(async (response) => {
+            const data = await response.json();
+            const alertContainer = document.getElementById('dynamicAlertContainer');
+            if (alertContainer) {
+                alertContainer.innerHTML = `
+                    <div class="alert alert-success border-0 shadow-sm rounded-3 py-2 px-3 mb-4" style="background-color: #f0fdf4; color: #166534; font-size: 0.85rem;">
+                        <i class="bi bi-check-circle-fill text-success me-1"></i> Kode OTP baru telah berhasil dikirim ulang ke email Anda!
+                    </div>
+                `;
+            }
+            startResendTimer();
+        })
+        .catch(() => {
+            btnResend.disabled = false;
+            btnResend.textContent = 'Kirim Ulang OTP';
+        });
+    }
 
     function toggleCustomIssueInput() {
         const selectEl = document.getElementById('whatsappIssueSelect');
@@ -530,11 +905,11 @@
             const textareaEl = document.getElementById('whatsappCustomIssueText');
             issueText = textareaEl ? textareaEl.value.trim() : '';
             if (!issueText) {
-                issueText = "Kendala Lupa Password";
+                issueText = "Kendala Lupa Password & Kode OTP";
             }
         }
         
-        const baseMessage = "Halo Admin, saya mengalami kendala lupa password pada FleetMaintenance.\n\nMasalah: " + issueText;
+        const baseMessage = "Halo Admin, saya mengalami kendala lupa password / kode OTP pada FleetMaintenance.\n\nMasalah: " + issueText;
         const waUrl = "https://wa.me/6287738565383?text=" + encodeURIComponent(baseMessage);
         
         const waModalEl = document.getElementById('whatsappModal');

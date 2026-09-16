@@ -141,10 +141,16 @@ class ComplaintController extends Controller
         if ($complaint->vehicle) {
             if ($status === 'Diproses') {
                 $complaint->vehicle->update(['status' => 'Sedang Diservis']);
-            } elseif ($status === 'Selesai') {
-                $complaint->vehicle->update(['status' => 'Siap Pakai']);
-            } elseif ($status === 'Baru') {
-                $complaint->vehicle->update(['status' => 'Siap Pakai']);
+            } elseif ($status === 'Selesai' || $status === 'Baru') {
+                // Cek apakah kendaraan ini masih memiliki keluhan lain yang sedang diproses
+                $hasOtherActiveRepairs = Complaint::where('vehicle_id', $complaint->vehicle_id)
+                    ->where('id', '!=', $complaint->id)
+                    ->where('status', 'Diproses')
+                    ->exists();
+
+                if (! $hasOtherActiveRepairs) {
+                    $complaint->vehicle->update(['status' => 'Siap Pakai']);
+                }
             }
         }
 

@@ -51,8 +51,20 @@
                     <input type="text" name="lokasi_pool" class="form-control" value="{{ old('lokasi_pool') }}" placeholder="Jakarta">
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">{{ __('Supir Utama') }}</label>
-                    <input type="text" name="supir_utama" class="form-control" value="{{ old('supir_utama') }}" placeholder="Budi Santoso">
+                    <label class="form-label">{{ __('Supir Utama (Penugasan Driver)') }}</label>
+                    <div class="input-group">
+                        <select name="driver_id" class="form-select" id="selectDriverId">
+                            <option value="">-- Pilih dari Driver Terdaftar --</option>
+                            @if(isset($drivers))
+                                @foreach($drivers as $d)
+                                    <option value="{{ $d->id }}" @selected(old('driver_id') == $d->id) data-name="{{ $d->name }}">
+                                        {{ $d->name }} ({{ $d->jenis_sim ?: 'SIM' }})
+                                    </option>
+                                @endforeach
+                            @endif
+                        </select>
+                        <input type="text" name="supir_utama" id="inputSupirUtama" class="form-control" value="{{ old('supir_utama') }}" placeholder="Atau ketik nama supir manual">
+                    </div>
                 </div>
                 <div class="col-md-4">
                     <label class="form-label">{{ __('Odometer Awal (km)') }}</label>
@@ -65,6 +77,23 @@
                 <div class="col-md-4">
                     <label class="form-label">{{ __('Pajak 5 Tahunan (Rp)') }}</label>
                     <input type="number" step="0.01" name="pajak_5_tahunan" class="form-control" value="{{ old('pajak_5_tahunan') }}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">{{ __('Lokasi Asal / Pool Keberangkatan') }}</label>
+                    <input type="text" name="lokasi_asal" class="form-control" value="{{ old('lokasi_asal') }}" placeholder="Contoh: Pool Pusat Gambir Jakarta">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">{{ __('Lokasi Tujuan Perjalanan') }}</label>
+                    <input type="text" name="lokasi_tujuan" class="form-control" value="{{ old('lokasi_tujuan') }}" placeholder="Contoh: Kawasan Industri MM2100 Cikarang">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">{{ __('Status Perjalanan') }}</label>
+                    <select name="status_perjalanan" class="form-select">
+                        <option value="Standby di Pool" {{ old('status_perjalanan') == 'Standby di Pool' ? 'selected' : '' }}>Standby di Pool</option>
+                        <option value="Dalam Perjalanan ke Tujuan" {{ old('status_perjalanan') == 'Dalam Perjalanan ke Tujuan' ? 'selected' : '' }}>Dalam Perjalanan ke Tujuan</option>
+                        <option value="Proses Bongkar Muat" {{ old('status_perjalanan') == 'Proses Bongkar Muat' ? 'selected' : '' }}>Proses Bongkar Muat</option>
+                        <option value="Perjalanan Kembali ke Pool" {{ old('status_perjalanan') == 'Perjalanan Kembali ke Pool' ? 'selected' : '' }}>Perjalanan Kembali ke Pool</option>
+                    </select>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">{{ __('Jatuh Tempo KIR') }}</label>

@@ -36,6 +36,10 @@ class UserController extends Controller
             'email' => 'required|email|max:255|unique:users,email',
             'password' => 'required|string|min:6',
             'role' => 'required|in:superadmin,admin,teknisi,user,pimpinan',
+            'no_telepon' => 'nullable|string|max:30',
+            'nomor_sim' => 'nullable|string|max:50',
+            'jenis_sim' => 'nullable|string|in:SIM A,SIM B1,SIM B2,SIM C,Lainnya',
+            'masa_berlaku_sim' => 'nullable|date',
             'nis' => 'nullable|string|max:50',
         ]);
 
@@ -65,6 +69,10 @@ class UserController extends Controller
             'email' => 'required|email|max:255|unique:users,email,'.$user->id,
             'role' => 'required|in:superadmin,admin,teknisi,user,pimpinan',
             'password' => 'nullable|string|min:6',
+            'no_telepon' => 'nullable|string|max:30',
+            'nomor_sim' => 'nullable|string|max:50',
+            'jenis_sim' => 'nullable|string|in:SIM A,SIM B1,SIM B2,SIM C,Lainnya',
+            'masa_berlaku_sim' => 'nullable|date',
             'nis' => 'nullable|string|max:50',
         ]);
 
@@ -102,6 +110,10 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$user->id,
+            'no_telepon' => 'nullable|string|max:30',
+            'nomor_sim' => 'nullable|string|max:50',
+            'jenis_sim' => 'nullable|string|in:SIM A,SIM B1,SIM B2,SIM C,Lainnya',
+            'masa_berlaku_sim' => 'nullable|date',
             'nis' => 'nullable|string|max:50',
             'password' => 'nullable|string|min:6|confirmed',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -109,7 +121,19 @@ class UserController extends Controller
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
-        $user->nis = $validated['nis'];
+        if (array_key_exists('no_telepon', $validated)) {
+            $user->no_telepon = $validated['no_telepon'];
+        }
+        if (array_key_exists('nomor_sim', $validated)) {
+            $user->nomor_sim = $validated['nomor_sim'];
+        }
+        if (array_key_exists('jenis_sim', $validated)) {
+            $user->jenis_sim = $validated['jenis_sim'];
+        }
+        if (array_key_exists('masa_berlaku_sim', $validated)) {
+            $user->masa_berlaku_sim = $validated['masa_berlaku_sim'];
+        }
+        $user->nis = $validated['nis'] ?? $user->nis;
 
         if (! empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);

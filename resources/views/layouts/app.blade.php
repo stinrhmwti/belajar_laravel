@@ -888,6 +888,139 @@
                 -webkit-overflow-scrolling: touch;
             }
         }
+
+        /* =========================================================================
+           ULTRA-FAST GLOBAL PRINT PERFORMANCE & STYLING OVERRIDES
+           Eliminates browser preview lag, WebGL tile freezing, and paper page bloat.
+           ========================================================================= */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 8mm 10mm 10mm 10mm;
+            }
+
+            *, *::before, *::after {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                text-shadow: none !important;
+                box-shadow: none !important;
+                filter: none !important;
+                backdrop-filter: none !important;
+                transition: none !important;
+                animation: none !important;
+            }
+
+            html, body {
+                background: #ffffff !important;
+                color: #0f172a !important;
+                font-size: 9.5pt !important;
+                line-height: 1.3 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                min-height: auto !important;
+                overflow: visible !important;
+            }
+
+            /* Hide heavy navigation, fixed overlays, modals, and non-printable elements */
+            #sidebar,
+            #topbar,
+            .top-navbar,
+            .sidebar-overlay,
+            .fab-container,
+            .whatsapp-widget,
+            .modal,
+            .modal-backdrop,
+            .offcanvas,
+            .offcanvas-backdrop,
+            .toast,
+            .toast-container,
+            .tooltip,
+            .popover,
+            .btn,
+            button,
+            .btn-group,
+            .pagination,
+            .dataTables_paginate,
+            .dataTables_length,
+            .dataTables_filter,
+            .dt-buttons,
+            .no-print,
+            footer,
+            audio,
+            video,
+            iframe,
+            .leaflet-control-container,
+            #soundEffects {
+                display: none !important;
+            }
+
+            /* Reset main wrapper to full print width */
+            #main-content {
+                margin-left: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                position: static !important;
+            }
+
+            .content-body {
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+
+            /* Optimize cards and tables for crisp vector paper printing */
+            .card {
+                border: 1px solid #cbd5e1 !important;
+                box-shadow: none !important;
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+                background: #ffffff !important;
+                color: #0f172a !important;
+                margin-bottom: 12px !important;
+            }
+
+            .card-header, .card-footer {
+                background-color: #f8fafc !important;
+                border-color: #cbd5e1 !important;
+            }
+
+            table {
+                width: 100% !important;
+                border-collapse: collapse !important;
+                page-break-inside: auto;
+            }
+
+            tr {
+                page-break-inside: avoid !important;
+                page-break-after: auto;
+            }
+
+            th, td {
+                padding: 5px 8px !important;
+                font-size: 8.5pt !important;
+                border: 1px solid #cbd5e1 !important;
+                color: #1e293b !important;
+                background: transparent !important;
+            }
+
+            th {
+                background-color: #f1f5f9 !important;
+                font-weight: bold !important;
+                text-align: center !important;
+            }
+
+            /* Preserve badge readability in monochrome or color print */
+            .badge {
+                border: 1px solid #cbd5e1 !important;
+                background-color: #f8fafc !important;
+                color: #0f172a !important;
+                padding: 2px 6px !important;
+                font-size: 7.5pt !important;
+            }
+        }
     </style>
 
     @stack('styles')

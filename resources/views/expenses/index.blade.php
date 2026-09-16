@@ -242,12 +242,22 @@
                 </div>
 
                 <h4 class="fw-extrabold text-dark mb-2">Rp {{ number_format($e->jumlah_biaya, 0, ',', '.') }}</h4>
+                @if ($e->liter_bbm || $e->odometer_pengisian)
+                    <div class="d-flex align-items-center gap-2 mb-2 flex-wrap" style="font-size: 0.78rem;">
+                        @if ($e->liter_bbm)
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2 py-1"><i class="bi bi-fuel-pump me-1"></i>{{ $e->liter_bbm }} L</span>
+                        @endif
+                        @if ($e->odometer_pengisian)
+                            <span class="badge bg-info-subtle text-info border border-info-subtle px-2 py-1"><i class="bi bi-speedometer2 me-1"></i>{{ number_format($e->odometer_pengisian, 0, ',', '.') }} KM</span>
+                        @endif
+                    </div>
+                @endif
                 <p class="text-secondary font-monospace" style="font-size: 0.85rem; line-height: 1.4;">{{ $e->keterangan }}</p>
 
                 <!-- Actions -->
-                @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'pimpinan']))
+                @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'pimpinan', 'teknisi']))
                 <div class="d-flex flex-column gap-2 pt-3 border-top mt-3">
-                    @if ($e->status_approval === 'Menunggu Persetujuan')
+                    @if ($e->status_approval === 'Menunggu Persetujuan' && in_array(auth()->user()->role, ['superadmin', 'admin', 'pimpinan']))
                     <div class="d-flex gap-2">
                         <form action="{{ route('expenses.approve', $e) }}" method="POST" class="w-100">
                             @csrf @method('PUT')
@@ -258,6 +268,11 @@
                             <button type="submit" name="status_approval" value="Ditolak" class="btn btn-sm btn-danger w-100" style="border-radius: 8px;">{{ __('Tolak') }}</button>
                         </form>
                     </div>
+                    @endif
+                    @if (in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
+                    <a href="{{ route('expenses.edit', $e->id) }}" class="btn btn-sm btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-1" style="border-radius: 8px;">
+                        <i class="bi bi-pencil-square"></i> {{ __('Edit Data') }}
+                    </a>
                     @endif
                     @if (in_array(auth()->user()->role, ['superadmin', 'admin']))
                     <form action="{{ route('expenses.destroy', $e) }}" method="POST" class="w-100 form-confirm-delete" data-text="{{ __('Data pengeluaran ini akan dihapus secara permanen dari sistem!') }}">
@@ -674,10 +689,14 @@
                     </div>
 
                     <script>
-                        window.onload = function() {
-                            window.print();
-                            setTimeout(function() { window.close(); }, 500);
-                        }
+                        window.onafterprint = function() {
+                            window.close();
+                        };
+                        window.addEventListener('load', function() {
+                            setTimeout(function() {
+                                window.print();
+                            }, 50);
+                        });
                     <\/script>
                 </body>
                 </html>
@@ -692,52 +711,110 @@
 <!-- Modal Kalkulator Efisiensi BBM di Menu Biaya -->
 <div class="modal fade" id="fuelExpenseCalcModal" tabindex="-1" aria-labelledby="fuelExpenseCalcModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
-            <div class="modal-header bg-warning text-dark py-3" style="border-top-left-radius: 16px; border-top-right-radius: 16px;">
-                <h6 class="modal-title fw-bold mb-0" id="fuelExpenseCalcModalLabel">
-                    <i class="bi bi-fuel-pump-fill me-1"></i> {{ __('Kalkulator Efisiensi BBM (KM/Liter)') }}
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+            <div class="modal-header bg-warning text-dark py-3 px-4">
+                <h6 class="modal-title fw-bold mb-0 d-flex align-items-center gap-2" id="fuelExpenseCalcModalLabel">
+                    <i class="bi bi-fuel-pump-fill fs-5"></i> {{ __('Kalkulator Efisiensi BBM (KM/Liter)') }}
                 </h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
-                <div class="alert alert-warning py-2 px-3 d-flex align-items-center gap-2 mb-3 text-dark" style="border-radius: 10px; font-size: 0.82rem;">
-                    <i class="bi bi-calculator-fill fs-5"></i>
+                <div class="alert alert-warning py-2 px-3 d-flex align-items-center gap-2 mb-3 text-dark border-0 shadow-sm" style="border-radius: 10px; font-size: 0.82rem; background: #fef3c7;">
+                    <i class="bi bi-calculator-fill fs-5 text-warning-emphasis"></i>
                     <div>{{ __('Hitung konsumsi rata-rata bahan bakar dan perkiraan biaya per kilometer.') }}</div>
                 </div>
 
-                <div class="row g-3 mb-3">
-                    <div class="col-6">
-                        <label class="form-label fw-semibold text-muted text-uppercase" style="font-size: 0.72rem;">{{ __('Odometer Awal (KM)') }}</label>
-                        <input type="number" id="calcExpOdoPrev" class="form-control" placeholder="Contoh: 15000" value="15000">
+                {{-- Alert Sukses Simpan Odometer --}}
+                <div id="alertOdoSaveSuccess" class="alert alert-success py-2 px-3 align-items-center gap-2 mb-3 text-success shadow-sm border-0" style="border-radius: 10px; font-size: 0.82rem; display: none; background: #dcfce7;">
+                    <i class="bi bi-check-circle-fill fs-5 text-success"></i>
+                    <div id="alertOdoSaveSuccessText">{{ __('Odometer akhir berhasil dipindahkan menjadi Odometer Awal!') }}</div>
+                </div>
+
+                {{-- Dropdown Pilihan Kendaraan --}}
+                <div class="mb-3 p-3 bg-light rounded-3 border">
+                    <div class="d-flex align-items-center justify-content-between mb-1.5">
+                        <label class="form-label fw-bold text-dark text-uppercase mb-0" style="font-size: 0.72rem; letter-spacing: 0.5px;">
+                            <i class="bi bi-truck me-1 text-primary"></i> {{ __('PILIH KENDARAAN ARMADA') }}
+                        </label>
+                        <button type="button" id="btnResetVehicleOdoMemory" class="btn btn-link p-0 text-danger text-decoration-none fw-semibold" style="font-size: 0.72rem; display: none;">
+                            <i class="bi bi-arrow-counterclockwise"></i> {{ __('Reset ke Odometer Master') }}
+                        </button>
                     </div>
-                    <div class="col-6">
-                        <label class="form-label fw-semibold text-muted text-uppercase" style="font-size: 0.72rem;">{{ __('Odometer Akhir (KM)') }}</label>
-                        <input type="number" id="calcExpOdoCurr" class="form-control" placeholder="Contoh: 15450" value="15450">
-                    </div>
-                    <div class="col-6">
-                        <label class="form-label fw-semibold text-muted text-uppercase" style="font-size: 0.72rem;">{{ __('BBM Terisi (Liter)') }}</label>
-                        <input type="number" step="0.1" id="calcExpLiters" class="form-control" placeholder="Contoh: 35" value="35">
-                    </div>
-                    <div class="col-6">
-                        <label class="form-label fw-semibold text-muted text-uppercase" style="font-size: 0.72rem;">{{ __('Nominal Biaya (Rp)') }}</label>
-                        <input type="number" id="calcExpCost" class="form-control" placeholder="Contoh: 350000" value="350000">
+                    <select id="calcExpVehicleSelect" class="form-select shadow-none border" style="font-size: 0.85rem; border-radius: 8px; background-color: #fff;">
+                        <option value="">-- {{ __('Pilih Kendaraan (Auto-Fill)') }} --</option>
+                        @foreach($vehicles ?? \App\Models\Vehicle::orderBy('plat_nomor')->get() as $v)
+                            <option value="{{ $v->id }}" 
+                                    data-odo="{{ (int)$v->odometer_terkini }}" 
+                                    data-plat="{{ $v->plat_nomor }}"
+                                    data-nama="{{ $v->plat_nomor }} - {{ $v->merek }} {{ $v->tipe }}">
+                                {{ $v->plat_nomor }} - {{ $v->merek }} {{ $v->tipe }} (Odo: {{ number_format($v->odometer_terkini, 0, ',', '.') }} KM)
+                            </option>
+                        @endforeach
+                    </select>
+                    <div id="calcVehicleInfo" class="mt-2 text-muted" style="font-size: 0.75rem; line-height: 1.35;">
+                        <span id="calcVehicleInfoText"><i class="bi bi-info-circle me-1"></i> {{ __('Pilih kendaraan agar odometer awal terisi otomatis.') }}</span>
                     </div>
                 </div>
 
+                {{-- Form Input Angka (Grid 2x2 Rapi & Tidak Tabrakan) --}}
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="form-label fw-bold text-muted text-uppercase mb-1" style="font-size: 0.72rem;">
+                            {{ __('ODOMETER AWAL (KM)') }}
+                        </label>
+                        <input type="number" id="calcExpOdoPrev" class="form-control fw-bold" placeholder="Contoh: 0" value="0" style="border-radius: 8px; font-size: 0.95rem;">
+                        <div class="mt-1" style="min-height: 22px;">
+                            <span id="badgeOdoAwalAuto" class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1" style="font-size: 0.68rem; display: none;">
+                                <i class="bi bi-clock-history me-1"></i> Lanjutan: 0 KM
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-bold text-muted text-uppercase mb-1" style="font-size: 0.72rem;">
+                            {{ __('ODOMETER AKHIR (KM)') }}
+                        </label>
+                        <input type="number" id="calcExpOdoCurr" class="form-control fw-bold" placeholder="Contoh: 4000" value="4000" style="border-radius: 8px; font-size: 0.95rem;">
+                        <div class="mt-1" style="min-height: 22px;">
+                            <span class="text-muted d-inline-flex align-items-center" style="font-size: 0.7rem;">
+                                <i class="bi bi-geo-alt-fill text-primary me-1"></i> Perjalanan Baru
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-bold text-muted text-uppercase mb-1" style="font-size: 0.72rem;">
+                            {{ __('BBM TERISI (LITER)') }}
+                        </label>
+                        <div class="input-group">
+                            <input type="number" step="0.1" id="calcExpLiters" class="form-control fw-bold" placeholder="Contoh: 35" value="35" style="border-top-left-radius: 8px; border-bottom-left-radius: 8px; font-size: 0.95rem;">
+                            <span class="input-group-text bg-light text-muted fw-bold" style="border-top-right-radius: 8px; border-bottom-right-radius: 8px; font-size: 0.78rem;">Liter</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-bold text-muted text-uppercase mb-1" style="font-size: 0.72rem;">
+                            {{ __('NOMINAL BIAYA (RP)') }}
+                        </label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light text-muted fw-bold" style="border-top-left-radius: 8px; border-bottom-left-radius: 8px; font-size: 0.78rem;">Rp</span>
+                            <input type="number" id="calcExpCost" class="form-control fw-bold" placeholder="Contoh: 350000" value="350000" style="border-top-right-radius: 8px; border-bottom-right-radius: 8px; font-size: 0.95rem;">
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Hasil Analisis Konsumsi Box --}}
                 <div class="p-3 bg-light rounded-4 border text-center">
-                    <span class="text-muted d-block mb-1 text-uppercase fw-semibold" style="font-size: 0.72rem; letter-spacing: 0.5px;">{{ __('Hasil Analisis Konsumsi') }}</span>
+                    <span class="text-muted d-block mb-1 text-uppercase fw-bold" style="font-size: 0.72rem; letter-spacing: 0.5px;">{{ __('Hasil Analisis Konsumsi') }}</span>
                     <div class="d-flex justify-content-around align-items-center my-3">
                         <div>
-                            <small class="text-muted d-block" style="font-size: 0.75rem;">{{ __('Jarak Tempuh') }}</small>
-                            <h5 class="fw-bold text-dark mb-0 font-monospace" id="calcExpResDist">450 km</h5>
+                            <small class="text-muted d-block fw-medium" style="font-size: 0.75rem;">{{ __('Jarak Tempuh') }}</small>
+                            <h5 class="fw-bold text-dark mb-0 font-monospace" id="calcExpResDist">4.000 km</h5>
                         </div>
                         <div class="border-start border-end px-3">
-                            <small class="text-muted d-block" style="font-size: 0.75rem;">{{ __('Konsumsi Rata-rata') }}</small>
-                            <h4 class="fw-bold text-primary mb-0 font-monospace" id="calcExpResKmL">12.9 km/L</h4>
+                            <small class="text-muted d-block fw-medium" style="font-size: 0.75rem;">{{ __('Konsumsi Rata-rata') }}</small>
+                            <h4 class="fw-bold text-primary mb-0 font-monospace" id="calcExpResKmL">114.3 km/L</h4>
                         </div>
                         <div>
-                            <small class="text-muted d-block" style="font-size: 0.75rem;">{{ __('Biaya / KM') }}</small>
-                            <h5 class="fw-bold text-dark mb-0 font-monospace" id="calcExpResCostKm">Rp 778 /km</h5>
+                            <small class="text-muted d-block fw-medium" style="font-size: 0.75rem;">{{ __('Biaya / KM') }}</small>
+                            <h5 class="fw-bold text-dark mb-0 font-monospace" id="calcExpResCostKm">Rp 88 /km</h5>
                         </div>
                     </div>
                     <div id="calcExpBadgeStatus" class="mt-2">
@@ -745,8 +822,18 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer bg-light py-2 border-top">
-                <button type="button" class="btn btn-secondary w-100 fw-bold" data-bs-dismiss="modal" style="border-radius: 8px;">{{ __('Tutup') }}</button>
+            <div class="modal-footer bg-light py-3 px-4 border-top d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <button type="button" id="btnSaveOdoFooter" class="btn btn-primary fw-bold px-3 py-2 d-flex align-items-center gap-1.5 shadow-sm" style="background: linear-gradient(135deg, #0e3054 0%, #0891b2 100%); border: none; border-radius: 8px; font-size: 0.84rem;">
+                        <i class="bi bi-cloud-arrow-up-fill"></i> {{ __('Simpan Odometer Terbaru') }}
+                    </button>
+                    @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
+                    <button type="button" id="btnRecordQuickBbm" class="btn btn-warning text-dark fw-bold px-3 py-2 d-flex align-items-center gap-1.5 shadow-sm" style="border-radius: 8px; font-size: 0.84rem;">
+                        <i class="bi bi-wallet2"></i> {{ __('Catat Biaya BBM & Update Odo') }}
+                    </button>
+                    @endif
+                </div>
+                <button type="button" class="btn btn-outline-secondary fw-semibold px-4 py-2" data-bs-dismiss="modal" style="border-radius: 8px; font-size: 0.85rem;">{{ __('Tutup') }}</button>
             </div>
         </div>
     </div>
@@ -754,11 +841,24 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const vehicleSelect = document.getElementById('calcExpVehicleSelect');
+    const odoPrevInput = document.getElementById('calcExpOdoPrev');
+    const odoCurrInput = document.getElementById('calcExpOdoCurr');
+    const litersInput = document.getElementById('calcExpLiters');
+    const costInput = document.getElementById('calcExpCost');
+    const vehicleInfoText = document.getElementById('calcVehicleInfoText');
+    const btnResetOdo = document.getElementById('btnResetVehicleOdoMemory');
+    const badgeOdoAuto = document.getElementById('badgeOdoAwalAuto');
+    const btnSaveFooter = document.getElementById('btnSaveOdoFooter');
+    const btnRecordQuickBbm = document.getElementById('btnRecordQuickBbm');
+    const alertSuccess = document.getElementById('alertOdoSaveSuccess');
+    const alertSuccessText = document.getElementById('alertOdoSaveSuccessText');
+
     function calculateExpFuel() {
-        const odoPrev = parseFloat(document.getElementById('calcExpOdoPrev')?.value) || 0;
-        const odoCurr = parseFloat(document.getElementById('calcExpOdoCurr')?.value) || 0;
-        const liters = parseFloat(document.getElementById('calcExpLiters')?.value) || 0;
-        const cost = parseFloat(document.getElementById('calcExpCost')?.value) || 0;
+        const odoPrev = parseFloat(odoPrevInput?.value) || 0;
+        const odoCurr = parseFloat(odoCurrInput?.value) || 0;
+        const liters = parseFloat(litersInput?.value) || 0;
+        const cost = parseFloat(costInput?.value) || 0;
 
         const distance = Math.max(0, odoCurr - odoPrev);
         const kmL = liters > 0 ? (distance / liters) : 0;
@@ -774,7 +874,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (costEl) costEl.innerText = 'Rp ' + Math.round(costPerKm).toLocaleString('id-ID') + ' /km';
 
         if (badgeContainer) {
-            if (kmL >= 12) {
+            if (distance === 0 || liters === 0) {
+                badgeContainer.innerHTML = '<span class="badge bg-secondary px-3 py-1.5 fw-bold"><i class="bi bi-info-circle me-1"></i> Masukkan data Odometer & Liter BBM</span>';
+            } else if (kmL >= 12) {
                 badgeContainer.innerHTML = '<span class="badge bg-success px-3 py-1.5 fw-bold"><i class="bi bi-patch-check-fill me-1"></i> Efisiensi Sangat Baik (Sangat Irit)</span>';
             } else if (kmL >= 8) {
                 badgeContainer.innerHTML = '<span class="badge bg-warning text-dark px-3 py-1.5 fw-bold"><i class="bi bi-check-circle me-1"></i> Efisiensi Standar / Normal</span>';
@@ -784,12 +886,306 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    ['calcExpOdoPrev', 'calcExpOdoCurr', 'calcExpLiters', 'calcExpCost'].forEach(id => {
-        const el = document.getElementById(id);
+    // Perbarui teks dalam dropdown opsi jika ada rekaman baru
+    function refreshDropdownOptionText(option, vehicleId, odoVal, plat, namaLengkap) {
+        if (!option) return;
+        option.setAttribute('data-odo', odoVal);
+        option.text = plat + ' - ' + namaLengkap + ' (Odo Terkini: ' + parseFloat(odoVal).toLocaleString('id-ID') + ' KM)';
+    }
+
+    // Sinkronkan seluruh list dropdown pada awal muat
+    function refreshAllDropdownOptions() {
+        if (!vehicleSelect) return;
+        for (let i = 1; i < vehicleSelect.options.length; i++) {
+            const opt = vehicleSelect.options[i];
+            const vId = opt.value;
+            const defOdo = parseFloat(opt.getAttribute('data-odo')) || 0;
+            const plat = opt.getAttribute('data-plat') || '';
+            const nama = opt.getAttribute('data-nama') || plat;
+            
+            const savedLastOdo = localStorage.getItem('calc_last_odo_akhir_vehicle_' + vId);
+            const finalOdo = (savedLastOdo !== null && parseFloat(savedLastOdo) >= defOdo) ? parseFloat(savedLastOdo) : defOdo;
+            refreshDropdownOptionText(opt, vId, finalOdo, plat, nama);
+        }
+    }
+
+    // Fungsi saat kendaraan dipilih di dropdown
+    function onVehicleChange() {
+        if (!vehicleSelect) return;
+        const vehicleId = vehicleSelect.value;
+
+        if (!vehicleId) {
+            if (badgeOdoAuto) badgeOdoAuto.style.display = 'none';
+            if (btnResetOdo) btnResetOdo.style.display = 'none';
+            if (vehicleInfoText) vehicleInfoText.innerHTML = '<i class="bi bi-info-circle me-1"></i> {{ __("Pilih kendaraan agar odometer awal terisi otomatis.") }}';
+            odoPrevInput.value = 0;
+            odoCurrInput.value = 0;
+            calculateExpFuel();
+            return;
+        }
+
+        const selectedOption = vehicleSelect.options[vehicleSelect.selectedIndex];
+        const defaultOdo = parseFloat(selectedOption?.getAttribute('data-odo')) || 0;
+        const plat = selectedOption?.getAttribute('data-plat') || '';
+        const nama = selectedOption?.getAttribute('data-nama') || plat;
+
+        // Cek memori odometer terkini
+        const savedLastOdoStr = localStorage.getItem('calc_last_odo_akhir_vehicle_' + vehicleId);
+        const savedLastOdo = savedLastOdoStr !== null ? parseFloat(savedLastOdoStr) : null;
+        const currentActiveOdo = (savedLastOdo !== null && !isNaN(savedLastOdo) && savedLastOdo >= defaultOdo) ? savedLastOdo : defaultOdo;
+
+        odoPrevInput.value = currentActiveOdo;
+        odoCurrInput.value = currentActiveOdo + 350;
+
+        if (badgeOdoAuto) {
+            badgeOdoAuto.style.display = 'inline-block';
+            badgeOdoAuto.className = 'badge bg-success-subtle text-success border border-success-subtle px-2 py-1';
+            badgeOdoAuto.innerHTML = '<i class="bi bi-speedometer2 me-1"></i> Odo Terkini: ' + currentActiveOdo.toLocaleString('id-ID') + ' KM';
+        }
+
+        if (vehicleInfoText) {
+            vehicleInfoText.innerHTML = '<i class="bi bi-check-circle-fill text-success me-1"></i> <strong>' + plat + '</strong>: Odometer awal <strong>' + currentActiveOdo.toLocaleString('id-ID') + ' KM</strong>.';
+        }
+        if (btnResetOdo) btnResetOdo.style.display = 'inline-block';
+
+        refreshDropdownOptionText(selectedOption, vehicleId, currentActiveOdo, plat, nama);
+        localStorage.setItem('calc_last_selected_vehicle', vehicleId);
+        calculateExpFuel();
+    }
+
+    // FUNGSI UTAMA: SIMPAN ODOMETER KE DATABASE SECARA PERMANEN
+    async function executeShiftOdoToAwal() {
+        const vehicleId = vehicleSelect?.value;
+        const odoAkhirVal = parseFloat(odoCurrInput?.value);
+
+        if (!vehicleId) {
+            alert('Silakan pilih armada kendaraan terlebih dahulu.');
+            vehicleSelect?.focus();
+            return;
+        }
+
+        if (isNaN(odoAkhirVal) || odoAkhirVal <= 0) {
+            alert('Silakan masukkan angka Odometer Akhir yang valid terlebih dahulu.');
+            odoCurrInput.focus();
+            return;
+        }
+
+        const selectedOption = vehicleSelect.options[vehicleSelect.selectedIndex];
+        const plat = selectedOption?.getAttribute('data-plat') || 'Armada';
+        const nama = selectedOption?.getAttribute('data-nama') || plat;
+
+        const origBtnHtml = btnSaveFooter.innerHTML;
+        btnSaveFooter.disabled = true;
+        btnSaveFooter.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Menyimpan ke Database...';
+
+        try {
+            const response = await fetch('/vehicles/' + vehicleId + '/odometer', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({
+                    odometer: Math.round(odoAkhirVal)
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.status === 'success') {
+                // 1. Pindahkan nilai Odometer Akhir menjadi Odometer Awal
+                odoPrevInput.value = odoAkhirVal;
+
+                // 2. Simpan ke LocalStorage agar browser selalu ingat
+                localStorage.setItem('calc_last_odo_akhir_vehicle_' + vehicleId, odoAkhirVal);
+
+                // 3. Update atribut data-odo dan teks dropdown secara permanen
+                refreshDropdownOptionText(selectedOption, vehicleId, odoAkhirVal, plat, nama);
+
+                // 4. Update Badge Odometer Awal & Subtext
+                if (badgeOdoAuto) {
+                    badgeOdoAuto.style.display = 'inline-block';
+                    badgeOdoAuto.className = 'badge bg-success-subtle text-success border border-success-subtle px-2 py-1';
+                    badgeOdoAuto.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Tersimpan: ' + odoAkhirVal.toLocaleString('id-ID') + ' KM';
+                }
+
+                if (vehicleInfoText) {
+                    vehicleInfoText.innerHTML = '<i class="bi bi-check-circle-fill text-success me-1"></i> <strong>' + plat + '</strong>: Odometer terbaru <strong>' + odoAkhirVal.toLocaleString('id-ID') + ' KM</strong> berhasil tersimpan permanen di database.';
+                }
+
+                if (btnResetOdo) btnResetOdo.style.display = 'inline-block';
+
+                // 5. Siapkan Odometer Akhir untuk perjalanan berikutnya (+350 KM)
+                const nextEstimatedOdo = odoAkhirVal + 350;
+                odoCurrInput.value = nextEstimatedOdo;
+
+                // 6. Tampilkan Notifikasi Alert Sukses
+                if (alertSuccess) {
+                    alertSuccess.style.display = 'flex';
+                    if (alertSuccessText) {
+                        alertSuccessText.innerHTML = '<strong>Berhasil Tersimpan Permanen!</strong> Odometer <strong>' + plat + '</strong> kini diset ke <strong>' + odoAkhirVal.toLocaleString('id-ID') + ' KM</strong> di database & dijadikan Odometer Awal.';
+                    }
+                    setTimeout(() => {
+                        if (alertSuccess) alertSuccess.style.display = 'none';
+                    }, 5000);
+                }
+
+                calculateExpFuel();
+                if (litersInput) litersInput.focus();
+            } else {
+                alert('Gagal menyimpan odometer: ' + (result.message || 'Terjadi kesalahan sistem.'));
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Terjadi kendala jaringan saat menghubungi server.');
+        } finally {
+            btnSaveFooter.disabled = false;
+            btnSaveFooter.innerHTML = origBtnHtml;
+        }
+    }
+
+    // FUNGSI KEDUA: CATAT LANGSUNG PENGELUARAN BBM & UPDATE ODOMETER KE DATABASE
+    async function executeQuickBbmExpense() {
+        const vehicleId = vehicleSelect?.value;
+        const odoAkhirVal = parseFloat(odoCurrInput?.value);
+        const litersVal = parseFloat(litersInput?.value);
+        const costVal = parseFloat(costInput?.value);
+
+        if (!vehicleId) {
+            alert('Silakan pilih armada kendaraan terlebih dahulu.');
+            vehicleSelect?.focus();
+            return;
+        }
+
+        if (isNaN(odoAkhirVal) || odoAkhirVal <= 0) {
+            alert('Silakan masukkan angka Odometer Akhir yang valid.');
+            odoCurrInput.focus();
+            return;
+        }
+
+        if (isNaN(litersVal) || litersVal <= 0) {
+            alert('Silakan masukkan jumlah Liter BBM.');
+            litersInput.focus();
+            return;
+        }
+
+        if (isNaN(costVal) || costVal <= 0) {
+            alert('Silakan masukkan nominal biaya BBM.');
+            costInput.focus();
+            return;
+        }
+
+        if (!btnRecordQuickBbm) return;
+        const origBtnHtml = btnRecordQuickBbm.innerHTML;
+        btnRecordQuickBbm.disabled = true;
+        btnRecordQuickBbm.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> Menyimpan Data...';
+
+        try {
+            const response = await fetch('/expenses/quick-bbm', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({
+                    vehicle_id: vehicleId,
+                    odometer_akhir: Math.round(odoAkhirVal),
+                    liter_bbm: litersVal,
+                    jumlah_biaya: costVal,
+                    keterangan: 'Pengisian BBM ' + litersVal + 'L pada Odo ' + odoAkhirVal.toLocaleString('id-ID') + ' KM'
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok && result.status === 'success') {
+                odoPrevInput.value = odoAkhirVal;
+                localStorage.setItem('calc_last_odo_akhir_vehicle_' + vehicleId, odoAkhirVal);
+                
+                const selectedOption = vehicleSelect.options[vehicleSelect.selectedIndex];
+                const plat = selectedOption?.getAttribute('data-plat') || 'Armada';
+                const nama = selectedOption?.getAttribute('data-nama') || plat;
+                refreshDropdownOptionText(selectedOption, vehicleId, odoAkhirVal, plat, nama);
+
+                const nextEstimatedOdo = odoAkhirVal + 350;
+                odoCurrInput.value = nextEstimatedOdo;
+
+                if (alertSuccess) {
+                    alertSuccess.style.display = 'flex';
+                    if (alertSuccessText) {
+                        alertSuccessText.innerHTML = '<strong>Sukses!</strong> ' + result.message;
+                    }
+                }
+
+                calculateExpFuel();
+
+                // Reload halaman agar rekap biaya di tabel langsung terupdate
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1800);
+            } else {
+                alert('Gagal mencatat pengeluaran: ' + (result.message || 'Terjadi kesalahan sistem.'));
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Terjadi kendala jaringan saat menghubungi server.');
+        } finally {
+            btnRecordQuickBbm.disabled = false;
+            btnRecordQuickBbm.innerHTML = origBtnHtml;
+        }
+    }
+
+    if (vehicleSelect) {
+        vehicleSelect.addEventListener('change', onVehicleChange);
+    }
+
+    if (btnSaveFooter) {
+        btnSaveFooter.addEventListener('click', executeShiftOdoToAwal);
+    }
+
+    if (btnRecordQuickBbm) {
+        btnRecordQuickBbm.addEventListener('click', executeQuickBbmExpense);
+    }
+
+    if (btnResetOdo) {
+        btnResetOdo.addEventListener('click', function() {
+            const vehicleId = vehicleSelect?.value;
+            if (vehicleId) {
+                localStorage.removeItem('calc_last_odo_akhir_vehicle_' + vehicleId);
+                const selectedOption = vehicleSelect.options[vehicleSelect.selectedIndex];
+                const defaultOdo = parseFloat(selectedOption?.getAttribute('data-odo')) || 0;
+                const plat = selectedOption?.getAttribute('data-plat') || '';
+                const nama = selectedOption?.getAttribute('data-nama') || plat;
+                refreshDropdownOptionText(selectedOption, vehicleId, defaultOdo, plat, nama);
+                onVehicleChange();
+            }
+        });
+    }
+
+    [odoPrevInput, odoCurrInput, litersInput, costInput].forEach(el => {
         if (el) {
-            el.addEventListener('input', calculateExpFuel);
+            el.addEventListener('input', function() {
+                calculateExpFuel();
+            });
         }
     });
+
+    // Inisialisasi teks dropdown
+    refreshAllDropdownOptions();
+
+    // Pulihkan kendaraan terakhir saat modal dibuka atau halaman dimuat
+    const lastVehicleId = localStorage.getItem('calc_last_selected_vehicle');
+    if (lastVehicleId && vehicleSelect) {
+        vehicleSelect.value = lastVehicleId;
+        if (vehicleSelect.value) {
+            onVehicleChange();
+        }
+    } else if (vehicleSelect && vehicleSelect.options.length > 1) {
+        vehicleSelect.selectedIndex = 1;
+        onVehicleChange();
+    }
 
     calculateExpFuel();
 });

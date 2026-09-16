@@ -25,6 +25,10 @@ class User extends Authenticatable
         'name',
         'username',
         'email',
+        'no_telepon',
+        'nomor_sim',
+        'jenis_sim',
+        'masa_berlaku_sim',
         'password',
         'role',
         'kelas',
@@ -36,19 +40,18 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $casts = [
+        'masa_berlaku_sim' => 'date',
+    ];
+
     public function getAuthPassword()
     {
         return $this->password;
     }
 
-    public function isGuru()
+    public function isSuperAdmin()
     {
-        return $this->role === 'guru';
-    }
-
-    public function isMurid()
-    {
-        return $this->role === 'murid';
+        return $this->role === 'superadmin';
     }
 
     public function isAdmin()
@@ -61,8 +64,48 @@ class User extends Authenticatable
         return $this->role === 'teknisi';
     }
 
-    public function hasilUjian()
+    public function isDriver()
     {
-        return $this->hasMany(HasilUjian::class, 'user_id');
+        return $this->role === 'user';
+    }
+
+    public function isPimpinan()
+    {
+        return $this->role === 'pimpinan';
+    }
+
+    /**
+     * Relasi ke armada yang ditugaskan ke pengemudi ini
+     */
+    public function assignedVehicles()
+    {
+        return $this->hasMany(Vehicle::class, 'driver_id');
+    }
+
+    /**
+     * Warning status masa berlaku SIM pengemudi:
+     * - 'merah' : sudah lewat masa berlaku
+     * - 'kuning': mendekati kedaluwarsa (<= 30 hari)
+     * - 'hijau' : aman
+     * - 'none'  : belum mengisi tanggal SIM
+     */
+    public function getStatusSimAttribute(): string
+    {
+        if (!$this->masa_berlaku_sim) {
+            return 'none';
+        }
+
+        $today = \Carbon\Carbon::now()->startOfDay();
+        $dueDate = \Carbon\Carbon::parse($this->masa_berlaku_sim)->startOfDay();
+
+        if ($today->greaterThan($dueDate)) {
+            return 'merah';
+        }
+
+        if ($today->diffInDays($dueDate) <= 30) {
+            return 'kuning';
+        }
+
+        return 'hijau';
     }
 }

@@ -17,7 +17,15 @@ class Vehicle extends Model
         'tahun',
         'plat_nomor',
         'lokasi_pool',
+        'lokasi_asal',
+        'lokasi_tujuan',
+        'status_perjalanan',
+        'kecepatan_kmh',
+        'estimasi_tiba',
+        'jarak_sisa_km',
+        'catatan_perjalanan',
         'supir_utama',
+        'driver_id',
         'odometer_awal',
         'pajak_tahunan',
         'pajak_5_tahunan',
@@ -27,6 +35,8 @@ class Vehicle extends Model
         'foto',
         'latitude',
         'longitude',
+        'tujuan_latitude',
+        'tujuan_longitude',
     ];
 
     /**
@@ -68,7 +78,60 @@ class Vehicle extends Model
     protected $casts = [
         'jatuh_tempo_kir' => 'date',
         'tanggal_servis_manual' => 'date',
+        'estimasi_tiba' => 'datetime',
+        'tujuan_latitude' => 'float',
+        'tujuan_longitude' => 'float',
+        'jarak_sisa_km' => 'float',
+        'kecepatan_kmh' => 'integer',
     ];
+
+    /**
+     * Format Estimasi Waktu Tiba (ETA) yang mudah dibaca
+     */
+    public function getFormattedEtaAttribute(): string
+    {
+        if (!$this->estimasi_tiba) {
+            if ($this->status_perjalanan === 'Standby di Pool') {
+                return 'Standby di Pool';
+            }
+            return 'Belum Diatur';
+        }
+
+        $now = Carbon::now();
+        $eta = Carbon::parse($this->estimasi_tiba);
+
+        if ($now->greaterThan($eta)) {
+            return 'Tiba di Lokasi (' . $eta->format('H:i') . ' WIB)';
+        }
+
+        $diffMinutes = (int) $now->diffInMinutes($eta);
+        if ($diffMinutes < 60) {
+            return $eta->format('H:i') . " WIB (± {$diffMinutes} menit)";
+        }
+
+        $hours = floor($diffMinutes / 60);
+        $minutes = $diffMinutes % 60;
+        return $eta->format('H:i') . " WIB (± {$hours}j {$minutes}m)";
+    }
+
+    /**
+     * Label Badge Berwarna untuk Status Perjalanan
+     */
+    public function getBadgeStatusPerjalananAttribute(): string
+    {
+        $status = $this->status_perjalanan ?: 'Standby di Pool';
+        return match($status) {
+            'Dalam Perjalanan ke Tujuan' => '<span class="badge bg-primary-subtle text-primary border border-primary-subtle"><i class="bi bi-geo-fill me-1"></i>Dalam Perjalanan</span>',
+            'Proses Bongkar Muat' => '<span class="badge bg-warning-subtle text-warning border border-warning-subtle"><i class="bi bi-box-seam me-1"></i>Bongkar Muat</span>',
+            'Perjalanan Kembali ke Pool' => '<span class="badge bg-info-subtle text-info border border-info-subtle"><i class="bi bi-arrow-return-left me-1"></i>Kembali ke Pool</span>',
+            default => '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle"><i class="bi bi-p-circle me-1"></i>Standby di Pool</span>',
+        };
+    }
+
+    public function driver()
+    {
+        return $this->belongsTo(User::class, 'driver_id');
+    }
 
     public function checklists()
     {
@@ -135,7 +198,10 @@ class Vehicle extends Model
             ? $this->latestChecklist
             : $this->checklists()->latest('tanggal')->first();
 
-        return $lastChecklist->odometer ?? $this->odometer_awal;
+        $odoChecklist = $lastChecklist ? (int) $lastChecklist->odometer : 0;
+        $odoMaster = (int) $this->odometer_awal;
+
+        return max($odoChecklist, $odoMaster);
     }
 
     /**

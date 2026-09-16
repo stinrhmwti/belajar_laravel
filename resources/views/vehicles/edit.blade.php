@@ -245,15 +245,47 @@
                     <div class="card-body p-4">
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label-custom"><i class="bi bi-person text-secondary"></i> Supir Utama</label>
-                                <input type="text" name="supir_utama" class="form-control form-control-custom" value="{{ old('supir_utama', $vehicle->supir_utama) }}" placeholder="Nama Supir">
+                                <label class="form-label-custom"><i class="bi bi-person-badge text-secondary"></i> Supir Utama (Penugasan Driver)</label>
+                                <div class="input-group">
+                                    <select name="driver_id" class="form-select form-select-custom">
+                                        <option value="">-- Pilih Driver Terdaftar --</option>
+                                        @if(isset($drivers))
+                                            @foreach($drivers as $d)
+                                                <option value="{{ $d->id }}" @selected(old('driver_id', $vehicle->driver_id) == $d->id)>
+                                                    {{ $d->name }} ({{ $d->jenis_sim ?: 'SIM' }})
+                                                </option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                    <input type="text" name="supir_utama" class="form-control form-control-custom" value="{{ old('supir_utama', $vehicle->supir_utama) }}" placeholder="Atau ketik manual">
+                                </div>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label-custom"><i class="bi bi-building text-secondary"></i> Lokasi Pool</label>
                                 <input type="text" name="lokasi_pool" class="form-control form-control-custom" value="{{ old('lokasi_pool', $vehicle->lokasi_pool) }}" placeholder="Lokasi Pool Cabang">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label-custom"><i class="bi bi-speedometer2 text-secondary"></i> Odometer Awal (km)</label>
+                                <label class="form-label-custom"><i class="bi bi-geo text-secondary"></i> Titik Asal Keberangkatan</label>
+                                <input type="text" name="lokasi_asal" class="form-control form-control-custom" value="{{ old('lokasi_asal', $vehicle->lokasi_asal) }}" placeholder="Contoh: Pool Gambir Jakarta">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label-custom"><i class="bi bi-flag text-secondary"></i> Titik Tujuan Perjalanan</label>
+                                <input type="text" name="lokasi_tujuan" class="form-control form-control-custom" value="{{ old('lokasi_tujuan', $vehicle->lokasi_tujuan) }}" placeholder="Contoh: Kawasan Industri MM2100 Cikarang">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label-custom"><i class="bi bi-signpost-split text-secondary"></i> Status Perjalanan</label>
+                                <select name="status_perjalanan" class="form-select form-select-custom">
+                                    @foreach (['Standby di Pool', 'Dalam Perjalanan ke Tujuan', 'Proses Bongkar Muat', 'Perjalanan Kembali ke Pool'] as $sp)
+                                        <option value="{{ $sp }}" @selected(old('status_perjalanan', $vehicle->status_perjalanan) === $sp)>{{ $sp }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label-custom"><i class="bi bi-speedometer2 text-secondary"></i> Kecepatan Live (km/jam)</label>
+                                <input type="number" name="kecepatan_kmh" class="form-control form-control-custom" value="{{ old('kecepatan_kmh', $vehicle->kecepatan_kmh ?? 0) }}" min="0" max="160">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label-custom"><i class="bi bi-speedometer text-secondary"></i> Odometer Awal (km)</label>
                                 <input type="number" name="odometer_awal" class="form-control form-control-custom" value="{{ old('odometer_awal', $vehicle->odometer_awal) }}" placeholder="0" required>
                             </div>
                             <div class="col-md-6">

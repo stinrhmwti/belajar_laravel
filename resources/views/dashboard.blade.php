@@ -591,23 +591,86 @@
     }
     
     @media print {
-        /* General layout overrides */
-        header, .sidebar, .sidebar-left, .navbar, .btn, .input-group, #statusFilterButtons, .welcome-banner-card .d-flex.gap-2, .card-grad-1::after, .card-grad-2::after, .card-grad-3::after, .card-grad-4::after, .card-grad-1::before, .card-grad-2::before, .card-grad-3::before, .card-grad-4::before {
+        @page {
+            size: A4 portrait;
+            margin: 8mm 10mm 10mm 10mm;
+        }
+
+        /* General layout overrides & hiding heavy non-printable components */
+        header,
+        nav,
+        .breadcrumb,
+        #liveClock,
+        .sidebar,
+        .sidebar-left,
+        .navbar,
+        .btn,
+        button,
+        .input-group,
+        #statusFilterButtons,
+        .welcome-banner-card,
+        .banner-image-card,
+        .banner-welcome-wrapper,
+        .quick-actions-row,
+        .card-header-actions,
+        .fab-container,
+        .whatsapp-widget,
+        #dashboardFleetMap,
+        .leaflet-container,
+        .map-card-wrapper,
+        .leaflet-pane,
+        .leaflet-control-container,
+        .sparkline-canvas,
+        .live-tracking-panel,
+        .audio-effects,
+        #soundEffects,
+        .btn-cetak-laporan,
+        .floating-widget,
+        .modal,
+        .toast,
+        .card-grad-1::after,
+        .card-grad-2::after,
+        .card-grad-3::after,
+        .card-grad-4::after,
+        .card-grad-1::before,
+        .card-grad-2::before,
+        .card-grad-3::before,
+        .card-grad-4::before {
             display: none !important;
         }
-        body, .content, .main-content {
+
+        *, *::before, *::after {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            text-shadow: none !important;
+            box-shadow: none !important;
+            filter: none !important;
+            backdrop-filter: none !important;
+            transition: none !important;
+            animation: none !important;
+        }
+
+        body, .content, .main-content, #main-content {
             background: #ffffff !important;
             color: #0f172a !important;
             margin: 0 !important;
             padding: 0 !important;
             width: 100% !important;
+            font-size: 9pt !important;
+            line-height: 1.3 !important;
         }
         
-        /* Set columns to be side-by-side instead of stacked full page in print */
+        /* Set columns to be side-by-side in print */
         .row {
             display: flex !important;
             flex-direction: row !important;
             flex-wrap: wrap !important;
+            margin-left: -5px !important;
+            margin-right: -5px !important;
+        }
+        .row > * {
+            padding-left: 5px !important;
+            padding-right: 5px !important;
         }
         .col-md-3 {
             flex: 0 0 25% !important;
@@ -635,32 +698,47 @@
             border: 1px solid #cbd5e1 !important;
             box-shadow: none !important;
             break-inside: avoid !important;
+            page-break-inside: avoid !important;
             background: #ffffff !important;
             color: #0f172a !important;
+            margin-bottom: 10px !important;
+            border-radius: 8px !important;
         }
         
-        /* Override gradient cards to high-contrast monochrome with colored indicator borders */
+        .card-body {
+            padding: 10px 12px !important;
+        }
+        
+        /* High-contrast KPI metric cards for executive print */
         .card-grad-1, .card-grad-2, .card-grad-3, .card-grad-4 {
             background: #ffffff !important;
             color: #0f172a !important;
             box-shadow: none !important;
             border: 1px solid #cbd5e1 !important;
+            padding: 10px !important;
+            border-radius: 8px !important;
         }
         
-        .card-grad-1 { border-top: 4px solid #4f46e5 !important; }
-        .card-grad-2 { border-top: 4px solid #e11d48 !important; }
-        .card-grad-3 { border-top: 4px solid #d97706 !important; }
-        .card-grad-4 { border-top: 4px solid #0f766e !important; }
+        .card-grad-1 { border-left: 4px solid #4f46e5 !important; }
+        .card-grad-2 { border-left: 4px solid #e11d48 !important; }
+        .card-grad-3 { border-left: 4px solid #d97706 !important; }
+        .card-grad-4 { border-left: 4px solid #0f766e !important; }
         
-        /* Make all text black/dark gray inside gradient cards */
         .card-grad-title {
             color: #475569 !important;
+            font-size: 8pt !important;
+            font-weight: 700 !important;
+            text-transform: uppercase !important;
         }
         .card-grad-1 h2, .card-grad-2 h2, .card-grad-3 h2, .card-grad-4 h2 {
             color: #0f172a !important;
+            font-size: 14pt !important;
+            font-weight: 800 !important;
+            margin: 4px 0 !important;
         }
         .card-grad-1 .text-white-50, .card-grad-2 .text-white-50, .card-grad-3 .text-white-50, .card-grad-4 .text-white-50 {
             color: #64748b !important;
+            font-size: 7.5pt !important;
         }
         .card-grad-1 .fw-bold.text-white, .card-grad-2 .fw-bold.text-white, .card-grad-3 .fw-bold.text-white, .card-grad-4 .fw-bold.text-white {
             color: #0f172a !important;
@@ -669,22 +747,34 @@
             background-color: #f1f5f9 !important;
             color: #0f172a !important;
             border: 1px solid #cbd5e1 !important;
+            font-size: 7pt !important;
         }
         
-        /* Icon styles inside print cards */
         .card-grad-icon {
-            background: #f1f5f9 !important;
-            color: #475569 !important;
-            border: 1px solid #cbd5e1 !important;
+            display: none !important;
         }
         
-        /* Progress bars in print */
-        .progress {
-            background-color: #e2e8f0 !important;
+        /* Table overrides for print */
+        .table-responsive {
+            overflow: visible !important;
+        }
+        table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            page-break-inside: auto;
+        }
+        tr {
+            page-break-inside: avoid !important;
+            page-break-after: auto;
+        }
+        th, td {
+            padding: 4px 6px !important;
+            font-size: 8pt !important;
             border: 1px solid #cbd5e1 !important;
         }
-        .progress-bar {
-            background-color: #475569 !important;
+        th {
+            background-color: #f1f5f9 !important;
+            font-weight: bold !important;
         }
     }
 </style>
@@ -758,8 +848,23 @@
 </style>
 @endpush
 
+{{-- KOP SURAT EKSEKUTIF UNTUK CETAK LAPORAN (Hanya Tampil Saat Print) --}}
+<div class="d-none d-print-block mb-3 pb-2 border-bottom border-2 border-dark">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold mb-0 text-dark" style="font-size: 16pt; letter-spacing: -0.5px;">FleetMaintenance System</h2>
+            <p class="mb-0 text-secondary" style="font-size: 8.5pt;">Sistem Manajemen Operasional & Pemeliharaan Armada Kendaraan</p>
+        </div>
+        <div class="text-end">
+            <h5 class="fw-bold mb-0 text-dark" style="font-size: 10pt; text-transform: uppercase;">Laporan Ringkasan Eksekutif Armada</h5>
+            <p class="mb-0 text-muted" style="font-size: 7.5pt;">Tanggal Cetak: {{ now()->translatedFormat('l, d F Y H:i') }} WIB</p>
+            <p class="mb-0 text-muted" style="font-size: 7.5pt;">Dicetak Oleh: {{ auth()->user()->name }} ({{ ucfirst(auth()->user()->role) }})</p>
+        </div>
+    </div>
+</div>
+
 {{-- HEADER WELCOME (Daya Motor Style Layout - Full Width) --}}
-<div class="mb-4">
+<div class="mb-4 d-print-none">
     <!-- Breadcrumb Header -->
     <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
         <nav style="--bs-breadcrumb-divider: '/';" aria-label="breadcrumb">
@@ -903,7 +1008,7 @@
     </div>
 
     <!-- Selamat Datang Greetings Card -->
-    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 welcome-banner-card" style="border-radius: 16px;">
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 welcome-banner-card d-print-none" style="border-radius: 16px;">
         <!-- Top accent line -->
         <div style="height: 6px; background: linear-gradient(to right, #0891b2, #0e7490, #4f46e5);"></div>
         <div class="card-body p-4 p-md-5">
@@ -1138,27 +1243,37 @@
         </div>
     </div>
  
-    <!-- Card 2: Keluhan Hari Ini -->
+    <!-- Card 2: Keluhan Aktif -->
     <div class="col-md-3">
         <div class="card dashboard-card card-grad-2 h-100 transition-hover">
             <div class="card-body p-4 d-flex flex-column justify-content-between">
                 <div>
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div class="card-grad-title d-flex align-items-center gap-2">
-                            <span class="{{ $keluhanHariIni > 0 ? 'pulse-dot-red' : 'pulse-dot-green' }}"></span>
-                            <span>{{ __('Keluhan Hari Ini') }}</span>
+                            <span class="{{ $totalKeluhanAktif > 0 ? 'pulse-dot-red' : 'pulse-dot-green' }}"></span>
+                            <span>{{ __('Keluhan Aktif') }}</span>
                         </div>
                         <div class="card-grad-icon"><i class="bi bi-exclamation-octagon-fill"></i></div>
                     </div>
                     <div class="d-flex align-items-baseline justify-content-between">
-                        <h2 class="mb-0 fw-extrabold display-6 text-white">{{ $keluhanHariIni }}</h2>
-                        <span class="badge bg-danger text-white border border-danger-subtle fw-bold" style="font-size:0.68rem; letter-spacing: 0.5px; text-transform: uppercase; padding: 3px 8px; border-radius: 12px; background: rgba(220,38,38,0.7) !important;">{{ __('Baru') }}</span>
+                        <h2 class="mb-0 fw-extrabold display-6 text-white">{{ $totalKeluhanAktif }}</h2>
+                        <div class="d-flex gap-1 flex-wrap justify-content-end">
+                            @if($keluhanBaruCount > 0)
+                                <span class="badge bg-danger text-white border border-danger-subtle fw-bold" style="font-size:0.65rem; letter-spacing: 0.5px; text-transform: uppercase; padding: 3px 6px; border-radius: 10px; background: rgba(220,38,38,0.85) !important;">{{ $keluhanBaruCount }} {{ __('Baru') }}</span>
+                            @endif
+                            @if($keluhanDiprosesCount > 0)
+                                <span class="badge bg-warning text-dark border border-warning-subtle fw-bold" style="font-size:0.65rem; letter-spacing: 0.5px; text-transform: uppercase; padding: 3px 6px; border-radius: 10px; background: rgba(245,158,11,0.9) !important;">{{ $keluhanDiprosesCount }} {{ __('Diproses') }}</span>
+                            @endif
+                            @if($totalKeluhanAktif == 0)
+                                <span class="badge bg-success text-white border border-success-subtle fw-bold" style="font-size:0.65rem; letter-spacing: 0.5px; text-transform: uppercase; padding: 3px 6px; border-radius: 10px; background: rgba(16,185,129,0.85) !important;">{{ __('Bebas Masalah') }}</span>
+                            @endif
+                        </div>
                     </div>
                 </div>
                 <div class="mt-3">
                     <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.72rem;">
-                        <span class="text-white-50">{{ __('Tindak Lanjut Segera') }}</span>
-                        <span class="fw-bold text-white">{{ __('Butuh Respon') }}</span>
+                        <span class="text-white-50">{{ $keluhanBaruCount > 0 ? __('Tindak Lanjut Segera') : ($keluhanDiprosesCount > 0 ? __('Dalam Proses Bengkel') : __('Semua Ditangani')) }}</span>
+                        <span class="fw-bold text-white">{{ $totalKeluhanAktif > 0 ? __('Perlu Respon') : __('Kondisi Prima') }}</span>
                     </div>
                     <div class="progress" style="height: 4px; border-radius: 10px; background: rgba(255, 255, 255, 0.22);">
                         <div class="progress-bar bg-white" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
@@ -1181,7 +1296,7 @@
                             <span class="{{ $sedangServis > 0 ? 'pulse-dot-yellow' : 'pulse-dot-green' }}"></span>
                             <span>{{ __('Sedang Servis') }}</span>
                         </div>
-                        <div class="card-grad-icon"><i class="bi bi-wrench-adjustable-caps"></i></div>
+                        <div class="card-grad-icon"><i class="bi bi-tools"></i></div>
                     </div>
                     <div class="d-flex align-items-baseline justify-content-between">
                         <h2 class="mb-0 fw-extrabold display-6 text-white">{{ $sedangServis }}</h2>
@@ -1555,17 +1670,28 @@
             <div class="card-header d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-danger-subtle text-danger rounded p-1.5"><i class="bi bi-exclamation-square-fill fs-5"></i></div>
-                    <span class="fw-bold">{{ __('Laporan Keluhan Baru Dari Pengemudi') }}</span>
+                    <span class="fw-bold">{{ __('Laporan Keluhan & Progres Perbaikan') }}</span>
                 </div>
-                <a href="{{ route('complaints.index') }}" class="btn btn-xs btn-outline-primary px-2.5 py-1" style="font-size:0.78rem;">{{ __('Lihat Semua') }}</a>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-danger text-white fw-bold" style="border-radius: 8px; font-size: 0.72rem; padding: 4px 8px;">{{ $totalKeluhanAktif }} {{ __('Aktif') }}</span>
+                    <a href="{{ route('complaints.index') }}" class="btn btn-xs btn-outline-primary px-2.5 py-1" style="font-size:0.78rem; border-radius: 6px;">{{ __('Lihat Semua') }}</a>
+                </div>
             </div>
             <div class="card-body p-4 d-flex flex-column justify-content-start" style="min-height: 280px;">
                 @forelse ($keluhanBaru as $k)
-                <div class="p-3 rounded-4 mb-3 bg-white border border-slate-100 shadow-xs hover-lift transition-all" style="border-left: 4px solid #ef4444 !important;">
+                <div class="p-3 rounded-4 mb-3 bg-white border border-slate-100 shadow-xs hover-lift transition-all" style="border-left: 4px solid {{ $k->status === 'Baru' ? '#ef4444' : '#f59e0b' }} !important;">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <div class="d-flex align-items-center gap-2">
                             <span class="badge bg-dark text-white font-monospace" style="letter-spacing: 0.5px; border-radius: 6px; font-size: 0.72rem; padding: 4px 8px;">{{ $k->vehicle->plat_nomor ?? 'N/A' }}</span>
-                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle" style="font-size:0.68rem; padding: 3px 6px; border-radius: 5px;">{{ __('Baru') }}</span>
+                            @if ($k->status === 'Baru')
+                                <span class="badge bg-danger text-white border border-danger-subtle fw-bold" style="font-size:0.68rem; padding: 3px 7px; border-radius: 5px;">{{ __('Baru') }}</span>
+                            @elseif ($k->status === 'Diproses')
+                                <span class="badge bg-warning text-dark border border-warning-subtle fw-bold" style="font-size:0.68rem; padding: 3px 7px; border-radius: 5px;">
+                                    <i class="bi bi-tools me-1"></i>{{ __('Diproses') }} ({{ $k->progress_perbaikan ?? 20 }}%)
+                                </span>
+                            @else
+                                <span class="badge bg-success text-white border border-success-subtle fw-bold" style="font-size:0.68rem; padding: 3px 7px; border-radius: 5px;">{{ __('Selesai') }}</span>
+                            @endif
                         </div>
                         <div class="d-flex align-items-center gap-1.5 text-muted" style="font-size:0.75rem;">
                             <div class="rounded-circle overflow-hidden bg-slate-100 d-flex align-items-center justify-content-center border" style="width: 22px; height: 22px; font-size: 0.65rem; font-weight: 700;">
@@ -1577,10 +1703,21 @@
                     <div class="p-2.5 rounded-3 bg-light text-dark mb-2" style="font-size:0.825rem; line-height:1.4;">
                         "{{ Str::limit($k->keluhan, 120) }}"
                     </div>
+                    @if($k->status === 'Diproses')
+                    <div class="mb-2">
+                        <div class="d-flex justify-content-between align-items-center mb-1" style="font-size: 0.7rem;">
+                            <span class="text-muted fw-semibold">{{ __('Progres Perbaikan Teknisi') }}</span>
+                            <span class="text-primary fw-bold font-monospace">{{ $k->progress_perbaikan ?? 20 }}%</span>
+                        </div>
+                        <div class="progress" style="height: 5px; border-radius: 3px; background-color: #f1f5f9;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ $k->progress_perbaikan ?? 20 }}%;" aria-valuenow="{{ $k->progress_perbaikan ?? 20 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    @endif
                     <div class="d-flex justify-content-between align-items-center mt-2">
-                        <small class="text-secondary" style="font-size:0.72rem;"><i class="bi bi-clock me-1"></i>{{ $k->created_at ? $k->created_at->diffForHumans() : '-' }}</small>
+                        <small class="text-secondary" style="font-size:0.72rem;"><i class="bi bi-calendar3 me-1"></i>{{ $k->tanggal ? $k->tanggal->format('d M Y') : ($k->created_at ? $k->created_at->diffForHumans() : '-') }}</small>
                         <a href="{{ route('complaints.index') }}" class="btn btn-xs btn-outline-primary px-3 py-1 d-inline-flex align-items-center gap-1" style="font-size: 0.72rem; border-radius: 6px; font-weight: 600;">
-                            {{ __('Proses') }} <i class="bi bi-arrow-right"></i>
+                            {{ $k->status === 'Baru' ? __('Tindak Lanjut') : __('Pantau Perbaikan') }} <i class="bi bi-arrow-right"></i>
                         </a>
                     </div>
                 </div>
@@ -1589,8 +1726,8 @@
                     <div class="premium-pulse-success mb-3 mx-auto">
                         <i class="bi bi-shield-check text-success" style="font-size: 1.8rem;"></i>
                     </div>
-                    <h6 class="fw-extrabold text-dark mb-1">{{ __('Armada Bebas Masalah') }}</h6>
-                    <p class="text-muted mb-0" style="font-size: 0.8rem;">{{ __('Belum ada keluhan baru hari ini.') }}</p>
+                    <h6 class="fw-extrabold text-dark mb-1">{{ __('Semua Armada Bebas Masalah') }}</h6>
+                    <p class="text-muted mb-0" style="font-size: 0.8rem;">{{ __('Tidak ada keluhan aktif yang memerlukan perbaikan saat ini.') }}</p>
                 </div>
                 @endforelse
             </div>
@@ -1822,7 +1959,23 @@
 </div>
 @endif
 
-
+{{-- BLOK TANDA TANGAN RESMI (HANYA TAMPIL SAAT CETAK LAPORAN) --}}
+<div class="d-none d-print-block mt-4 pt-3" style="page-break-inside: avoid;">
+    <div class="row text-center">
+        <div class="col-6">
+            <p class="mb-1" style="font-size: 8.5pt;">Dibuat / Disiapkan Oleh,</p>
+            <div style="height: 45px;"></div>
+            <p class="fw-bold mb-0 border-top border-dark d-inline-block px-4 pt-1" style="font-size: 9pt;">{{ auth()->user()->name }}</p>
+            <p class="text-muted" style="font-size: 8pt;">{{ ucfirst(auth()->user()->role) }} Operasional</p>
+        </div>
+        <div class="col-6">
+            <p class="mb-1" style="font-size: 8.5pt;">Mengetahui & Menyetujui,</p>
+            <div style="height: 45px;"></div>
+            <p class="fw-bold mb-0 border-top border-dark d-inline-block px-4 pt-1" style="font-size: 9pt;">Manager / Kepala Bengkel</p>
+            <p class="text-muted" style="font-size: 8pt;">Direksi Armada FleetMaintenance</p>
+        </div>
+    </div>
+</div>
 
 <script type="application/json" id="dashboard-chart-data">
 {

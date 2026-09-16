@@ -11,9 +11,11 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         $users = [
-            // ===== ADMIN (2) =====
+            // ===== ADMIN =====
             ['name' => 'Admin Fleet', 'username' => 'admin_fleet', 'email' => 'admin@fleet.com', 'role' => 'admin'],
             ['name' => 'Andi Wijaya', 'username' => 'admin_andi', 'email' => 'andi.admin@fleet.com', 'role' => 'admin'],
+            ['name' => 'Siti Rahmawati', 'username' => 'siti_admin', 'email' => 'sitirahmawat083@gmail.com', 'role' => 'admin'],
+            ['name' => 'Siti Rahmawati', 'username' => 'sitirahmawati', 'email' => 'sitirahmawati083@gmail.com', 'role' => 'admin'],
 
             // ===== GURU (2) =====
             ['name' => 'Budi Utomo, S.Pd.', 'username' => 'guru_budi', 'email' => 'guru.budi@school.com', 'role' => 'guru'],

@@ -7,36 +7,46 @@ Dokumentasi ini menyajikan panduan arsitektur, daftar modul fungsional, kamus da
 ## 1. IKHTISAR SISTEM (SYSTEM OVERVIEW)
 
 *Fleet Management System* adalah platform manajemen armada terintegrasi yang dirancang untuk mengontrol seluruh siklus hidup operasional kendaraan perusahaan, mulai dari:
-1. **Manajemen Data Armada & Pajak:** Pencatatan spesifikasi kendaraan, status fisik, foto unit, pelacakan pajak tahunan, pajak 5 tahunan, dan uji KIR.
-2. **Sistem Peringatan Servis Otomatis (Smart Maintenance Alert):** Deteksi otomatis jatuh tempo servis berdasarkan jarak tempuh (kelipatan 5.000 KM) dan waktu (notifikasi H-7 atau interval 3 bulan).
-3. **Pelacakan Posisi Armada Real-time (Live GPS Tracking):** Visualisasi sebaran armada di peta interaktif (*Leaflet.js + OpenStreetMap*) dengan fitur auto-polling API koordinat GPS.
+1. **Manajemen Data Armada, Pajak & Lisensi Driver:** Pencatatan spesifikasi lengkap kendaraan, status fisik, foto unit, pelacakan pajak tahunan, pajak 5 tahunan, uji KIR, serta penugasan dan masa berlaku SIM pengemudi.
+2. **Sistem Peringatan Servis Otomatis (Smart Maintenance Alert):** Deteksi otomatis jatuh tempo servis berkala berdasarkan jarak tempuh (kelipatan 5.000 KM) dan waktu (notifikasi H-7 atau interval 3 bulan).
+3. **Pelacakan Posisi Armada Real-time & Dispatcher Rute Pengiriman (Live GPS & Trip Manifest):** Visualisasi sebaran armada di peta interaktif (*Leaflet.js + OpenStreetMap*), penugasan rute pengiriman baru, telemetri kecepatan (*km/h*), sisa jarak (*km*), estimasi waktu tiba (*ETA*), tombol konfirmasi penyelesaian antar barang (*Complete Delivery*), dan sinkronisasi GPS perangkat.
 4. **Pemeriksaan Harian (Daily Inspection Checklist):** Pengecekan 6 parameter kelaikan jalan oleh teknisi/driver yang secara otomatis menyinkronkan odometer fisik terkini ke sistem.
 5. **Manajemen Keluhan & Siklus Perbaikan (Complaint to Repair Flow):** Pelaporan kendala oleh pengemudi dilengkapi foto/video kerusakan, pelacakan persentase *progress* perbaikan, hingga pencatatan otomatis ke riwayat servis dan rekap pengeluaran bengkel.
-6. **Sistem Otorisasi Anggaran (Approval System):** Validasi berjenjang untuk pengeluaran biaya operasional berbiaya besar (> Rp 1.000.000) oleh Pimpinan/Admin.
-7. **Dukungan Multi-bahasa (Localization):** Antarmuka dwibahasa (Bahasa Indonesia & Bahasa Inggris).
+6. **Sistem Otorisasi Anggaran, Ekspor CSV & Telemetri BBM:** Validasi berjenjang untuk pengeluaran operasional berbiaya besar (> Rp 1.000.000) oleh Pimpinan/Admin, ekspor laporan pengeluaran ke CSV kompatibel Excel (UTF-8 BOM), serta modal pencatatan pengisian BBM instan dengan auto-update odometer.
+7. **Keamanan Akun & Pemulihan Kata Sandi Berbasis OTP (Security & Password Recovery):** Proteksi *rate limiting* saat login, serta alur pemulihan kata sandi menggunakan kode OTP 6 digit yang dikirimkan via notifikasi email (*15 minutes validity*).
+8. **Dukungan Multi-bahasa (Localization):** Antarmuka dwibahasa (Bahasa Indonesia & Bahasa Inggris).
 
 ---
 
 ## 2. DAFTAR MODUL UTAMA & FITUR
 
-### Modul 1: Autentikasi & Keamanan (Authentication)
-* **Tujuan:** Mengelola autentikasi login pengguna dengan proteksi sesi (*session fixation protection*), multi-role redirection, dan logout aman.
+### Modul 1: Autentikasi, Keamanan & Pemulihan Kata Sandi (Authentication & Password Reset)
+* **Tujuan:** Mengelola autentikasi login pengguna dengan proteksi sesi (*session fixation protection*), pembatasan percobaan login (*Rate Limiting*), *multi-role redirection*, dan alur pemulihan kata sandi mandiri via kode OTP 6 digit.
 * **Alur Bisnis:**
   1. Pengguna mengakses form login di `/login`.
   2. Input data diverifikasi otomatis apakah berupa alamat email atau username.
-  3. `Auth::attempt` dijalankan. Jika valid, session diregenerasi dan diarahkan ke Dashboard sesuai hak akses.
-  4. Pengguna dapat melakukan logout yang membatalkan sesi dan meregenerasi token CSRF.
+  3. Sistem membatasi percobaan gagal maksimal 5 kali dalam 60 detik (*Rate Limiting*).
+  4. `Auth::attempt` dijalankan. Jika valid, session diregenerasi dan diarahkan ke Dashboard sesuai peran (*role*).
+  5. Jika pengguna lupa kata sandi:
+     - Pengguna membuka `/forgot-password` dan memasukkan email/username.
+     - Sistem membuat kode OTP numerik 6 digit acak (berlaku 15 menit) dan mengirimkannya via email notification (`ResetPasswordOtpNotification`).
+     - Pengguna memasukkan kode OTP dan password baru di form `/reset-password/{token}`.
+     - Sistem memverifikasi kecocokan OTP dan memperbarui password pengguna dengan enkripsi Bcrypt.
 * **Controller:** [AuthController](file:///c:/xampppp/htdocs/belajar-laravel/app/Http/Controllers/AuthController.php)
-* **Model & Tabel:** [User](file:///c:/xampppp/htdocs/belajar-laravel/app/Models/User.php) (`users`)
+* **Model & Tabel:** [User](file:///c:/xampppp/htdocs/belajar-laravel/app/Models/User.php) (`users`), `password_reset_tokens`
 * **Endpoint Rute:**
   * `GET /login` (Name: `login`)
   * `POST /login`
   * `POST /logout` (Name: `logout`)
+  * `GET /forgot-password` (Name: `password.request`)
+  * `POST /forgot-password` (Name: `password.email`)
+  * `GET /reset-password/{token}` (Name: `password.reset`)
+  * `POST /reset-password` (Name: `password.update`)
 
 ---
 
 ### Modul 2: Dashboard Eksekutif & Monitoring Operasional
-* **Tujuan:** Menampilkan visualisasi analitik real-time, status armada, jatuh tempo dokumen kendaraan, ringkasan pengeluaran, leaderboard teknisi, dan aksi cepat berdasarkan peran pengguna.
+* **Tujuan:** Menampilkan visualisasi analitik real-time, status kesiapan armada, jatuh tempo dokumen kendaraan, ringkasan pengeluaran, leaderboard teknisi, dan aksi cepat berdasarkan peran pengguna.
 * **Alur Bisnis:**
   1. Pengguna masuk ke `/dashboard`.
   2. Sistem membaca `$user->role`:
@@ -50,17 +60,19 @@ Dokumentasi ini menyajikan panduan arsitektur, daftar modul fungsional, kamus da
 
 ---
 
-### Modul 3: Pelacakan Armada Real-Time (Live GPS Fleet Tracking)
-* **Tujuan:** Memvisualisasikan posisi armada di peta geografis digital interaktif (*Leaflet.js*), memantau status gerak/servis, dan memperbarui koordinat posisi kendaraan secara dinamis.
+### Modul 3: Pelacakan Armada Real-Time & Dispatcher Rute Pengiriman (Live GPS Fleet Tracking)
+* **Tujuan:** Memvisualisasikan posisi armada di peta geografis digital interaktif (*Leaflet.js*), memantau telemetri perjalanan (kecepatan, sisa jarak, ETA), menugaskan rute perjalanan logistik baru, serta menyelesaikan siklus pengantaran.
 * **Alur Bisnis:**
   1. Pengguna membuka menu Pelacakan (`/tracking`).
-  2. Sistem memuat seluruh armada dengan koordinat latitude & longitude aktif. Jika belum ada koordinat GPS riil, sistem memberikan titik pusat pool secara terdistribusi.
+  2. Sistem memuat seluruh armada dengan koordinat latitude & longitude aktif, lokasi asal, lokasi tujuan, dan status perjalanan.
   3. Peta menampilkan marker kustom berbasis tipe kendaraan (Truk Boks, Pick Up, Motor, Mobil) dan warna status:
-     * 🟢 **Hijau (Ready):** Kendaraan Siap Pakai dan kondisi dokumen aman.
-     * 🟡 **Kuning (Servis/Perhatian):** Mendekati jatuh tempo KIR/Servis atau sedang dalam perbaikan ringan.
+     * 🟢 **Hijau (Ready / On Trip):** Kendaraan Siap Pakai dan kondisi dokumen aman.
+     * 🟡 **Kuning (Servis / Perhatian):** Mendekati jatuh tempo KIR/Servis atau sedang dalam perbaikan.
      * 🔴 **Merah (Peringatan):** Melewati jatuh tempo KIR/Servis atau keluhan mendesak.
-  4. Pengemudi atau Admin dapat memperbarui koordinat GPS secara instan melalui API GPS bawaan browser/perangkat (`/tracking/{vehicle}/location`).
-  5. JavaScript melakukan polling otomatis ke `/tracking/api/vehicles` untuk menyegarkan posisi marker tanpa *reload* halaman.
+  4. **Penugasan Rute (Trip Dispatcher):** Admin/Teknisi dapat menugaskan lokasi tujuan baru (`lokasi_tujuan`, `tujuan_latitude`, `tujuan_longitude`, `kecepatan_kmh`, `catatan_perjalanan`). Sistem secara otomatis mengkalkulasi sisa jarak darat (formula Haversine berbobot rute darat 1.25x) dan estimasi jam tiba (*ETA*).
+  5. **Selesaikan Pengantaran (Complete Trip):** Tombol *Selesaikan Pengantaran* memindahkan posisi armada langsung ke titik koordinat tujuan, menyetel status perjalanan menjadi `Selesai Mengantar`, kecepatan `0 km/h`, dan mempersiapkan armada untuk rute berikutnya.
+  6. **Pembaruan Koordinat GPS:** Pengemudi atau Admin dapat menyinkronkan koordinat GPS instan melalui API browser/perangkat (`/tracking/{vehicle}/location`).
+  7. JavaScript melakukan polling otomatis ke `/tracking/api/vehicles` untuk menyegarkan posisi marker dan kartu telemetri tanpa *reload* halaman.
 * **Controller:** [TrackingController](file:///c:/xampppp/htdocs/belajar-laravel/app/Http/Controllers/TrackingController.php)
 * **Model:** [Vehicle](file:///c:/xampppp/htdocs/belajar-laravel/app/Models/Vehicle.php)
 * **Endpoint Rute:**
@@ -68,20 +80,22 @@ Dokumentasi ini menyajikan panduan arsitektur, daftar modul fungsional, kamus da
   * `GET /tracking/api/vehicles` (Name: `tracking.api`)
   * `POST /tracking/{vehicle}/location` (Name: `tracking.updateLocation`)
   * `PUT /vehicles/{vehicle}/location` (Name: `vehicles.updateLocation`)
+  * `POST /tracking/{vehicle}/trip` (Name: `tracking.assignTrip`)
+  * `POST /tracking/{vehicle}/complete-trip` (Name: `tracking.completeTrip`)
 
 ---
 
-### Modul 4: Data Master Kendaraan (Vehicles Management)
-* **Tujuan:** Mengelola inventaris aset kendaraan, spesifikasi teknis, dokumen legalitas (KIR, Pajak Tahunan, Pajak 5 Tahunan), foto kendaraan, dan kalkulasi otomatis status pemeliharaan.
+### Modul 4: Data Master Kendaraan & Penugasan Driver (Vehicles Management)
+* **Tujuan:** Mengelola inventaris aset kendaraan, spesifikasi teknis, dokumen legalitas (KIR, Pajak Tahunan, Pajak 5 Tahunan), foto kendaraan, relasi penugasan pengemudi (`driver_id`), serta pembaruan odometer instan.
 * **Alur Bisnis:**
-  1. **Admin** menginput data kendaraan (Merk, Tipe, Plat Nomor, Tahun, Odometer Awal, Lokasi Pool, Supir Utama, Pajak, Jatuh Tempo KIR, dan Foto Unit).
+  1. **Admin** menginput data kendaraan (Merk, Tipe, Plat Nomor, Tahun, Odometer Awal, Lokasi Pool, Supir Utama / Akun Driver Terdaftar, Pajak, Jatuh Tempo KIR, dan Foto Unit).
   2. Sistem menghitung secara otomatis:
      * **Status KIR:** Hijau (>30 hari), Kuning ($\le$ 30 hari), Merah (lewat jatuh tempo).
      * **KM Menuju Servis:** Dihitung dari `(Odometer Saat Servis Terakhir + 5000 KM) - Odometer Terkini`.
      * **Status Servis Berkala:** Peringatan H-7 sebelum estimasi waktu 3 bulan atau sisa $\le$ 500 KM.
-  3. **Admin & Teknisi** dapat memperbarui status operasional kendaraan (`Siap Pakai`, `Sedang Diservis`, `Selesai`) lewat aksi cepat.
+  3. **Aksi Cepat Odometer & Status:** Admin, Teknisi, dan Driver dapat memperbarui status armada (`Siap Pakai`, `Sedang Diservis`, `Selesai`) atau memperbarui angka odometer fisik secara cepat lewat endpoint `/vehicles/{vehicle}/odometer`.
 * **Controller:** [VehicleController](file:///c:/xampppp/htdocs/belajar-laravel/app/Http/Controllers/VehicleController.php)
-* **Model:** [Vehicle](file:///c:/xampppp/htdocs/belajar-laravel/app/Models/Vehicle.php)
+* **Model:** [Vehicle](file:///c:/xampppp/htdocs/belajar-laravel/app/Models/Vehicle.php), [User](file:///c:/xampppp/htdocs/belajar-laravel/app/Models/User.php)
 * **Endpoint Rute:**
   * `GET /vehicles` (Name: `vehicles.index`)
   * `GET /vehicles/{vehicle}` (Name: `vehicles.show`)
@@ -90,7 +104,8 @@ Dokumentasi ini menyajikan panduan arsitektur, daftar modul fungsional, kamus da
   * `GET /vehicles/{vehicle}/edit` (Name: `vehicles.edit`) - *Admin/Superadmin*
   * `PUT /vehicles/{vehicle}` (Name: `vehicles.update`) - *Admin/Superadmin*
   * `DELETE /vehicles/{vehicle}` (Name: `vehicles.destroy`) - *Admin/Superadmin*
-  * `PUT /vehicles/{vehicle}/status` (Name: `vehicles.updateStatus`) - *Admin/Teknisi*
+  * `PUT /vehicles/{vehicle}/status` (Name: `vehicles.updateStatus`) - *Admin/Teknisi/Driver*
+  * `PUT /vehicles/{vehicle}/odometer` (Name: `vehicles.updateOdometer`) - *Admin/Teknisi/Driver*
   * `GET /vehicles/{vehicle}/read-notification` (Name: `vehicles.readNotification`)
 
 ---
@@ -105,33 +120,39 @@ Dokumentasi ini menyajikan panduan arsitektur, daftar modul fungsional, kamus da
      * Ban & Rem (`OK` / `Not OK`)
      * Lampu & Klakson (`OK` / `Not OK`)
      * Kebersihan Kendaraan (`OK` / `Not OK`)
-  2. Nilai odometer terkini yang diinput pada form checklist akan otomatis memperbarui data odometer kendaraan di sistem.
+  2. Nilai odometer terkini yang diinput pada form checklist akan otomatis menyinkronkan data odometer kendaraan di sistem.
 * **Controller:** [DailyChecklistController](file:///c:/xampppp/htdocs/belajar-laravel/app/Http/Controllers/DailyChecklistController.php)
 * **Model:** [DailyChecklist](file:///c:/xampppp/htdocs/belajar-laravel/app/Models/DailyChecklist.php), [Vehicle](file:///c:/xampppp/htdocs/belajar-laravel/app/Models/Vehicle.php)
 * **Endpoint Rute:**
   * `GET /checklist` (Name: `checklist.index`)
+  * `GET /checklist/{checklist}` (Name: `checklist.show`)
   * `GET /checklist-create` (Name: `checklist.create`)
   * `POST /checklist` (Name: `checklist.store`)
-  * `GET /checklist/{checklist}` (Name: `checklist.show`)
   * `PUT /checklist/{checklist}/odometer` (Name: `checklist.updateOdometer`)
   * `DELETE /checklist/{checklist}` (Name: `checklist.destroy`) - *Admin/Teknisi*
 
 ---
 
-### Modul 6: Rekap Biaya Operasional & Approval Anggaran (Expenses)
-* **Tujuan:** Mencatat seluruh transaksi biaya kendaraan (BBM, Tol, Bengkel, Pajak, Parkir, Lainnya) dengan mekanisme validasi dan otorisasi anggaran berjenjang.
-* **Alur Bisnis:**
-  1. Admin/Teknisi mencatat pengeluaran operasional.
-  2. **Aturan Approval Otomatis:**
-     * Pengeluaran normal $\le$ Rp 1.000.000 langsung berstatus `Disetujui` (atau default antrean).
+### Modul 6: Rekap Biaya Operasional, Approval Anggaran, Ekspor CSV & Quick BBM (Expenses)
+* **Tujuan:** Mencatat seluruh transaksi biaya kendaraan (BBM, Tol, Bengkel, Parkir, Pajak, Sparepart, Lainnya) dengan validasi anggaran berjenjang, ekspor laporan ke format CSV Excel, serta modal pencatatan BBM kilat.
+* **Alur Bisnis & Fitur Utama:**
+  1. **Pencatatan Biaya:** Admin/Teknisi mencatat pengeluaran operasional per kendaraan dengan detail tanggal, kategori biaya, nominal, liter BBM, dan odometer pengisian.
+  2. **Aturan Approval Anggaran Berjenjang:**
+     * Pengeluaran $\le$ Rp 1.000.000 otomatis berstatus `Disetujui`.
      * Pengeluaran besar > Rp 1.000.000 otomatis berstatus `Menunggu Persetujuan`.
-  3. **Super Admin, Admin, dan Pimpinan** dapat meninjau, menyetujui (`Disetujui`), atau menolak (`Ditolak`) pengeluaran melalui rute `/expenses/{expense}/approve`.
+     * **Super Admin, Admin, dan Pimpinan** dapat meninjau, menyetujui (`Disetujui`), atau menolak (`Ditolak`) pengeluaran melalui rute `/expenses/{expense}/approve`.
+  3. **Ekspor Data Laporan (Export CSV):** Menyediakan unduhan laporan berformat CSV yang kompatibel dengan Microsoft Excel (menggunakan *UTF-8 Byte Order Mark*).
+  4. **Pencatatan Cepat BBM (Quick BBM Modal):** Form modal interaktif yang mencatat pengeluaran BBM (`POST /expenses/quick-bbm`) sekaligus secara otomatis memperbarui angka odometer master kendaraan.
 * **Controller:** [ExpenseController](file:///c:/xampppp/htdocs/belajar-laravel/app/Http/Controllers/ExpenseController.php)
 * **Model:** [Expense](file:///c:/xampppp/htdocs/belajar-laravel/app/Models/Expense.php), [Vehicle](file:///c:/xampppp/htdocs/belajar-laravel/app/Models/Vehicle.php)
 * **Endpoint Rute:**
   * `GET /expenses` (Name: `expenses.index`)
+  * `GET /expenses/export` (Name: `expenses.export`)
   * `GET /expenses-create` (Name: `expenses.create`)
   * `POST /expenses` (Name: `expenses.store`)
+  * `POST /expenses/quick-bbm` (Name: `expenses.quickBbm`)
+  * `GET /expenses/{expense}/edit` (Name: `expenses.edit`)
+  * `PUT /expenses/{expense}` (Name: `expenses.update`)
   * `PUT /expenses/{expense}/approve` (Name: `expenses.approve`) - *Superadmin/Admin/Pimpinan*
   * `DELETE /expenses/{expense}` (Name: `expenses.destroy`) - *Superadmin/Admin/Teknisi*
 
@@ -142,7 +163,7 @@ Dokumentasi ini menyajikan panduan arsitektur, daftar modul fungsional, kamus da
 * **Alur Bisnis:**
   1. **Pengemudi (Driver/User)** mengirimkan formulir laporan keluhan (status awal: `Baru`), melampirkan foto/video kerusakan.
   2. **Teknisi** menerima laporan dan mengubah status menjadi `Diproses` (status kendaraan otomatis beralih ke `Sedang Diservis`, timestamp `diterima_at` / `diperbaiki_at` tercatat).
-  3. Teknisi memperbarui persentase *progress* perbaikan (misal: 25%, 50%, 75%, 100%).
+  3. Teknisi memperbarui persentase *progress* perbaikan (0% - 100%).
   4. Ketika perbaikan selesai:
      * Status keluhan diubah menjadi `Selesai` (`selesai_at` tercatat).
      * Status kendaraan otomatis dipulihkan menjadi `Siap Pakai`.
@@ -153,7 +174,7 @@ Dokumentasi ini menyajikan panduan arsitektur, daftar modul fungsional, kamus da
   * `GET /complaints` (Name: `complaints.index`)
   * `GET /complaints-create` (Name: `complaints.create`)
   * `POST /complaints` (Name: `complaints.store`)
-  * `PUT /complaints/{complaint}/status` (Name: `complaints.updateStatus`) - *Superadmin/Teknisi*
+  * `PUT /complaints/{complaint}/status` (Name: `complaints.updateStatus`) - *Superadmin/Admin/Teknisi*
 
 ---
 
@@ -174,11 +195,11 @@ Dokumentasi ini menyajikan panduan arsitektur, daftar modul fungsional, kamus da
 
 ---
 
-### Modul 9: Manajemen Pengguna & Profil Akun (Users & Profile)
-* **Tujuan:** Mengelola akun sistem seluruh karyawan (Role: Super Admin, Admin, Teknisi, Pimpinan, Driver) serta memungkinkan pengguna memperbarui profil dan foto avatar mandiri.
+### Modul 9: Manajemen Pengguna, Profil & Lisensi Pengemudi (Users & Driver Licensing)
+* **Tujuan:** Mengelola akun pengguna sistem armada (Super Admin, Admin, Teknisi, Pimpinan, Driver), pencatatan nomor kontak dan lisensi SIM pengemudi, serta pembaruan profil mandiri.
 * **Alur Bisnis:**
-  1. **Super Admin / Admin** dapat menambah, mengedit, melihat, dan menghapus akun pengguna serta menetapkan *role*.
-  2. Seluruh pengguna terautentikasi dapat membuka modal/halaman profil untuk mengganti nama, email, password, dan mengunggah foto avatar profil.
+  1. **Super Admin / Admin** dapat menambah, mengedit, melihat, dan menghapus akun pengguna, menetapkan *role*, serta mencatat data lisensi SIM driver (`no_telepon`, `nomor_sim`, `jenis_sim`, `masa_berlaku_sim`).
+  2. Seluruh pengguna terautentikasi dapat memperbarui profil nama, email, password, nomor telepon, data SIM, dan mengunggah foto avatar profil.
 * **Controller:** [UserController](file:///c:/xampppp/htdocs/belajar-laravel/app/Http/Controllers/UserController.php)
 * **Model:** [User](file:///c:/xampppp/htdocs/belajar-laravel/app/Models/User.php)
 * **Endpoint Rute:**
@@ -206,18 +227,19 @@ Sistem menggunakan 5 peran (*roles*) dengan pembagian wewenang yang tegas:
 | Modul / Fitur | Super Admin | Admin Fleet | Teknisi | Pimpinan (Manager) | Driver (User) |
 | :--- | :---: | :---: | :---: | :---: | :---: |
 | **Dashboard Analytics** | ✅ Lengkap | ✅ Lengkap | ✅ Operasional | ✅ Finansial & KPI | ✅ Armada Saya |
-| **Live GPS Tracking** | ✅ Akses | ✅ Akses | ✅ Akses | ✅ Akses | ✅ Akses |
+| **Live GPS Tracking & Dispatcher** | ✅ Akses Penuh | ✅ Akses Penuh | ✅ Akses | ✅ Akses | ✅ Akses / Unit Sendiri |
+| **Penugasan Rute & Selesai Antar** | ✅ Ya | ✅ Ya | ✅ Ya | ❌ Tidak | ✅ Ya |
 | **Data Kendaraan (Lihat)** | ✅ Ya | ✅ Ya | ✅ Ya | ✅ Ya | ✅ Ya |
 | **Data Kendaraan (Tambah/Edit/Hapus)**| ✅ Ya | ✅ Ya | ❌ Tidak | ❌ Tidak | ❌ Tidak |
-| **Ubah Status Armada Cepat** | ✅ Ya | ✅ Ya | ✅ Ya | ❌ Tidak | ❌ Tidak |
+| **Ubah Status & Odometer Cepat** | ✅ Ya | ✅ Ya | ✅ Ya | ❌ Tidak | ✅ Ya |
 | **Input Daily Checklist** | ✅ Ya | ✅ Ya | ✅ Ya | ❌ Tidak | ✅ Ya |
 | **Hapus Daily Checklist** | ✅ Ya | ✅ Ya | ✅ Ya | ❌ Tidak | ❌ Tidak |
-| **Rekap Biaya (Lihat/Tambah/Hapus)** | ✅ Ya | ✅ Ya | ✅ Tambah | ✅ Lihat | ❌ Tidak |
+| **Rekap Biaya (Lihat/Tambah/Export)** | ✅ Ya | ✅ Ya | ✅ Tambah/Export | ✅ Lihat/Export | ❌ Tidak |
 | **Approval Anggaran Biaya Besar** | ✅ Ya | ✅ Ya | ❌ Tidak | ✅ Ya | ❌ Tidak |
 | **Buat Laporan Keluhan** | ✅ Ya | ✅ Ya | ✅ Ya | ✅ Ya | ✅ Ya |
-| **Update Status & Progress Keluhan** | ✅ Ya | ❌ Tidak | ✅ Ya | ❌ Tidak | ❌ Tidak |
+| **Update Status & Progress Keluhan** | ✅ Ya | ✅ Ya | ✅ Ya | ❌ Tidak | ❌ Tidak |
 | **Kelola Riwayat Servis (CRUD)** | ✅ Ya | ✅ Ya | ✅ Ya | ❌ Tidak | ❌ Tidak |
-| **Kelola Akun Pengguna (CRUD)** | ✅ Ya | ✅ Ya | ❌ Tidak | ❌ Tidak | ❌ Tidak |
+| **Kelola Akun Pengguna & SIM (CRUD)** | ✅ Ya | ✅ Ya | ❌ Tidak | ❌ Tidak | ❌ Tidak |
 | **Update Profil & Avatar Mandiri** | ✅ Ya | ✅ Ya | ✅ Ya | ✅ Ya | ✅ Ya |
 
 ---
@@ -231,11 +253,15 @@ Sistem menggunakan 5 peran (*roles*) dengan pembagian wewenang yang tegas:
 | `name` | VARCHAR(255) | Nama Lengkap |
 | `username` | VARCHAR(255) (Unique) | Username Login |
 | `email` | VARCHAR(255) (Unique) | Alamat Email |
+| `no_telepon` | VARCHAR(30) (Nullable) | Nomor Telepon / WhatsApp |
+| `nomor_sim` | VARCHAR(50) (Nullable) | Nomor Surat Izin Mengemudi (SIM) |
+| `jenis_sim` | VARCHAR(20) (Nullable) | Kategori SIM (`SIM A`, `SIM B1`, `SIM B2`, `SIM C`, `Lainnya`) |
+| `masa_berlaku_sim` | DATE (Nullable) | Tanggal Batas Akhir Masa Berlaku SIM |
 | `password` | VARCHAR(255) | Hash Sandi (Bcrypt) |
 | `role` | ENUM / VARCHAR | `superadmin`, `admin`, `teknisi`, `pimpinan`, `user` |
-| `kelas` | VARCHAR(255) (Nullable) | Jalur Path File Avatar Profil |
-| `nis` | VARCHAR(255) (Nullable) | Nomor Induk / SIM Karyawan |
-| `remember_token` | VARCHAR(100) (Nullable) | Token Remember Me |
+| `kelas` | VARCHAR(255) (Nullable) | Jalur Path File Avatar Profil (`uploads/avatars/...`) |
+| `nis` | VARCHAR(255) (Nullable) | Nomor Induk / ID Karyawan |
+| `remember_token` | VARCHAR(100) (Nullable) | Token Sesi Remember Me |
 | `created_at`, `updated_at` | TIMESTAMP | Waktu Dibuat & Diperbarui |
 
 ---
@@ -250,16 +276,26 @@ Sistem menggunakan 5 peran (*roles*) dengan pembagian wewenang yang tegas:
 | `tahun` | INT | Tahun Pembuatan Unit |
 | `plat_nomor` | VARCHAR(255) (Unique) | Nomor Polisi / Plat Kendaraan |
 | `lokasi_pool` | VARCHAR(255) (Nullable) | Nama Lokasi Pool / Depo Parkir |
+| `lokasi_asal` | VARCHAR(255) (Nullable) | Titik Asal Perjalanan / Pengiriman |
+| `lokasi_tujuan` | VARCHAR(255) (Nullable) | Titik Destinasi Pengantaran Barang |
+| `status_perjalanan` | VARCHAR(255) | `Standby di Pool`, `Dalam Perjalanan ke Tujuan`, `Proses Bongkar Muat`, `Selesai Mengantar` |
+| `kecepatan_kmh` | INT (Default: 0) | Kecepatan Bergerak Armada Saat Ini (km/jam) |
+| `estimasi_tiba` | DATETIME (Nullable) | Waktu Estimasi Tiba di Lokasi Tujuan (ETA) |
+| `jarak_sisa_km` | DECIMAL(8,2) (Nullable) | Sisa Jarak Tempuh Menuju Titik Tujuan (KM) |
+| `catatan_perjalanan` | TEXT (Nullable) | Catatan Manifest / Muatan Logistik Pengiriman |
+| `driver_id` | BIGINT (FK $\rightarrow$ `users.id`, Nullable) | Relasi ke Akun Pengemudi yang Ditugaskan |
 | `supir_utama` | VARCHAR(255) (Nullable) | Nama Driver Penanggung Jawab |
-| `odometer_awal` | INT | Angka Kilometer Awal |
+| `odometer_awal` | INT | Angka Kilometer Master / Terkini |
 | `pajak_tahunan` | DECIMAL(15,2) (Nullable) | Biaya Pajak Tahunan |
 | `pajak_5_tahunan`| DECIMAL(15,2) (Nullable) | Biaya Pajak Ganti Plat (5 Tahunan) |
 | `jatuh_tempo_kir` | DATE (Nullable) | Tanggal Batas Akhir Uji Berkala KIR |
 | `tanggal_servis_manual` | DATE (Nullable) | Override Tanggal Jadwal Servis Mendatang |
 | `status` | VARCHAR(255) | `Siap Pakai`, `Sedang Diservis`, `Selesai` |
 | `foto` | VARCHAR(255) (Nullable) | Path File Foto Kendaraan di Storage |
-| `latitude` | DECIMAL(10,8) (Nullable) | Titik Koordinat Garis Lintang GPS |
-| `longitude` | DECIMAL(11,8) (Nullable) | Titik Koordinat Garis Bujur GPS |
+| `latitude` | DECIMAL(10,7) (Nullable) | Titik Koordinat Garis Lintang GPS Terkini |
+| `longitude` | DECIMAL(11,7) (Nullable) | Titik Koordinat Garis Bujur GPS Terkini |
+| `tujuan_latitude` | DECIMAL(10,7) (Nullable) | Titik Koordinat Latitude Alamat Tujuan |
+| `tujuan_longitude`| DECIMAL(11,7) (Nullable) | Titik Koordinat Longitude Alamat Tujuan |
 | `created_at`, `updated_at` | TIMESTAMP | Waktu Dibuat & Diperbarui |
 
 ---
@@ -289,8 +325,10 @@ Sistem menggunakan 5 peran (*roles*) dengan pembagian wewenang yang tegas:
 | `id` | BIGINT (PK, Auto Increment) | ID Unik Pengeluaran |
 | `vehicle_id` | BIGINT (FK $\rightarrow$ `vehicles.id`) | Relasi ke Kendaraan |
 | `tanggal` | DATE | Tanggal Transaksi |
-| `jenis_pengeluaran` | VARCHAR(255) | `BBM`, `Tol`, `Bengkel`, `Parkir`, `Pajak`, `Lainnya` |
+| `jenis_pengeluaran` | VARCHAR(255) | `BBM`, `Tol`, `Bengkel`, `Parkir`, `Pajak`, `Sparepart`, `Lainnya` |
 | `jumlah_biaya` | DECIMAL(15,2) | Nominal Biaya (Rupiah) |
+| `liter_bbm` | DECIMAL(8,2) (Nullable) | Jumlah Liter Pengisian BBM |
+| `odometer_pengisian`| INT (Nullable) | Angka Odometer saat Pengisian BBM |
 | `keterangan` | VARCHAR(255) (Nullable) | Deskripsi Rincian Pengeluaran |
 | `status_approval` | VARCHAR(255) | `Menunggu Persetujuan`, `Disetujui`, `Ditolak` |
 | `catatan_admin` | VARCHAR(255) (Nullable) | Catatan Alasan Persetujuan/Penolakan |
@@ -333,6 +371,15 @@ Sistem menggunakan 5 peran (*roles*) dengan pembagian wewenang yang tegas:
 
 ---
 
+### 7. Tabel `password_reset_tokens`
+| Kolom | Tipe Data | Keterangan |
+| :--- | :--- | :--- |
+| `email` | VARCHAR(255) (PK) | Alamat Email Pemilik Akun |
+| `token` | VARCHAR(255) | Hash Kode OTP 6 Digit |
+| `created_at` | TIMESTAMP (Nullable) | Waktu Pembuatan Kode OTP |
+
+---
+
 ## 5. DIAGRAM ARSITEKTUR & PROSES BISNIS
 
 ### A. Entity Relationship Diagram (ERD)
@@ -341,6 +388,7 @@ Sistem menggunakan 5 peran (*roles*) dengan pembagian wewenang yang tegas:
 erDiagram
     users ||--o{ complaints : "melaporkan"
     users ||--o{ vehicle_histories : "mengerjakan"
+    users ||--o{ vehicles : "ditugaskan mengemudi"
     vehicles ||--o{ daily_checklists : "diperiksa berkala"
     vehicles ||--o{ expenses : "memakan biaya"
     vehicles ||--o{ complaints : "memiliki keluhan"
@@ -351,10 +399,14 @@ erDiagram
         string name
         string username UK
         string email UK
+        string no_telepon
+        string nomor_sim
+        string jenis_sim
+        date masa_berlaku_sim
         string password
         string role
         string kelas "Path Avatar"
-        string nis "Nomor SIM/ID"
+        string nis "Nomor ID"
     }
 
     vehicles {
@@ -365,6 +417,14 @@ erDiagram
         int tahun
         string plat_nomor UK
         string lokasi_pool
+        string lokasi_asal
+        string lokasi_tujuan
+        string status_perjalanan
+        int kecepatan_kmh
+        datetime estimasi_tiba
+        decimal jarak_sisa_km
+        text catatan_perjalanan
+        bigint driver_id FK
         string supir_utama
         int odometer_awal
         decimal pajak_tahunan
@@ -375,6 +435,8 @@ erDiagram
         string foto
         decimal latitude
         decimal longitude
+        decimal tujuan_latitude
+        decimal tujuan_longitude
     }
 
     daily_checklists {
@@ -398,6 +460,8 @@ erDiagram
         date tanggal
         string jenis_pengeluaran
         decimal jumlah_biaya
+        decimal liter_bbm
+        int odometer_pengisian
         string keterangan
         string status_approval
         string catatan_admin
@@ -465,30 +529,56 @@ sequenceDiagram
 
 ---
 
-### C. Diagram Arsitektur Aplikasi (Component Architecture)
+### C. Sequence Diagram: Pemulihan Sandi Mandiri (OTP Password Reset Flow)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as Pengguna / Driver
+    participant AC as AuthController
+    participant DB as PasswordResetTokens Table
+    participant Mail as Mailer / Notification
+    participant US as User Model
+
+    User->>AC: 1. Input Email / Username di /forgot-password
+    AC->>AC: Generate 6-Digit OTP (cth: 582914)
+    AC->>DB: Simpan Hashed OTP + Timestamp (Masa Berlaku: 15 Menit)
+    AC->>Mail: Kirim Email ResetPasswordOtpNotification
+    Mail-->>User: 2. Pengguna Menerima Kode OTP di Inbox/Spam
+    User->>AC: 3. Input Kode OTP & Password Baru di /reset-password
+    AC->>DB: Validasi Kecocokan OTP & Cek Kedaluwarsa (<15 mnt)
+    AC->>US: Update Password Terenkripsi (Hash::make)
+    AC->>DB: Hapus Token yang Sudah Digunakan
+    AC-->>User: 4. Notifikasi Berhasil & Redirect ke /login
+```
+
+---
+
+### D. Diagram Arsitektur Aplikasi (Component Architecture)
 
 ```mermaid
 graph TD
-    ClientBrowser[Web Browser / Mobile Device] -->|HTTP/HTTPS Request| WebServer[Web Server / Nginx / Apache]
+    ClientBrowser["Web Browser / Mobile Device"] -->|HTTP / HTTPS Request| WebServer["Web Server / Nginx / Apache"]
     
     subgraph Laravel Core Application
-        WebServer --> Routing[routes/web.php & auth.php]
-        Routing --> RoleMiddleware{Middleware: auth & role}
+        WebServer --> Routing["routes/web.php & auth.php"]
+        Routing --> RoleMiddleware["Middleware: auth & role:superadmin,admin,teknisi,pimpinan,user"]
         
-        RoleMiddleware -->|Authorized| Controllers[Controllers Layer]
+        RoleMiddleware -->|Authorized| Controllers["Controllers Layer (Vehicle, Tracking, Expense, Complaint, User, Auth)"]
         
-        Controllers -->|Data Logic| Models[Eloquent Models Layer]
-        Controllers -->|Render View| Views[Blade Templates + Bootstrap 5 + Leaflet JS]
+        Controllers -->|Data Logic| Models["Eloquent Models Layer (Vehicle, User, Expense, Complaint, Checklist, History)"]
+        Controllers -->|Render View| Views["Blade Templates + Bootstrap 5 + Leaflet JS (Interactive Maps)"]
         
-        Models --> QueryBuilder[Query Builder & Eloquent ORM]
+        Models --> QueryBuilder["Query Builder & Eloquent ORM"]
     end
 
     subgraph Data & Storage Persistence
-        QueryBuilder --> MySQL[(MySQL Database)]
-        Controllers --> StorageDisk[Local Storage / Public Uploads]
+        QueryBuilder --> MySQL[("MySQL Database (Fleet DB)")]
+        Controllers --> StorageDisk["Local Storage / Public Uploads (Foto Kendaraan, Bukti Rusak, Avatar)"]
+        Controllers --> MailService["Mail Service / SMTP (Reset Password OTP)"]
     end
 
-    Views -->|Response HTML/JSON| ClientBrowser
+    Views -->|Response HTML / JSON| ClientBrowser
 ```
 
 ---
@@ -501,49 +591,60 @@ graph TD
 | `GET` | `/login` | `login` | `guest` | `AuthController@showLoginForm` | Menampilkan Form Login |
 | `POST` | `/login` | - | `guest` | `AuthController@login` | Memproses Autentikasi Login |
 | `POST` | `/logout` | `logout` | `auth` | `AuthController@logout` | Mengakhiri Sesi Pengguna |
-| `GET` | `/set-locale/{locale}` | `set-locale` | `web` | Closure | Mengubah Bahasa (ID/EN) |
-| `GET` | `/dashboard` | `dashboard` | `auth` | `DashboardController@index` | Dashboard Utama Sistem |
-| `GET` | `/tracking` | `tracking.index` | `auth` | `TrackingController@index` | Peta Pelacakan Armada GPS |
-| `GET` | `/tracking/api/vehicles` | `tracking.api` | `auth` | `TrackingController@apiVehicles` | API JSON Koordinat Armada |
-| `POST` | `/tracking/{vehicle}/location`| `tracking.updateLocation` | `auth` | `TrackingController@updateLocation`| Update Koordinat GPS Kendaraan |
+| `GET` | `/forgot-password` | `password.request` | `guest` | `AuthController@showLinkRequestForm` | Form Permintaan OTP Reset Sandi |
+| `POST` | `/forgot-password` | `password.email` | `guest` | `AuthController@sendResetLinkEmail` | Kirim Kode OTP 6-Digit ke Email |
+| `GET` | `/reset-password/{token}` | `password.reset` | `guest` | `AuthController@showResetForm` | Form Input OTP & Sandi Baru |
+| `POST` | `/reset-password` | `password.update` | `guest` | `AuthController@resetPassword` | Proses Verifikasi OTP & Update Sandi |
+| `GET` | `/set-locale/{locale}` | `set-locale` | `web` | Closure | Mengubah Bahasa Sistem (ID/EN) |
+| `GET` | `/dashboard` | `dashboard` | `auth` | `DashboardController@index` | Dashboard Utama Sistem Armada |
+| `GET` | `/tracking` | `tracking.index` | `auth` | `TrackingController@index` | Peta Pelacakan GPS & Telemetri Armada |
+| `GET` | `/tracking/api/vehicles` | `tracking.api` | `auth` | `TrackingController@apiVehicles` | API JSON Polling Koordinat & Rute |
+| `POST` | `/tracking/{vehicle}/location`| `tracking.updateLocation` | `auth` | `TrackingController@updateLocation`| Update Koordinat GPS dari HP/Browser |
 | `PUT` | `/vehicles/{vehicle}/location` | `vehicles.updateLocation` | `auth` | `TrackingController@updateLocation`| Update Koordinat GPS (Alias) |
-| `GET` | `/vehicles` | `vehicles.index` | `auth` | `VehicleController@index` | Daftar Master Armada |
+| `POST` | `/tracking/{vehicle}/trip` | `tracking.assignTrip` | `auth` | `TrackingController@assignTrip` | Penugasan Rute & Tujuan Pengiriman Baru |
+| `POST` | `/tracking/{vehicle}/complete-trip` | `tracking.completeTrip` | `auth` | `TrackingController@completeTrip` | Tandai Selesai Pengantaran Barang |
+| `GET` | `/vehicles` | `vehicles.index` | `auth` | `VehicleController@index` | Daftar Master Armada Kendaraan |
 | `GET` | `/vehicles/{vehicle}` | `vehicles.show` | `auth` | `VehicleController@show` | Detail Informasi & Timeline Armada |
 | `GET` | `/vehicles/{vehicle}/read-notification` | `vehicles.readNotification` | `auth` | `VehicleController@readNotification` | Tandai Notifikasi Servis Dibaca |
-| `PUT` | `/vehicles/{vehicle}/status` | `vehicles.updateStatus` | `auth, role:superadmin,admin,teknisi` | `VehicleController@updateStatus` | Ubah Cepat Status Kendaraan |
+| `PUT` | `/vehicles/{vehicle}/status` | `vehicles.updateStatus` | `auth, role:superadmin,admin,teknisi,user` | `VehicleController@updateStatus` | Ubah Cepat Status Kendaraan |
+| `PUT` | `/vehicles/{vehicle}/odometer` | `vehicles.updateOdometer` | `auth, role:superadmin,admin,teknisi,user` | `VehicleController@updateOdometer` | Perbarui Angka Odometer Master Armada |
 | `GET` | `/vehicles-create` | `vehicles.create` | `auth, role:superadmin,admin` | `VehicleController@create` | Form Tambah Armada Baru |
 | `POST` | `/vehicles` | `vehicles.store` | `auth, role:superadmin,admin` | `VehicleController@store` | Simpan Data Armada Baru |
 | `GET` | `/vehicles/{vehicle}/edit` | `vehicles.edit` | `auth, role:superadmin,admin` | `VehicleController@edit` | Form Edit Data Armada |
 | `PUT` | `/vehicles/{vehicle}` | `vehicles.update` | `auth, role:superadmin,admin` | `VehicleController@update` | Simpan Perubahan Data Armada |
 | `DELETE`| `/vehicles/{vehicle}` | `vehicles.destroy` | `auth, role:superadmin,admin` | `VehicleController@destroy` | Hapus Data Armada |
-| `GET` | `/checklist` | `checklist.index` | `auth` | `DailyChecklistController@index` | Riwayat Pemeriksaan Harian |
-| `GET` | `/checklist/{checklist}` | `checklist.show` | `auth` | `DailyChecklistController@show` | Detail Lembar Pemeriksaan |
-| `GET` | `/checklist-create` | `checklist.create` | `auth` | `DailyChecklistController@create` | Form Lembar Checklist Baru |
-| `POST` | `/checklist` | `checklist.store` | `auth` | `DailyChecklistController@store` | Simpan Hasil Pemeriksaan |
-| `PUT` | `/checklist/{checklist}/odometer` | `checklist.updateOdometer` | `auth` | `DailyChecklistController@updateOdometer` | Perbarui Angka Odometer |
+| `GET` | `/checklist` | `checklist.index` | `auth, role:superadmin,admin,teknisi,user` | `DailyChecklistController@index` | Riwayat Pemeriksaan Harian |
+| `GET` | `/checklist/{checklist}` | `checklist.show` | `auth, role:superadmin,admin,teknisi,user` | `DailyChecklistController@show` | Detail Lembar Pemeriksaan |
+| `GET` | `/checklist-create` | `checklist.create` | `auth, role:superadmin,admin,teknisi,user` | `DailyChecklistController@create` | Form Lembar Checklist Baru |
+| `POST` | `/checklist` | `checklist.store` | `auth, role:superadmin,admin,teknisi,user` | `DailyChecklistController@store` | Simpan Hasil Pemeriksaan Harian |
+| `PUT` | `/checklist/{checklist}/odometer` | `checklist.updateOdometer` | `auth, role:superadmin,admin,teknisi,user` | `DailyChecklistController@updateOdometer` | Perbarui Angka Odometer Checklist |
 | `DELETE`| `/checklist/{checklist}` | `checklist.destroy` | `auth, role:superadmin,admin,teknisi` | `DailyChecklistController@destroy` | Hapus Data Checklist |
 | `GET` | `/expenses` | `expenses.index` | `auth, role:superadmin,admin,teknisi` | `ExpenseController@index` | Daftar Rekapitulasi Biaya |
+| `GET` | `/expenses/export` | `expenses.export` | `auth, role:superadmin,admin,teknisi` | `ExpenseController@exportCsv` | Ekspor Laporan Biaya ke CSV Excel |
 | `GET` | `/expenses-create` | `expenses.create` | `auth, role:superadmin,admin,teknisi` | `ExpenseController@create` | Form Tambah Biaya Operasional |
-| `POST` | `/expenses` | `expenses.store` | `auth, role:superadmin,admin,teknisi` | `ExpenseController@store` | Simpan Catatan Biaya |
-| `PUT` | `/expenses/{expense}/approve` | `expenses.approve` | `auth, role:superadmin,admin,pimpinan` | `ExpenseController@approve` | Setujui/Tolak Pengeluaran |
+| `POST` | `/expenses` | `expenses.store` | `auth, role:superadmin,admin,teknisi` | `ExpenseController@store` | Simpan Catatan Biaya Operasional |
+| `POST` | `/expenses/quick-bbm` | `expenses.quickBbm` | `auth, role:superadmin,admin,teknisi` | `ExpenseController@storeQuickBbm` | Catat Quick BBM & Update Odometer |
+| `GET` | `/expenses/{expense}/edit` | `expenses.edit` | `auth, role:superadmin,admin,teknisi` | `ExpenseController@edit` | Form Edit Data Biaya |
+| `PUT` | `/expenses/{expense}` | `expenses.update` | `auth, role:superadmin,admin,teknisi` | `ExpenseController@update` | Simpan Perubahan Biaya |
+| `PUT` | `/expenses/{expense}/approve` | `expenses.approve` | `auth, role:superadmin,admin,pimpinan` | `ExpenseController@approve` | Setujui/Tolak Pengeluaran Besar |
 | `DELETE`| `/expenses/{expense}` | `expenses.destroy` | `auth, role:superadmin,admin,teknisi` | `ExpenseController@destroy` | Hapus Catatan Biaya |
 | `GET` | `/complaints` | `complaints.index` | `auth` | `ComplaintController@index` | Daftar Laporan Keluhan |
 | `GET` | `/complaints-create` | `complaints.create` | `auth` | `ComplaintController@create` | Form Buat Keluhan Kerusakan |
 | `POST` | `/complaints` | `complaints.store` | `auth` | `ComplaintController@store` | Simpan Laporan Keluhan |
-| `PUT` | `/complaints/{complaint}/status` | `complaints.updateStatus` | `auth, role:superadmin,teknisi` | `ComplaintController@updateStatus` | Update Progres & Status Keluhan |
+| `PUT` | `/complaints/{complaint}/status` | `complaints.updateStatus` | `auth, role:superadmin,admin,teknisi` | `ComplaintController@updateStatus` | Update Progres & Status Keluhan |
 | `GET` | `/vehicle-histories` | `vehicle-histories.index` | `auth, role:superadmin,admin,teknisi` | `VehicleHistoryController@index` | Daftar Riwayat Servis |
 | `GET` | `/vehicle-histories/create` | `vehicle-histories.create` | `auth, role:superadmin,admin,teknisi` | `VehicleHistoryController@create` | Form Tambah Riwayat Servis |
 | `POST` | `/vehicle-histories` | `vehicle-histories.store` | `auth, role:superadmin,admin,teknisi` | `VehicleHistoryController@store` | Simpan Data Riwayat Servis |
-| `GET` | `/vehicle-histories/{id}/edit` | `vehicle-histories.edit` | `auth, role:superadmin,admin,teknisi` | `VehicleHistoryController@edit` | Form Edit Riwayat Servis |
-| `PUT` | `/vehicle-histories/{id}` | `vehicle-histories.update` | `auth, role:superadmin,admin,teknisi` | `VehicleHistoryController@update` | Simpan Edit Riwayat Servis |
-| `DELETE`| `/vehicle-histories/{id}` | `vehicle-histories.destroy` | `auth, role:superadmin,admin,teknisi` | `VehicleHistoryController@destroy` | Hapus Data Riwayat Servis |
-| `GET` | `/users` | `users.index` | `auth, role:superadmin,admin` | `UserController@index` | Manajemen Pengguna |
+| `GET` | `/vehicle-histories/{vehicle_history}/edit` | `vehicle-histories.edit` | `auth, role:superadmin,admin,teknisi` | `VehicleHistoryController@edit` | Form Edit Riwayat Servis |
+| `PUT` | `/vehicle-histories/{vehicle_history}` | `vehicle-histories.update` | `auth, role:superadmin,admin,teknisi` | `VehicleHistoryController@update` | Simpan Edit Riwayat Servis |
+| `DELETE`| `/vehicle-histories/{vehicle_history}` | `vehicle-histories.destroy` | `auth, role:superadmin,admin,teknisi` | `VehicleHistoryController@destroy` | Hapus Data Riwayat Servis |
+| `GET` | `/users` | `users.index` | `auth, role:superadmin,admin` | `UserController@index` | Manajemen Pengguna & Lisensi SIM |
 | `GET` | `/users-create` | `users.create` | `auth, role:superadmin,admin` | `UserController@create` | Form Tambah Pengguna Baru |
 | `POST` | `/users` | `users.store` | `auth, role:superadmin,admin` | `UserController@store` | Simpan Pengguna Baru |
-| `GET` | `/users/{user}/edit` | `users.edit` | `auth, role:superadmin,admin` | `UserController@edit` | Form Edit Pengguna |
+| `GET` | `/users/{user}/edit` | `users.edit` | `auth, role:superadmin,admin` | `UserController@edit` | Form Edit Pengguna & SIM |
 | `PUT` | `/users/{user}` | `users.update` | `auth, role:superadmin,admin` | `UserController@update` | Simpan Perubahan Pengguna |
 | `DELETE`| `/users/{user}` | `users.destroy` | `auth, role:superadmin,admin` | `UserController@destroy` | Hapus Pengguna |
-| `POST` | `/profile/update` | `profile.update` | `auth` | `UserController@updateProfile` | Update Profil & Avatar Mandiri |
+| `POST` | `/profile/update` | `profile.update` | `auth` | `UserController@updateProfile` | Update Profil, SIM & Foto Avatar |
 
 ---
 
@@ -575,12 +676,16 @@ php artisan storage:link
 php artisan serve
 ```
 
+### Akses Melalui Handphone / Jaringan Wi-Fi Lokal
+Tersedia skrip otomatis `jalankan_di_hp.bat` di root direktori project. Cukup klik ganda berkas tersebut untuk mendeteksi IP lokal komputer dan menjalankan server dengan host `0.0.0.0:8000`.
+
 ### Akun Demo Pengujian (Default Password: `password`)
 
 | Peran (Role) | Username | Email | Kegunaan Pengujian |
 | :--- | :--- | :--- | :--- |
-| **Admin Fleet** | `admin_fleet` | `admin@fleet.com` | Akses penuh inventaris armada, user, approval pengeluaran |
-| **Teknisi** | `teknisi_utama` | `teknisi@fleet.com` | Penanganan keluhan, update status servis, isi checklist |
-| **Driver / Pengemudi** | `driver_utama` | `user@fleet.com` | Lapor keluhan foto/video, pelacakan armada saya |
-| **Teknisi 2** | `teknisi_budi` | `budi.teknisi@fleet.com`| Leaderboard & logbook riwayat servis |
-| **Driver 2** | `driver_dedi` | `dedi.driver@fleet.com` | Simulasi pengemudi unit armada B 9821 TXT |
+| **Admin Fleet** | `admin_fleet` | `admin@fleet.com` | Akses penuh inventaris armada, user, trip dispatcher, approval pengeluaran |
+| **Teknisi Utama** | `teknisi_utama` | `teknisi@fleet.com` | Penanganan keluhan, update progress servis, isi checklist harian |
+| **Driver Utama** | `driver_utama` | `user@fleet.com` | Lapor keluhan foto/video, pelacakan armada saya, update odometer |
+| **Teknisi Budi** | `teknisi_budi` | `budi.teknisi@fleet.com`| Leaderboard perbaikan, manajemen logbook riwayat servis |
+| **Driver Dedi** | `driver_dedi` | `dedi.driver@fleet.com` | Simulasi pengemudi unit armada B 9821 TXT |
+| **Pimpinan** | `sitirahmawati` | `sitirahmawati083@gmail.com` | Hak otorisasi anggaran belanja perbaikan besar |

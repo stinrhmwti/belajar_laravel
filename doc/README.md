@@ -1,6 +1,6 @@
-# Dokumentasi Proyek - Fleet Management System
+# 📚 Dokumentasi Proyek - Fleet Management System
 
-Selamat datang di folder dokumentasi **Fleet Management System** (Sistem Manajemen Armada) berbasis Laravel 12.
+Selamat datang di direktori dokumentasi resmi **Fleet Management System (Sistem Manajemen Armada)** berbasis Laravel 12.
 
 ---
 
@@ -8,17 +8,19 @@ Selamat datang di folder dokumentasi **Fleet Management System** (Sistem Manajem
 
 1. **[belajar_sistem_armada.md](file:///c:/xampppp/htdocs/belajar-laravel/doc/belajar_sistem_armada.md)**  
    *Dokumentasi Utama & Analisis Lengkap Sistem* yang memuat:
-   * **Ikhtisar Sistem & Fitur Unggulan** (Live GPS Tracking, Smart Maintenance Alert, Rekap Biaya, Approval, Multi-role).
-   * **10 Modul Fungsional Lengkap** dengan alur bisnis, validasi, dan controller terkait.
+   * **Ikhtisar Sistem & 8 Fitur Unggulan**: Live GPS Fleet Tracking, Trip Dispatcher & ETA Telemetry, Smart Maintenance Alert, Rekap Biaya & Export CSV, Quick BBM Odometer Sync, Otorisasi Anggaran Berjenjang, Pemulihan Sandi OTP, dan Multi-role RBAC.
+   * **10 Modul Fungsional Lengkap**: Alur bisnis, validasi, dan controller terkait.
    * **Matriks Hak Akses Peran (RBAC)** untuk 5 tingkatan user (`superadmin`, `admin`, `teknisi`, `pimpinan`, `user/driver`).
-   * **Kamus Data & Skema Database** untuk seluruh entitas armada (`users`, `vehicles`, `daily_checklists`, `expenses`, `complaints`, `vehicle_histories`).
-   * **Diagram Arsitektur Mermaid** (ERD, Sequence Diagram, Component Diagram).
-   * **Tabel Lengkap Seluruh Rute & Endpoint HTTP**.
-   * **Panduan Menjalankan Sistem & Akun Demo Default**.
+   * **Kamus Data & Skema Database**: Detail 7 tabel utama (`users`, `vehicles`, `daily_checklists`, `expenses`, `complaints`, `vehicle_histories`, `password_reset_tokens`).
+   * **Diagram Arsitektur Mermaid**: Entity Relationship Diagram (ERD), Sequence Diagram Alur Servis & Keuangan, Sequence Diagram Reset Password OTP, dan Component Architecture.
+   * **Tabel Lengkap Seluruh Endpoint Rute HTTP (Routing Table)**.
+   * **Panduan Menjalankan Sistem, Akses HP/Wi-Fi Lokal, & Akun Demo Default**.
 
 ---
 
-## 🚀 Cara Cepat Menjalankan Proyek
+## 🚀 Panduan Ringkas Menjalankan Sistem
+
+### 1. Menjalankan di Localhost PC
 ```bash
 # Pindah ke root project
 cd C:\xampppp\htdocs\belajar-laravel
@@ -27,3 +29,25 @@ cd C:\xampppp\htdocs\belajar-laravel
 php artisan serve
 ```
 Akses di browser: `http://127.0.0.1:8000`
+
+### 2. Menjalankan untuk Akses Handphone / Jaringan Wi-Fi Lokal
+Klik ganda file batch di root direktori:
+```bash
+jalankan_di_hp.bat
+```
+Atau jalankan perintah:
+```bash
+php artisan serve --host=0.0.0.0 --port=8000
+```
+Buka browser di HP yang terhubung ke Wi-Fi yang sama: `http://<IP_PC_ANDA>:8000`
+
+---
+
+## 👥 Akun Demo Pengujian (Password: `password`)
+
+| Peran | Username | Email |
+| :--- | :--- | :--- |
+| **Admin Fleet** | `admin_fleet` | `admin@fleet.com` |
+| **Teknisi Utama** | `teknisi_utama` | `teknisi@fleet.com` |
+| **Driver Utama** | `driver_utama` | `user@fleet.com` |
+| **Pimpinan** | `sitirahmawati` | `sitirahmawati083@gmail.com` |

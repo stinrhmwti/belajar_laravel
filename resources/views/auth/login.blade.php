@@ -21,7 +21,8 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0e3054 0%, #06182c 100%);
+            background: #0b1e36 url('{{ asset('images/fleet_showroom_bg.jpg') }}') no-repeat center center fixed;
+            background-size: cover;
             min-height: 100vh;
             margin: 0;
             display: flex;
@@ -32,26 +33,14 @@
             color: var(--text-light);
         }
 
-        /* Ambient Glow Background Spheres */
-        .bg-glow-1 {
-            position: absolute;
-            top: -15%;
-            left: -10%;
-            width: 650px;
-            height: 650px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(15, 23, 42, 0) 70%);
-            pointer-events: none;
-            z-index: 1;
-        }
-        .bg-glow-2 {
-            position: absolute;
-            bottom: -20%;
-            right: -10%;
-            width: 700px;
-            height: 700px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(6, 182, 212, 0.25) 0%, rgba(15, 23, 42, 0) 70%);
+        /* Subtle modern backdrop overlay to ensure crisp readability while keeping full vehicle fleet & showroom clearly visible */
+        .bg-backdrop-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(8, 24, 48, 0.78) 0%, rgba(9, 30, 58, 0.52) 45%, rgba(12, 28, 50, 0.28) 100%);
             pointer-events: none;
             z-index: 1;
         }
@@ -85,7 +74,7 @@
             margin: 0;
             line-height: 1;
         }
-        .brand-subtitle {
+        .brand-sub {
             font-size: 0.65rem;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.55);
@@ -118,16 +107,19 @@
             line-height: 1.15;
             letter-spacing: -1px;
             margin-bottom: 1.25rem;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
         }
         .hero-title span {
             color: var(--brand-yellow);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
         }
         .hero-desc {
             font-size: 1rem;
             line-height: 1.6;
-            color: var(--text-muted-light);
+            color: rgba(255, 255, 255, 0.9);
             margin-bottom: 2rem;
             max-width: 520px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
         }
 
         /* Glassmorphism Login Card (Right Side) */
@@ -232,7 +224,7 @@
         .whatsapp-widget {
             position: fixed;
             bottom: 24px;
-            left: 24px; /* Repositioned to left side to prevent overlap with login card */
+            left: 24px;
             z-index: 100;
             display: flex;
             align-items: center;
@@ -259,18 +251,6 @@
             justify-content: center;
         }
 
-        /* Background image decorative */
-        .truck-backdrop {
-            position: absolute;
-            right: -10%;
-            bottom: 0;
-            opacity: 0.12;
-            width: 55%;
-            pointer-events: none;
-            z-index: 1;
-            transform: scaleX(-1); /* Flip horizontally to look towards form */
-        }
-
         @media (max-width: 991.98px) {
             .hero-section {
                 text-align: center;
@@ -279,9 +259,6 @@
             .hero-desc {
                 margin-left: auto;
                 margin-right: auto;
-            }
-            .truck-backdrop {
-                display: none;
             }
             .login-card {
                 padding: 2rem;
@@ -316,11 +293,10 @@
 </head>
 <body>
 
-<div class="bg-glow-1"></div>
-<div class="bg-glow-2"></div>
+<div class="bg-backdrop-overlay"></div>
 
 <!-- Top Alert Bar -->
-<div class="w-100 text-center py-2 px-3 fw-medium" style="background: rgba(255, 255, 255, 0.08); font-size: 0.8rem; letter-spacing: 0.3px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); position: relative; z-index: 5;">
+<div class="w-100 text-center py-2 px-3 fw-medium" style="background: rgba(7, 24, 48, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); font-size: 0.8rem; letter-spacing: 0.3px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); position: relative; z-index: 5;">
     <i class="bi bi-geo-alt-fill me-1 text-warning"></i> {{ __('Izinkan lokasi pada browser Anda untuk pemantauan GPS armada secara real-time') }}
 </div>
 
@@ -351,7 +327,7 @@
         
         <div class="d-none d-md-flex align-items-center gap-2">
             <div class="dropdown me-2">
-                <button class="btn btn-outline-light dropdown-toggle py-1.5 px-3 rounded-pill fw-semibold d-flex align-items-center gap-2" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.72rem; border-color: rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.05); color: #ffffff;">
+                <button class="btn btn-outline-light dropdown-toggle py-1.5 px-3 rounded-pill fw-semibold d-flex align-items-center gap-2" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 0.72rem; border-color: rgba(255, 255, 255, 0.3); background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: #ffffff;">
                     <i class="bi bi-translate"></i>
                     <span>{{ App::getLocale() === 'en' ? '🇺🇸 English' : '🇮🇩 Indonesian' }}</span>
                 </button>
@@ -375,7 +351,7 @@
                 </ul>
             </div>
 
-            <span class="badge bg-success-subtle text-success py-1.5 px-3 border border-success-subtle rounded-pill d-flex align-items-center gap-2" style="font-size: 0.72rem;">
+            <span class="badge py-1.5 px-3 rounded-pill d-flex align-items-center gap-2" style="font-size: 0.72rem; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.45); color: #34d399; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
                 <span class="bg-success rounded-circle" style="width:6px; height:6px; display:inline-block; box-shadow: 0 0 8px #22c55e;"></span>
                 {{ __('Server Aktif') }}
             </span>
@@ -387,7 +363,7 @@
         
         <!-- Left Side: Hero Info -->
         <div class="col-lg-6 hero-section">
-            <span class="badge-digital">{{ __('Booking & Perawatan Digital') }}</span>
+            <span class="badge-digital">{{ __('BOOKING & PERAWATAN DIGITAL') }}</span>
             <h2 class="hero-title">{{ __('Pemantauan & Servis Armada Jadi') }} <span>{{ __('Lebih Mudah') }}</span></h2>
             <p class="hero-desc">
                 {{ __('Sistem informasi terpadu untuk memantau kelayakan KIR, estimasi jadwal servis berkala otomatis (setiap 5.000 KM / 3 bulan), pengisian checklist harian, dan pelaporan kendala jalan dari supir secara real-time.') }}
@@ -435,15 +411,15 @@
                 <form method="POST" action="{{ route('login') }}" id="loginForm">
                     @csrf
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('Email atau Username') }}</label>
+                        <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('EMAIL ATAU USERNAME') }}</label>
                         <div class="input-icon-wrapper">
-                            <input type="text" name="login" class="form-control-custom w-100" value="{{ old('login') }}" required autofocus>
+                            <input type="text" name="login" class="form-control-custom w-100" value="{{ old('login') }}" placeholder="admin@fleet.com" required autofocus>
                             <i class="bi bi-person input-icon"></i>
                         </div>
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('Password') }}</label>
+                        <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('PASSWORD') }}</label>
                         <div class="input-icon-wrapper position-relative">
                             <input type="password" id="password" name="password" class="form-control-custom w-100" placeholder="••••••••" style="padding-right: 44px;" required>
                             <i class="bi bi-lock input-icon"></i>
@@ -476,11 +452,8 @@
 
     </div>
 
-    <!-- Decorative Box Truck Image Background -->
-    <img src="{{ asset('images/box_truck.png') }}" class="truck-backdrop" alt="Box Truck Decoration">
-
     <!-- Footer Copyright -->
-    <footer class="d-flex flex-column flex-md-row justify-content-between align-items-center pt-4 mt-4 border-top" style="border-color: rgba(255, 255, 255, 0.08) !important; font-size: 0.75rem; color: var(--text-muted-light);">
+    <footer class="d-flex flex-column flex-md-row justify-content-between align-items-center pt-4 mt-4 border-top" style="border-color: rgba(255, 255, 255, 0.12) !important; font-size: 0.75rem; color: var(--text-muted-light);">
         <p class="mb-2 mb-md-0">&copy; {{ date('Y') }} FleetMaintenance System &bull; {{ __('Versi 2.5 Premium Active.') }}</p>
         <div class="d-flex gap-3">
             <a href="#" class="text-white-50 text-decoration-none">{{ __('Ketentuan Layanan') }}</a>
@@ -502,7 +475,7 @@
         <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
             <div class="modal-header border-0 pb-0">
                 <h5 class="modal-title fw-bold" id="quickGuideModalLabel">
-                    <i class="bi bi-book text-primary me-2"></i> {{ __('Panduan Peran Akun') }}
+                    <i class="bi bi-book text-primary me-2"></i> {{ __('Panduan Peran (Role)') }}
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -633,7 +606,6 @@
     }
 
     function showWhatsappRedirectScreen() {
-        // Get issue text
         const selectEl = document.getElementById('whatsappIssueSelect');
         let issueText = selectEl ? selectEl.value : '';
         
@@ -645,12 +617,10 @@
             }
         }
         
-        // Construct pre-filled message text
         const baseMessage = "Halo Admin, saya mengalami kendala pada halaman login FleetMaintenance.\n\nMasalah: " + issueText;
         const encodedMessage = encodeURIComponent(baseMessage);
         const waUrl = "https://wa.me/6287738565383?text=" + encodedMessage;
         
-        // Hide WhatsApp modal first
         const waModalEl = document.getElementById('whatsappModal');
         let waModal = bootstrap.Modal.getInstance(waModalEl);
         if (!waModal) {
@@ -658,18 +628,14 @@
         }
         waModal.hide();
         
-        // Show redirect screen overlay
         const redirectScreen = document.getElementById('whatsappRedirectScreen');
         if (redirectScreen) {
             redirectScreen.classList.remove('d-none');
-            // Force flex display
             redirectScreen.style.setProperty('display', 'flex', 'important');
         }
         
-        // Open WhatsApp URL in new tab
         window.open(waUrl, "_blank");
         
-        // Update the manual link in redirect screen in case popup is blocked
         const manualLink = document.getElementById('whatsappManualLink');
         if (manualLink) {
             manualLink.href = waUrl;

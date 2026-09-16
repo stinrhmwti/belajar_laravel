@@ -34,15 +34,18 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tracking/api/vehicles', [TrackingController::class, 'apiVehicles'])->name('tracking.api');
     Route::post('/tracking/{vehicle}/location', [TrackingController::class, 'updateLocation'])->name('tracking.updateLocation');
     Route::put('/vehicles/{vehicle}/location', [TrackingController::class, 'updateLocation'])->name('vehicles.updateLocation');
+    Route::post('/tracking/{vehicle}/trip', [TrackingController::class, 'assignTrip'])->name('tracking.assignTrip');
+    Route::post('/tracking/{vehicle}/complete-trip', [TrackingController::class, 'completeTrip'])->name('tracking.completeTrip');
 
     // ============ VEHICLES ============
     Route::get('/vehicles', [VehicleController::class, 'index'])->name('vehicles.index');
     Route::get('/vehicles/{vehicle}', [VehicleController::class, 'show'])->name('vehicles.show');
     Route::get('/vehicles/{vehicle}/read-notification', [VehicleController::class, 'readNotification'])->name('vehicles.readNotification');
 
-    // Teknisi & Admin boleh update status pemeliharaan cepat
-    Route::middleware(['role:superadmin,admin,teknisi'])->group(function () {
+    // Teknisi, Admin, & Driver boleh update odometer kendaraan secara cepat
+    Route::middleware(['role:superadmin,admin,teknisi,user'])->group(function () {
         Route::put('/vehicles/{vehicle}/status', [VehicleController::class, 'updateStatus'])->name('vehicles.updateStatus');
+        Route::put('/vehicles/{vehicle}/odometer', [VehicleController::class, 'updateOdometer'])->name('vehicles.updateOdometer');
     });
 
     // Hanya admin yang boleh tambah/edit/hapus data master kendaraan
@@ -71,8 +74,12 @@ Route::middleware(['auth'])->group(function () {
     // ============ EXPENSES (REKAP BIAYA) ============
     Route::middleware(['role:superadmin,admin,teknisi'])->group(function () {
         Route::get('/expenses', [ExpenseController::class, 'index'])->name('expenses.index');
+        Route::get('/expenses/export', [ExpenseController::class, 'exportCsv'])->name('expenses.export');
         Route::get('/expenses-create', [ExpenseController::class, 'create'])->name('expenses.create');
         Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store');
+        Route::post('/expenses/quick-bbm', [ExpenseController::class, 'storeQuickBbm'])->name('expenses.quickBbm');
+        Route::get('/expenses/{expense}/edit', [ExpenseController::class, 'edit'])->name('expenses.edit');
+        Route::put('/expenses/{expense}', [ExpenseController::class, 'update'])->name('expenses.update');
         Route::delete('/expenses/{expense}', [ExpenseController::class, 'destroy'])->name('expenses.destroy');
     });
 
@@ -93,7 +100,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/complaints', [ComplaintController::class, 'store'])->name('complaints.store');
     Route::post('/profile/update', [UserController::class, 'updateProfile'])->name('profile.update');
 
-    Route::middleware(['role:superadmin,teknisi'])->group(function () {
+    Route::middleware(['role:superadmin,admin,teknisi'])->group(function () {
         Route::put('/complaints/{complaint}/status', [ComplaintController::class, 'updateStatus'])->name('complaints.updateStatus');
     });
 

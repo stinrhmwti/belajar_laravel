@@ -194,19 +194,59 @@ class VehicleSeeder extends Seeder
             ],
         ];
 
-        // Center coordinates: Jakarta/Java region
-        $baseLat = -6.17511;
-        $baseLng = 106.82717;
+        // Definisi titik koordinat presisi per Kota Pool Operasional
+        $cityPoolCoords = [
+            'Jakarta' => [
+                [-6.175392, 106.827153, 'Pool Pusat Gambir'],
+                [-6.126588, 106.905663, 'Pool Tanjung Priok'],
+                [-6.215000, 106.817000, 'Pool Sudirman Senayan'],
+                [-6.155000, 106.745000, 'Pool Daan Mogot'],
+                [-6.194000, 106.888000, 'Pool Rawamangun'],
+            ],
+            'Bandung' => [
+                [-6.938500, 107.625000, 'Pool Soekarno-Hatta Bandung'],
+                [-6.892000, 107.578000, 'Pool Pasteur Bandung'],
+            ],
+            'Bekasi' => [
+                [-6.238000, 106.992000, 'Pool Summarecon Bekasi'],
+                [-6.284000, 107.150000, 'Pool Kawasan Cikarang'],
+            ],
+            'Tangerang' => [
+                [-6.301000, 106.652000, 'Pool BSD City Serpong'],
+                [-6.185000, 106.635000, 'Pool Cikokol Tangerang'],
+            ],
+            'Depok' => [
+                [-6.372000, 106.832000, 'Pool Margonda Depok'],
+                [-6.398000, 106.772000, 'Pool Sawangan Depok'],
+            ],
+            'Bogor' => [
+                [-6.595000, 106.806000, 'Pool Pajajaran Bogor'],
+                [-6.536000, 106.862000, 'Pool Sentul City'],
+            ],
+        ];
+
+        $poolUsageCounts = [];
 
         foreach ($vehicles as $index => $v) {
-            // Assign coordinate offsets based on vehicle locations
-            if (str_contains(strtolower($v['lokasi_pool']), 'bandung')) {
-                $v['latitude'] = -6.91746 + ($index * 0.0035);
-                $v['longitude'] = 107.61912 + ($index * 0.0042);
-            } else {
-                $v['latitude'] = $baseLat + (($index % 5) * 0.0073) - 0.015;
-                $v['longitude'] = $baseLng + (($index % 5) * 0.0084) - 0.015;
+            $kota = trim($v['lokasi_pool'] ?? 'Jakarta');
+            
+            // Cari kecocokan kota
+            $matchedKey = 'Jakarta';
+            foreach (array_keys($cityPoolCoords) as $k) {
+                if (stripos($kota, $k) !== false) {
+                    $matchedKey = $k;
+                    break;
+                }
             }
+
+            $coordsList = $cityPoolCoords[$matchedKey];
+            $useIndex = ($poolUsageCounts[$matchedKey] ?? 0) % count($coordsList);
+            $poolUsageCounts[$matchedKey] = ($poolUsageCounts[$matchedKey] ?? 0) + 1;
+
+            $assignedCoord = $coordsList[$useIndex];
+            $v['latitude'] = $assignedCoord[0];
+            $v['longitude'] = $assignedCoord[1];
+            $v['lokasi_pool'] = $assignedCoord[2];
 
             Vehicle::updateOrCreate(
                 ['plat_nomor' => $v['plat_nomor']],

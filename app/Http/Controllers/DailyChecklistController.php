@@ -14,8 +14,10 @@ class DailyChecklistController extends Controller
 
         // Jika peran pengguna adalah 'user' (Driver), batasi hanya kendaraan mereka sendiri
         if (auth()->user()->role === 'user') {
-            $query->whereHas('vehicle', function ($q) {
-                $q->where('supir_utama', auth()->user()->name);
+            $user = auth()->user();
+            $query->whereHas('vehicle', function ($q) use ($user) {
+                $q->where('driver_id', $user->id)
+                  ->orWhere('supir_utama', $user->name);
             });
         }
 
@@ -28,7 +30,11 @@ class DailyChecklistController extends Controller
     {
         // Jika peran pengguna adalah 'user' (Driver), hanya tampilkan kendaraan milik mereka
         if (auth()->user()->role === 'user') {
-            $vehicles = Vehicle::where('supir_utama', auth()->user()->name)->orderBy('plat_nomor')->get();
+            $user = auth()->user();
+            $vehicles = Vehicle::where(function ($q) use ($user) {
+                $q->where('driver_id', $user->id)
+                  ->orWhere('supir_utama', $user->name);
+            })->orderBy('plat_nomor')->get();
         } else {
             $vehicles = Vehicle::orderBy('plat_nomor')->get();
         }
@@ -55,7 +61,8 @@ class DailyChecklistController extends Controller
         // Proteksi tambahan untuk Driver agar tidak memanipulasi vehicle_id ke kendaraan lain
         if (auth()->user()->role === 'user') {
             $vehicle = Vehicle::find($validated['vehicle_id']);
-            if (!$vehicle || $vehicle->supir_utama !== auth()->user()->name) {
+            $user = auth()->user();
+            if (!$vehicle || ($vehicle->driver_id !== $user->id && $vehicle->supir_utama !== $user->name)) {
                 return redirect()->back()->withErrors(['vehicle_id' => 'Anda hanya diperbolehkan melakukan checklist untuk kendaraan penugasan Anda sendiri.'])->withInput();
             }
         }
@@ -98,6 +105,10 @@ class DailyChecklistController extends Controller
         $checklist->update([
             'odometer' => $validated['odometer']
         ]);
+
+        if ($checklist->vehicle && $checklist->vehicle->odometer_awal < $validated['odometer']) {
+            $checklist->vehicle->update(['odometer_awal' => $validated['odometer']]);
+        }
 
         return redirect()->back()->with('success', 'Angka odometer berhasil diperbarui.');
     }
