@@ -411,7 +411,7 @@
                 <form method="POST" action="{{ route('login') }}" id="loginForm">
                     @csrf
                     <div class="mb-3">
-                        <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('EMAIL ATAU USERNAME') }}</label>
+                        <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('Email atau Username') }}</label>
                         <div class="input-icon-wrapper">
                             <input type="text" name="login" class="form-control-custom w-100" value="{{ old('login') }}" placeholder="admin@fleet.com" required autofocus>
                             <i class="bi bi-person input-icon"></i>
@@ -419,7 +419,7 @@
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('PASSWORD') }}</label>
+                        <label class="form-label fw-bold text-secondary mb-1.5" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.3px;">{{ __('Password') }}</label>
                         <div class="input-icon-wrapper position-relative">
                             <input type="password" id="password" name="password" class="form-control-custom w-100" placeholder="••••••••" style="padding-right: 44px;" required>
                             <i class="bi bi-lock input-icon"></i>
