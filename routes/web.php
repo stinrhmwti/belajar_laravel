@@ -118,10 +118,12 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // ============ NOTIFIKASI WHATSAPP ============
-    Route::get('/whatsapp', [WhatsappController::class, 'index'])->name('whatsapp.index');
-    Route::post('/whatsapp/send', [WhatsappController::class, 'send'])->name('whatsapp.send');
-    Route::post('/whatsapp/{log}/resend', [WhatsappController::class, 'resend'])->name('whatsapp.resend');
-    Route::get('/whatsapp/{log}', [WhatsappController::class, 'show'])->name('whatsapp.show');
+    Route::middleware(['role:superadmin,admin,teknisi'])->group(function () {
+        Route::get('/whatsapp', [WhatsappController::class, 'index'])->name('whatsapp.index');
+        Route::post('/whatsapp/send', [WhatsappController::class, 'send'])->name('whatsapp.send');
+        Route::post('/whatsapp/{log}/resend', [WhatsappController::class, 'resend'])->name('whatsapp.resend');
+        Route::get('/whatsapp/{log}', [WhatsappController::class, 'show'])->name('whatsapp.show');
+    });
 });
 
 // ============================================================

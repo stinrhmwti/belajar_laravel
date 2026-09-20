@@ -2,11 +2,15 @@
 
 namespace App\Services;
 
+use App\Exceptions\PermanentWhatsappException;
+use App\Jobs\KirimPesanWhatsApp;
 use App\Models\WhatsappLog;
 use App\Models\WhatsappTemplate;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use RuntimeException;
 use Throwable;
 
 class WhatsappService
@@ -42,7 +46,7 @@ class WhatsappService
             $cleaned = $countryCode . $cleaned;
         }
 
-        // Return null kalau hasil akhir kurang dari 10 digit
+        // Return null jika hasil akhir kurang dari 10 digit
         if (strlen($cleaned) < 10) {
             return null;
         }
@@ -51,7 +55,7 @@ class WhatsappService
     }
 
     /**
-     * Membuat tautan langsung ke WhatsApp Web / WhatsApp App (wa.me / api.whatsapp.com).
+     * Membuat tautan langsung ke WhatsApp Web / WhatsApp App (wa.me).
      */
     public function getDirectLink(string $phone, string $message): string
     {
@@ -61,7 +65,7 @@ class WhatsappService
     }
 
     /**
-     * Mengirim payload HTTP request ke penyedia WhatsApp Gateway API (Ervelia, Fonnte, Wablas, dll).
+     * Mengirim payload HTTP request ke penyedia WhatsApp Gateway API dengan batas timeout aman.
      *
      * @param string $target Nomor telepon tujuan format internasional (contoh: 628xxx)
      * @param string $message Isi pesan yang akan dikirim
@@ -76,56 +80,52 @@ class WhatsappService
         // 1. Driver FONNTE (https://api.fonnte.com/send)
         if ($driver === 'fonnte') {
             $url = !empty($baseUrl) ? $baseUrl . '/send' : 'https://api.fonnte.com/send';
-            return Http::withHeaders([
-                'Authorization' => $token,
-            ])
-            ->connectTimeout(5)
-            ->timeout(10)
-            ->asForm()
-            ->post($url, [
-                'target' => $target,
-                'message' => $message,
-                'countryCode' => config('services.whatsapp.country_code', '62'),
-            ]);
+            return Http::connectTimeout(5)
+                ->timeout(10)
+                ->withHeaders([
+                    'Authorization' => $token,
+                ])
+                ->asForm()
+                ->post($url, [
+                    'target' => $target,
+                    'message' => $message,
+                    'countryCode' => config('services.whatsapp.country_code', '62'),
+                ]);
         }
 
         // 2. Driver WABLAS (https://pati.wablas.com/api/send-message)
         if ($driver === 'wablas') {
             $url = !empty($baseUrl) ? $baseUrl . '/api/send-message' : 'https://pati.wablas.com/api/send-message';
-            return Http::withHeaders([
-                'Authorization' => $token,
-                'Content-Type' => 'application/json',
-            ])
-            ->connectTimeout(5)
-            ->timeout(10)
-            ->post($url, [
-                'phone' => $target,
-                'message' => $message,
-            ]);
+            return Http::connectTimeout(5)
+                ->timeout(10)
+                ->withHeaders([
+                    'Authorization' => $token,
+                    'Content-Type' => 'application/json',
+                ])
+                ->post($url, [
+                    'phone' => $target,
+                    'message' => $message,
+                ]);
         }
 
         // 3. Driver ERVELIA / CUSTOM REST API (Default)
         $endpoint = str_ends_with($baseUrl, '/api/v1/messages/send') ? $baseUrl : $baseUrl . '/api/v1/messages/send';
-        return Http::withHeaders([
-            'X-API-KEY' => $token,
-            'Authorization' => 'Bearer ' . $token,
-            'Content-Type' => 'application/json',
-        ])
-        ->connectTimeout(3)
-        ->timeout(8)
-        ->post($endpoint, [
-            'to' => $target,
-            'phone' => $target,
-            'message' => $message,
-        ]);
+        return Http::connectTimeout(5)
+            ->timeout(10)
+            ->withHeaders([
+                'X-API-KEY' => $token,
+                'Authorization' => 'Bearer ' . $token,
+                'Content-Type' => 'application/json',
+            ])
+            ->post($endpoint, [
+                'to' => $target,
+                'phone' => $target,
+                'message' => $message,
+            ]);
     }
 
     /**
      * Memeriksa apakah response dari provider mengindikasikan status sukses.
-     *
-     * @param array $body Response body dalam bentuk array
-     * @param string $driver Jenis provider driver
-     * @return bool
      */
     public function isProviderSuccess(array $body, string $driver = 'ervelia'): bool
     {
@@ -142,11 +142,11 @@ class WhatsappService
     }
 
     /**
-     * Mengirim pesan WhatsApp teks biasa via WhatsApp Gateway API dan mencatat history ke database.
+     * Mendaftarkan pengiriman pesan ke database berstatus 'pending', lalu memasukkannya ke antrean (Queue Job).
      *
      * @param string $phone Nomor tujuan
-     * @param string $message Isi pesan yang akan dikirim
-     * @param array $meta Metadata tambahan (misal: template_id, user_id)
+     * @param string $message Isi pesan
+     * @param array $meta Metadata tambahan (template_id, user_id)
      * @return WhatsappLog
      */
     public function send(string $phone, string $message, array $meta = []): WhatsappLog
@@ -154,17 +154,18 @@ class WhatsappService
         $driver = config('services.whatsapp.driver', 'ervelia');
         $formattedPhone = $this->formatPhone($phone);
 
-        // SELALU buat record WhatsappLog status 'pending' terlebih dahulu
+        // 1. Simpan pesan ke tabel whatsapp_logs dengan status awal 'pending' dan attempts = 0
         $log = WhatsappLog::create([
             'whatsapp_template_id' => $meta['template_id'] ?? null,
             'user_id' => $meta['user_id'] ?? null,
             'phone' => $formattedPhone ?? $phone,
             'message' => $message,
             'status' => WhatsappLog::STATUS_PENDING,
+            'attempts' => 0,
             'provider' => $driver,
         ]);
 
-        // Validasi format nomor telepon
+        // 2. Validasi format nomor telepon (Error Permanen)
         if (! $formattedPhone) {
             $log->update([
                 'status' => WhatsappLog::STATUS_FAILED,
@@ -173,104 +174,14 @@ class WhatsappService
             return $log;
         }
 
-        // Validasi fitur aktif/nonaktif
-        if (! config('services.whatsapp.enabled', true)) {
-            $log->update([
-                'status' => WhatsappLog::STATUS_FAILED,
-                'error_message' => 'Fitur pengiriman WhatsApp sedang dinonaktifkan di pengaturan sistem (WHATSAPP_ENABLED=false).',
-            ]);
-            return $log;
-        }
-
-        // Mode Sandbox / Simulasi Lokal (berguna saat offline atau pengujian di localhost tanpa server gateway aktif)
-        if (in_array($driver, ['sandbox', 'mock', 'log', 'local'])) {
-            $mockMessageId = 'SANDBOX_WA_' . strtoupper(bin2hex(random_bytes(6)));
-            $log->update([
-                'status' => WhatsappLog::STATUS_SUCCESS,
-                'message_id' => $mockMessageId,
-                'response' => [
-                    'status' => 'success',
-                    'driver' => $driver,
-                    'mode' => 'sandbox_simulation',
-                    'message_id' => $mockMessageId,
-                    'target' => $formattedPhone,
-                    'message' => $message,
-                    'timestamp' => now()->toIso8601String(),
-                ],
-                'sent_at' => now(),
-                'error_message' => null,
-            ]);
-            Log::info("WhatsApp [Sandbox] terkirim ke {$formattedPhone}: {$message}");
-            return $log;
-        }
-
-        $token = config('services.whatsapp.token');
-        // Validasi ketersediaan token API
-        if (empty($token) && !in_array($driver, ['sandbox', 'mock', 'log'])) {
-            $log->update([
-                'status' => WhatsappLog::STATUS_FAILED,
-                'error_message' => 'Token API WhatsApp belum dikonfigurasi (WHATSAPP_TOKEN kosong di file .env).',
-            ]);
-            return $log;
-        }
-
-        // Kirim request ke Gateway API dengan proteksi try-catch
-        try {
-            $response = $this->dispatchToProvider($formattedPhone, $message, $driver);
-            $responseData = $response->json();
-            $bodyArray = is_array($responseData) ? $responseData : [];
-
-            if ($response->successful() && $this->isProviderSuccess($bodyArray, $driver)) {
-                // Ambil message_id dari response jika ada
-                $messageId = $bodyArray['id'] ?? $bodyArray['message_id'] ?? $bodyArray['data']['message_id'] ?? $bodyArray['data']['id'] ?? null;
-                if (is_array($messageId)) {
-                    $messageId = implode(',', $messageId);
-                }
-
-                $log->update([
-                    'status' => WhatsappLog::STATUS_SUCCESS,
-                    'message_id' => $messageId ? (string) $messageId : null,
-                    'response' => $bodyArray ?: ['raw_body' => $response->body()],
-                    'sent_at' => now(),
-                    'error_message' => null,
-                ]);
-            } else {
-                $errorMsg = $bodyArray['message'] ?? $bodyArray['error'] ?? $bodyArray['reason'] ?? ('Gagal mengirim pesan via WhatsApp Gateway (HTTP ' . $response->status() . ').');
-
-                $log->update([
-                    'status' => WhatsappLog::STATUS_FAILED,
-                    'error_message' => is_string($errorMsg) ? $errorMsg : json_encode($errorMsg),
-                    'response' => $bodyArray ?: ['raw_body' => $response->body()],
-                ]);
-            }
-        } catch (Throwable $e) {
-            $cleanError = $e->getMessage();
-            if (str_contains($cleanError, 'cURL error 7') || str_contains($cleanError, 'Failed to connect') || str_contains($cleanError, 'Connection refused')) {
-                $cleanError = "Server WhatsApp Gateway sedang offline atau tidak dapat dijangkau (" . config('services.whatsapp.base_url') . "). Silakan periksa koneksi server gateway atau gunakan tombol Kirim via WhatsApp Web.";
-            }
-
-            $log->update([
-                'status' => WhatsappLog::STATUS_FAILED,
-                'error_message' => $cleanError,
-                'response' => [
-                    'exception' => get_class($e),
-                    'message' => $e->getMessage(),
-                    'hint' => 'Gunakan WhatsApp Web atau sesuaikan konfigurasi WHATSAPP_BASE_URL di file .env',
-                ],
-            ]);
-        }
+        // 3. Masukkan tugas ke Antrean (Queue Job) dengan afterCommit agar transaksi database tuntas lebih dulu
+        KirimPesanWhatsApp::dispatch($log->id)->afterCommit();
 
         return $log;
     }
 
     /**
-     * Mengirim pesan WhatsApp menggunakan template yang tersimpan di database.
-     *
-     * @param string $code Kode template (contoh: 'kir_expired')
-     * @param string $phone Nomor tujuan
-     * @param array $data Data variabel untuk menggantikan placeholder {{variabel}}
-     * @param array $meta Metadata tambahan (misal: user_id)
-     * @return WhatsappLog
+     * Mengirim pesan WhatsApp berbasis template yang tersimpan di database.
      */
     public function sendTemplate(string $code, string $phone, array $data = [], array $meta = []): WhatsappLog
     {
@@ -286,6 +197,7 @@ class WhatsappService
                 'phone' => $formattedPhone ?? $phone,
                 'message' => "Template [{$code}]",
                 'status' => WhatsappLog::STATUS_FAILED,
+                'attempts' => 0,
                 'provider' => $driver,
                 'error_message' => "Template WhatsApp dengan kode '{$code}' tidak ditemukan atau sedang tidak aktif.",
             ]);
@@ -294,22 +206,124 @@ class WhatsappService
         // Render isi pesan dengan mengganti placeholder variabel
         $message = $this->renderTemplate($template->content, $data);
 
-        // Panggil method send() dengan metadata template_id
+        // Panggil method send() yang akan memasukkan pesan ke Queue
         return $this->send($phone, $message, array_merge($meta, ['template_id' => $template->id]));
     }
 
     /**
-     * Merender konten template dengan menggantikan {{variabel}} dan {{ variabel }} sesuai data.
+     * Memproses pengiriman pesan aktual (dieksekusi oleh Queue Worker di latar belakang).
      *
-     * @param string $content Teks template dengan placeholder
-     * @param array $data Data pengganti variabel ['nama' => 'Budi', ...]
-     * @return string
+     * @param WhatsappLog $log
+     * @return void
+     * @throws PermanentWhatsappException Jika terjadi error permanen (tidak perlu retry)
+     * @throws RuntimeException Jika terjadi error sementara (harus di-retry oleh Queue)
+     */
+    public function processLog(WhatsappLog $log): void
+    {
+        $driver = config('services.whatsapp.driver', 'ervelia');
+
+        // 1. Cek apakah fitur WhatsApp diaktifkan
+        if (! config('services.whatsapp.enabled', true)) {
+            throw new PermanentWhatsappException('Fitur pengiriman WhatsApp dinonaktifkan di pengaturan sistem (WHATSAPP_ENABLED=false).');
+        }
+
+        // 2. Mode Sandbox / Simulasi Lokal (Selalu berhasil tanpa koneksi luar)
+        if (in_array($driver, ['sandbox', 'mock', 'log', 'local'])) {
+            $mockMessageId = 'SANDBOX_WA_' . strtoupper(bin2hex(random_bytes(6)));
+            $log->update([
+                'status' => WhatsappLog::STATUS_SENT,
+                'message_id' => $mockMessageId,
+                'response' => [
+                    'status' => 'success',
+                    'driver' => $driver,
+                    'mode' => 'sandbox_simulation',
+                    'message_id' => $mockMessageId,
+                    'target' => $log->phone,
+                    'message' => $log->message,
+                    'attempts' => $log->attempts,
+                    'timestamp' => now()->toIso8601String(),
+                ],
+                'sent_at' => now(),
+                'error_message' => null,
+            ]);
+            Log::info("WhatsApp [Sandbox Queue] terkirim ke {$log->phone}: {$log->message}");
+            return;
+        }
+
+        // 3. Cek Ketersediaan Token API
+        $token = config('services.whatsapp.token');
+        if (empty($token)) {
+            throw new PermanentWhatsappException('Token API WhatsApp belum dikonfigurasi (WHATSAPP_TOKEN kosong di file .env).');
+        }
+
+        // 4. Eksekusi HTTP Request ke API Gateway
+        try {
+            $response = $this->dispatchToProvider($log->phone, $log->message, $driver);
+        } catch (ConnectionException $e) {
+            // Error koneksi / timeout / server mati -> Error Sementara (Temporary) -> Lempar RuntimeException agar di-retry
+            throw new RuntimeException("Gagal koneksi ke server gateway ({$e->getMessage()}). Server gateway mungkin sedang offline.", 0, $e);
+        } catch (Throwable $e) {
+            throw new RuntimeException("Kesalahan jaringan: " . $e->getMessage(), 0, $e);
+        }
+
+        $statusCode = $response->status();
+        $responseData = $response->json();
+        $bodyArray = is_array($responseData) ? $responseData : [];
+
+        // 5. Analisis Kode Respon HTTP
+        // a. Status 429 (Rate Limit) atau 5xx (Server Error) -> Error Sementara -> Retry
+        if ($statusCode === 429 || $statusCode >= 500) {
+            $errDetail = $bodyArray['message'] ?? $bodyArray['error'] ?? $response->body();
+            throw new RuntimeException("Server gateway mengalami gangguan (HTTP {$statusCode}): {$errDetail}");
+        }
+
+        // b. Status 4xx selain 429 (400, 401, 403, 404, 422) -> Error Permanen -> Jangan Retry
+        if ($statusCode >= 400 && $statusCode < 500) {
+            $errDetail = $bodyArray['message'] ?? $bodyArray['error'] ?? $response->body();
+            $log->update([
+                'response' => $bodyArray ?: ['raw_body' => $response->body()],
+            ]);
+            throw new PermanentWhatsappException("Gateway menolak permintaan (HTTP {$statusCode}): {$errDetail}");
+        }
+
+        // c. Status 2xx (Sukses)
+        if ($response->successful() && $this->isProviderSuccess($bodyArray, $driver)) {
+            $messageId = $bodyArray['id'] ?? $bodyArray['message_id'] ?? $bodyArray['data']['message_id'] ?? $bodyArray['data']['id'] ?? null;
+            if (is_array($messageId)) {
+                $messageId = implode(',', $messageId);
+            }
+
+            $log->update([
+                'status' => WhatsappLog::STATUS_SENT,
+                'message_id' => $messageId ? (string) $messageId : null,
+                'response' => $bodyArray ?: ['raw_body' => $response->body()],
+                'sent_at' => now(),
+                'error_message' => null,
+            ]);
+        } else {
+            // Jika status HTTP 200 namun body menyatakan kegagalan
+            $errorMsg = $bodyArray['message'] ?? $bodyArray['error'] ?? $bodyArray['reason'] ?? ('Gagal mengirim pesan via WhatsApp Gateway (HTTP ' . $statusCode . ').');
+            
+            // Cek apakah error body mengindikasikan nomor tidak valid atau token salah (permanen)
+            $errorStr = is_string($errorMsg) ? $errorMsg : json_encode($errorMsg);
+            if (str_contains(strtolower($errorStr), 'invalid') || str_contains(strtolower($errorStr), 'not registered') || str_contains(strtolower($errorStr), 'unauthorized')) {
+                $log->update([
+                    'response' => $bodyArray ?: ['raw_body' => $response->body()],
+                ]);
+                throw new PermanentWhatsappException($errorStr);
+            }
+
+            throw new RuntimeException($errorStr);
+        }
+    }
+
+    /**
+     * Merender konten template dengan menggantikan {{variabel}} dan {{ variabel }} sesuai data.
      */
     public function renderTemplate(string $content, array $data): string
     {
         foreach ($data as $key => $value) {
             $valStr = is_scalar($value) ? (string) $value : json_encode($value);
-            // Ganti placeholder dengan format {{key}} maupun {{ key }}
             $content = preg_replace('/\{\{\s*' . preg_quote($key, '/') . '\s*\}\}/', $valStr, $content);
         }
 

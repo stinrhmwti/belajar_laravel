@@ -463,7 +463,7 @@
      SUMMARY METRIC & TELEMETRY CARDS
      ========================================================= --}}
 @php
-    $successCount = $logs->where('status', 'success')->count();
+    $successCount = $logs->whereIn('status', ['sent', 'success'])->count();
     $failedCount = $logs->where('status', 'failed')->count();
     $pendingCount = $logs->where('status', 'pending')->count();
     $totalCount = $logs->total();
@@ -867,8 +867,8 @@
                             <span class="fw-bold text-dark small">{{ __('Filter Status:') }}</span>
                             <div class="btn-group btn-group-sm" role="group">
                                 <a href="{{ route('whatsapp.index') }}" class="btn {{ !request('status') ? 'btn-dark' : 'btn-outline-secondary' }}" style="font-size: 0.74rem;">Semua</a>
-                                <a href="{{ route('whatsapp.index', ['status' => 'success']) }}" class="btn {{ request('status') === 'success' ? 'btn-success' : 'btn-outline-success' }}" style="font-size: 0.74rem;">Sukses</a>
-                                <a href="{{ route('whatsapp.index', ['status' => 'pending']) }}" class="btn {{ request('status') === 'pending' ? 'btn-warning text-dark' : 'btn-outline-warning' }}" style="font-size: 0.74rem;">Pending</a>
+                                <a href="{{ route('whatsapp.index', ['status' => 'sent']) }}" class="btn {{ request('status') === 'sent' || request('status') === 'success' ? 'btn-success' : 'btn-outline-success' }}" style="font-size: 0.74rem;">Terkirim</a>
+                                <a href="{{ route('whatsapp.index', ['status' => 'pending']) }}" class="btn {{ request('status') === 'pending' ? 'btn-warning text-dark' : 'btn-outline-warning' }}" style="font-size: 0.74rem;">Antrean</a>
                                 <a href="{{ route('whatsapp.index', ['status' => 'failed']) }}" class="btn {{ request('status') === 'failed' ? 'btn-danger' : 'btn-outline-danger' }}" style="font-size: 0.74rem;">Gagal</a>
                             </div>
                         </div>
@@ -969,17 +969,17 @@
                                         </div>
                                     </td>
                                     <td>
-                                        @if($log->status === 'success')
+                                        @if($log->isSuccess())
                                             <span class="badge badge-soft-success px-2 py-0.5 d-inline-flex align-items-center gap-1 text-uppercase" style="font-size: 0.68rem;">
-                                                <i class="bi bi-check-all"></i>Sukses
+                                                <i class="bi bi-check2-all"></i>Terkirim
                                             </span>
-                                        @elseif($log->status === 'failed')
+                                        @elseif($log->isFailed())
                                             <span class="badge badge-soft-danger px-2 py-0.5 d-inline-flex align-items-center gap-1 text-uppercase" style="font-size: 0.68rem;">
                                                 <i class="bi bi-x-circle"></i>Gagal
                                             </span>
                                         @else
-                                            <span class="badge badge-soft-warning px-2 py-0.5 d-inline-flex align-items-center gap-1 text-uppercase" style="font-size: 0.68rem;">
-                                                <i class="bi bi-hourglass-split"></i>Pending
+                                            <span class="badge badge-soft-warning px-2 py-0.5 d-inline-flex align-items-center gap-1 text-uppercase" style="font-size: 0.68rem;" title="Percobaan: {{ $log->attempts }}/5">
+                                                <i class="bi bi-hourglass-split"></i>Antrean @if($log->attempts > 0)({{ $log->attempts }}/5)@endif
                                             </span>
                                         @endif
                                     </td>

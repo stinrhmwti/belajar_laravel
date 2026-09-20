@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -23,3 +24,8 @@ Artisan::command('mail:test {email=sitirahmawat083@gmail.com}', function ($email
         $this->warn("Pastikan MAIL_USERNAME dan MAIL_PASSWORD di file .env sudah diisi dengan benar.");
     }
 })->purpose('Menguji pengiriman email SMTP secara langsung');
+
+// ============================================================
+// SCHEDULER: Penjadwalan Otomatis Pengiriman Ulang Pesan Pending
+// ============================================================
+Schedule::command('whatsapp:retry-stuck')->everyFifteenMinutes()->withoutOverlapping();

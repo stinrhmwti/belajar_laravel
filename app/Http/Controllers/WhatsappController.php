@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\SendWhatsappRequest;
+use App\Jobs\KirimPesanWhatsApp;
 use App\Models\WhatsappLog;
 use App\Models\WhatsappTemplate;
 use App\Services\WhatsappService;
@@ -30,9 +31,14 @@ class WhatsappController extends Controller
     {
         $query = WhatsappLog::with(['template', 'user'])->latest();
 
-        // Filter berdasarkan status pengiriman (pending, success, failed)
+        // Filter berdasarkan status pengiriman (pending, sent, failed)
         if ($request->filled('status')) {
-            $query->where('status', $request->status);
+            $status = $request->status;
+            if ($status === 'success' || $status === 'sent') {
+                $query->whereIn('status', [WhatsappLog::STATUS_SENT, WhatsappLog::STATUS_SUCCESS]);
+            } else {
+                $query->where('status', $status);
+            }
         }
 
         // Filter pencarian berdasarkan nomor telepon, isi pesan, atau nama user
@@ -56,7 +62,7 @@ class WhatsappController extends Controller
     }
 
     /**
-     * Mengirim pesan WhatsApp teks manual atau berbasis template.
+     * Mendaftarkan pesan WhatsApp teks manual atau berbasis template ke dalam Antrean (Queue).
      */
     public function send(SendWhatsappRequest $request): JsonResponse|RedirectResponse
     {
@@ -77,59 +83,51 @@ class WhatsappController extends Controller
         // Respon JSON jika diminta (API request)
         if ($request->expectsJson()) {
             return response()->json([
-                'success' => $log->isSuccess(),
-                'message' => $log->isSuccess()
-                    ? 'Pesan WhatsApp berhasil dikirim.'
-                    : ($log->error_message ?: 'Gagal mengirim pesan WhatsApp.'),
+                'success' => ! $log->isFailed(),
+                'message' => $log->isFailed()
+                    ? ($log->error_message ?: 'Gagal memproses pengiriman WhatsApp.')
+                    : 'Pesan masuk antrean dan akan dikirim.',
                 'data' => $log->load(['template', 'user']),
-            ], $log->isSuccess() ? 200 : 422);
+            ], $log->isFailed() ? 422 : 202);
         }
 
-        // Respon redirect dengan flash session untuk request Blade Web
-        if ($log->isSuccess()) {
-            return back()->with('success', 'Pesan WhatsApp berhasil dikirim ke nomor ' . $log->phone);
+        // Jika nomor tidak valid sejak awal (error format langsung failed)
+        if ($log->isFailed()) {
+            return back()
+                ->with('error', 'Gagal memproses pesan: ' . ($log->error_message ?: 'Nomor WhatsApp tidak valid.'))
+                ->with('direct_wa_url', $log->wa_url)
+                ->with('failed_phone', $log->phone);
         }
 
-        return back()
-            ->with('error', 'Gagal mengirim pesan WhatsApp ke ' . $log->phone . ': ' . ($log->error_message ?: 'Terjadi kendala pada layanan.'))
-            ->with('direct_wa_url', $log->wa_url)
-            ->with('failed_phone', $log->phone);
+        // Respon redirect web dengan notifikasi antrean
+        return back()->with('success', 'Pesan masuk antrean dan akan dikirim ke nomor ' . $log->phone);
     }
 
     /**
-     * Kirim ulang pesan yang gagal dengan isi log yang sama.
+     * Kirim ulang pesan yang gagal secara manual dengan memasukkannya kembali ke Antrean (Queue).
      */
     public function resend(WhatsappLog $log): JsonResponse|RedirectResponse
     {
-        $newLog = $this->whatsapp->send(
-            $log->phone,
-            $log->message,
-            [
-                'template_id' => $log->whatsapp_template_id,
-                'user_id' => $log->user_id,
-            ]
-        );
+        // 1. Reset status menjadi pending, attempts menjadi 0, dan kosongkan error_message lama
+        $log->update([
+            'status' => WhatsappLog::STATUS_PENDING,
+            'attempts' => 0,
+            'error_message' => null,
+        ]);
+
+        // 2. Dispatch kembali Job ke Antrean (Queue) setelah transaksi database selesai
+        KirimPesanWhatsApp::dispatch($log->id)->afterCommit();
 
         if (request()->expectsJson()) {
             return response()->json([
-                'success' => $newLog->isSuccess(),
-                'message' => $newLog->isSuccess()
-                    ? 'Pesan WhatsApp berhasil dikirim ulang.'
-                    : ($newLog->error_message ?: 'Gagal mengirim ulang pesan WhatsApp.'),
-                'data' => $newLog->load(['template', 'user']),
-            ], $newLog->isSuccess() ? 200 : 422);
+                'success' => true,
+                'message' => 'Pesan berhasil dimasukkan kembali ke antrean untuk dikirim ulang.',
+                'data' => $log->load(['template', 'user']),
+            ], 200);
         }
 
-        if ($newLog->isSuccess()) {
-            return back()->with('success', 'Pesan WhatsApp berhasil dikirim ulang ke nomor ' . $newLog->phone);
-        }
-
-        return back()
-            ->with('error', 'Gagal mengirim ulang pesan ke ' . $newLog->phone . ': ' . ($newLog->error_message ?: 'Terjadi kesalahan sistem.'))
-            ->with('direct_wa_url', $newLog->wa_url)
-            ->with('failed_phone', $newLog->phone);
+        return back()->with('success', 'Pesan berhasil dimasukkan kembali ke antrean untuk dikirim ulang ke nomor ' . $log->phone);
     }
-
 
     /**
      * Tampilkan detail data log WhatsApp dalam format JSON.

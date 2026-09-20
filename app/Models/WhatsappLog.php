@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $phone
  * @property string $message
  * @property string $status
+ * @property int $attempts
  * @property string|null $provider
  * @property string|null $message_id
  * @property string|null $error_message
@@ -23,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class WhatsappLog extends Model
 {
     public const STATUS_PENDING = 'pending';
+    public const STATUS_SENT = 'sent';
     public const STATUS_SUCCESS = 'success';
     public const STATUS_FAILED = 'failed';
 
@@ -34,6 +36,7 @@ class WhatsappLog extends Model
         'phone',
         'message',
         'status',
+        'attempts',
         'provider',
         'message_id',
         'error_message',
@@ -42,6 +45,7 @@ class WhatsappLog extends Model
     ];
 
     protected $casts = [
+        'attempts' => 'integer',
         'response' => 'array',
         'sent_at' => 'datetime',
     ];
@@ -63,23 +67,52 @@ class WhatsappLog extends Model
     }
 
     /**
-     * Cek apakah pengiriman pesan berstatus sukses.
+     * Cek apakah pengiriman pesan berstatus sukses atau terkirim.
      */
     public function isSuccess(): bool
     {
-        return $this->status === self::STATUS_SUCCESS;
+        return in_array($this->status, [self::STATUS_SENT, self::STATUS_SUCCESS], true);
+    }
+
+    /**
+     * Cek apakah pesan masih dalam antrean (pending).
+     */
+    public function isPending(): bool
+    {
+        return $this->status === self::STATUS_PENDING;
+    }
+
+    /**
+     * Cek apakah pengiriman pesan gagal permanen.
+     */
+    public function isFailed(): bool
+    {
+        return $this->status === self::STATUS_FAILED;
     }
 
     /**
      * Mengembalikan nama modifier badge Bootstrap sesuai status log.
-     * 'success' => success, 'failed' => danger, lainnya => secondary.
      */
     public function statusBadge(): string
     {
         return match ($this->status) {
-            self::STATUS_SUCCESS => 'success',
+            self::STATUS_SENT, self::STATUS_SUCCESS => 'success',
             self::STATUS_FAILED => 'danger',
+            self::STATUS_PENDING => 'warning',
             default => 'secondary',
+        };
+    }
+
+    /**
+     * Mengembalikan label teks status yang mudah dipahami.
+     */
+    public function statusLabel(): string
+    {
+        return match ($this->status) {
+            self::STATUS_SENT, self::STATUS_SUCCESS => 'Terkirim (Sent)',
+            self::STATUS_FAILED => 'Gagal (Failed)',
+            self::STATUS_PENDING => 'Antrean (Pending)',
+            default => ucfirst($this->status),
         };
     }
 
@@ -104,16 +137,8 @@ class WhatsappLog extends Model
             }
         }
 
-        // 3. Pola sapaan "Halo Nama,"
-        if (preg_match('/Halo\s+([^,\n\r]+)/i', $this->message, $matches)) {
-            $name = trim(str_replace('*', '', $matches[1]));
-            if (!empty($name) && !str_starts_with($name, '{{')) {
-                return $name;
-            }
-        }
-
-        // 4. Fallback ke relasi User
-        if ($this->user) {
+        // 3. Fallback ke relasi User
+        if ($this->user && !empty($this->user->name)) {
             return $this->user->name;
         }
 
@@ -183,4 +208,3 @@ class WhatsappLog extends Model
         return "https://api.whatsapp.com/send?phone={$phone}&text={$encodedText}";
     }
 }
-
