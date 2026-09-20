@@ -177,116 +177,7 @@
         border-color: #3b82f6;
     }
 
-    /* Realistic Smartphone Mockup */
-    .phone-mockup-wrapper {
-        background: #0b141a;
-        border-radius: 36px;
-        padding: 12px;
-        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25), inset 0 0 0 2px #334155;
-        max-width: 380px;
-        margin: 0 auto;
-        position: relative;
-    }
-    .phone-notch {
-        width: 100px;
-        height: 16px;
-        background: #0b141a;
-        border-bottom-left-radius: 12px;
-        border-bottom-right-radius: 12px;
-        position: absolute;
-        top: 12px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 10;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .phone-notch .camera-lens {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: #1e293b;
-    }
-    .phone-screen {
-        background: var(--wa-chat-bg);
-        border-radius: 26px;
-        overflow: hidden;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        min-height: 480px;
-        background-image: radial-gradient(rgba(0,0,0,0.05) 1px, transparent 0);
-        background-size: 16px 16px;
-    }
-    body.dark-theme .phone-screen {
-        background-color: #0b141a;
-        background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 0);
-    }
-    .phone-header {
-        background: var(--wa-brand-deep);
-        color: #ffffff;
-        padding: 14px 14px 12px 14px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.12);
-        z-index: 5;
-    }
-    .phone-chat-body {
-        padding: 14px;
-        flex-grow: 1;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-    .chat-bubble-wa {
-        background: var(--wa-bubble-out);
-        color: #111827;
-        border-radius: 12px 12px 2px 12px;
-        padding: 10px 14px;
-        max-width: 90%;
-        align-self: flex-end;
-        position: relative;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.12);
-        font-size: 0.83rem;
-        line-height: 1.5;
-        word-break: break-word;
-        white-space: pre-wrap;
-    }
-    body.dark-theme .chat-bubble-wa {
-        background: var(--wa-bubble-dark-out);
-        color: #e9edef;
-    }
-    .chat-time-meta {
-        font-size: 0.65rem;
-        color: #667781;
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 3px;
-        margin-top: 4px;
-    }
-    body.dark-theme .chat-time-meta { color: #8696a0; }
-    .chat-time-meta i { color: #53bdeb; font-size: 0.75rem; }
 
-    .security-notice-badge {
-        background: #ffeecd;
-        color: #54656f;
-        font-size: 0.68rem;
-        padding: 6px 10px;
-        border-radius: 6px;
-        text-align: center;
-        margin: 4px auto 6px auto;
-        max-width: 92%;
-        line-height: 1.35;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    }
-    body.dark-theme .security-notice-badge {
-        background: #182229;
-        color: #ffd279;
-    }
 
     /* Formatting Toolbar */
     .format-btn {
@@ -841,16 +732,10 @@
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="simulator-tab" data-bs-toggle="tab" data-bs-target="#tab-simulator" type="button" role="tab" aria-selected="false">
-                            <i class="bi bi-phone text-success"></i>
-                            <span>{{ __('Simulator Chat Live') }}</span>
-                            <span class="badge badge-soft-success rounded-pill px-1.5 py-0.5 ms-1" style="font-size: 0.68rem;">Interactive</span>
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
                         <button class="nav-link" id="catalogue-tab" data-bs-toggle="tab" data-bs-target="#tab-catalogue" type="button" role="tab" aria-selected="false">
                             <i class="bi bi-grid-fill text-info"></i>
                             <span>{{ __('Galeri Template') }}</span>
+                            <span class="badge bg-primary rounded-pill px-1.5 py-0.5 ms-1" style="font-size: 0.68rem;">7</span>
                         </button>
                     </li>
                 </ul>
@@ -1051,60 +936,7 @@
                     @endif
                 </div>
 
-                {{-- TAB 2: SMARTPHONE WHATSAPP SIMULATOR LIVE --}}
-                <div class="tab-pane fade p-4" id="tab-simulator" role="tabpanel" aria-labelledby="simulator-tab">
-                    <div class="text-center mb-3">
-                        <span class="badge badge-soft-success px-3 py-1 rounded-pill mb-1">
-                            <i class="bi bi-phone me-1"></i>Live Smartphone Mockup Simulator
-                        </span>
-                        <p class="text-muted small mb-0">Tampilan pesan terformat di smartphone pengemudi / staf secara real-time.</p>
-                    </div>
-
-                    {{-- Realistic Smartphone Body --}}
-                    <div class="phone-mockup-wrapper">
-                        <div class="phone-notch">
-                            <div class="camera-lens"></div>
-                        </div>
-                        <div class="phone-screen">
-                            {{-- Phone WhatsApp Top Header --}}
-                            <div class="phone-header">
-                                <div class="d-flex align-items-center gap-2">
-                                    <i class="bi bi-arrow-left fs-6"></i>
-                                    <div class="rounded-circle bg-white text-dark d-flex align-items-center justify-content-center fw-bold" style="width: 30px; height: 30px; font-size: 0.75rem;">
-                                        <i class="bi bi-person-fill text-secondary"></i>
-                                    </div>
-                                    <div>
-                                        <span id="phoneRecipientName" class="fw-bold d-block" style="font-size: 0.8rem; line-height: 1.2;">Fleet Control Center</span>
-                                        <small class="text-white-50" style="font-size: 0.65rem;">online</small>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center gap-2.5 fs-6 text-white-50">
-                                    <i class="bi bi-camera-video"></i>
-                                    <i class="bi bi-telephone"></i>
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </div>
-                            </div>
-
-                            {{-- Phone WhatsApp Chat Screen --}}
-                            <div class="phone-chat-body">
-                                <div class="security-notice-badge">
-                                    <i class="bi bi-lock-fill me-1"></i>Pesan ini dienkripsi secara end-to-end melalui Ervelia WhatsApp Gateway API.
-                                </div>
-
-                                {{-- Live Chat Bubble --}}
-                                <div class="chat-bubble-wa" id="phoneLiveBubble">
-                                    Pilih template atau tulis teks pesan pada panel composer untuk melihat pratinjau live di sini.
-                                    <div class="chat-time-meta">
-                                        <span id="phoneLiveTime">12:00</span>
-                                        <i class="bi bi-check2-all"></i>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- TAB 3: KATALOG 7 TEMPLATE SISTEM --}}
+                {{-- TAB 2: KATALOG 7 TEMPLATE SISTEM --}}
                 <div class="tab-pane fade p-4" id="tab-catalogue" role="tabpanel" aria-labelledby="catalogue-tab">
                     <div class="mb-3 d-flex justify-content-between align-items-center">
                         <div>
@@ -1303,11 +1135,6 @@
         const btnUseAdminNumber = document.getElementById('btnUseAdminNumber');
         const btnSubmitWa = document.getElementById('btnSubmitWa');
 
-        // Phone Simulator Elements
-        const phoneLiveBubble = document.getElementById('phoneLiveBubble');
-        const phoneLiveTime = document.getElementById('phoneLiveTime');
-        const phoneRecipientName = document.getElementById('phoneRecipientName');
-
         // Contact Mini Card
         const contactMiniCard = document.getElementById('contactMiniCard');
         const contactMiniName = document.getElementById('contactMiniName');
@@ -1318,21 +1145,12 @@
 
         const adminNumber = @json(config('services.whatsapp.admin_number', ''));
 
-        // Update Phone Live Clock
-        function updateLiveClock() {
-            const now = new Date();
-            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-            if (phoneLiveTime) phoneLiveTime.textContent = timeStr;
-        }
-        updateLiveClock();
-
         // 1. Tombol Cepat Isi Nomor Admin
         if (btnUseAdminNumber) {
             btnUseAdminNumber.addEventListener('click', function () {
                 if (adminNumber) {
                     phoneInput.value = adminNumber;
                     if (selectedUserId) selectedUserId.value = '';
-                    if (phoneRecipientName) phoneRecipientName.textContent = 'Admin Fleet Control';
                     if (contactMiniCard) contactMiniCard.classList.add('d-none');
                 } else {
                     alert('Nomor admin belum dikonfigurasi di file .env (WHATSAPP_ADMIN_NUMBER)');
@@ -1364,7 +1182,6 @@
                     contactMiniRole.textContent = userRole;
                     contactMiniPhone.textContent = phone;
                     contactMiniInitial.textContent = userName.charAt(0).toUpperCase();
-                    if (phoneRecipientName) phoneRecipientName.textContent = userName;
 
                     if (vehiclePlat) {
                         contactMiniPlat.style.display = 'inline-flex';
@@ -1374,7 +1191,6 @@
                     }
                 } else {
                     contactMiniCard.classList.add('d-none');
-                    if (phoneRecipientName) phoneRecipientName.textContent = 'Fleet Control Center';
                 }
 
                 // Auto-fill template variables
@@ -1400,8 +1216,6 @@
                         }
                     }
                 }
-
-                updateLivePreview();
             });
         }
 
@@ -1424,8 +1238,6 @@
                     if (merkInput) merkInput.value = merk || '';
                     if (odoInput) odoInput.value = odo || '0';
                     if (driverInput && driver && driver !== 'Belum ada driver') driverInput.value = driver;
-
-                    updateLivePreview();
                 }
             });
         }
@@ -1439,54 +1251,11 @@
         if (messageTextarea) {
             messageTextarea.addEventListener('input', function () {
                 updateCounter();
-                updateLivePreview();
             });
             updateCounter();
         }
 
-        // 5. WhatsApp Text Formatter (WhatsApp bold *text*, italics _text_, strikethrough ~text~)
-        function formatWhatsappText(raw) {
-            if (!raw) return 'Tulis teks pesan untuk melihat pratinjau live.';
-            let formatted = raw
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/\*(.*?)\*/g, '<strong>$1</strong>')
-                .replace(/_(.*?)_/g, '<em>$1</em>')
-                .replace(/~(.*?)~/g, '<del>$1</del>')
-                .replace(/\n/g, '<br>');
-            return formatted;
-        }
-
-        // 6. Live Preview Update Function
-        function updateLivePreview() {
-            const selectedOpt = templateSelect.options[templateSelect.selectedIndex];
-            let content = selectedOpt.getAttribute('data-content');
-
-            if (!content) {
-                const manualText = messageTextarea.value;
-                const formattedHtml = formatWhatsappText(manualText);
-                if (phoneLiveBubble) {
-                    phoneLiveBubble.innerHTML = `${formattedHtml} <div class="chat-time-meta"><span>${phoneLiveTime ? phoneLiveTime.textContent : '12:00'}</span><i class="bi bi-check2-all"></i></div>`;
-                }
-                return;
-            }
-
-            const varInputs = dynamicFieldsList.querySelectorAll('input, textarea');
-            varInputs.forEach(input => {
-                const varName = input.getAttribute('data-var');
-                const val = input.value || `{${varName}}`;
-                const regex = new RegExp(`\\{\\{\\s*${varName}\\s*\\}\\}`, 'g');
-                content = content.replace(regex, val);
-            });
-
-            const formattedHtml = formatWhatsappText(content);
-            if (phoneLiveBubble) {
-                phoneLiveBubble.innerHTML = `${formattedHtml} <div class="chat-time-meta"><span>${phoneLiveTime ? phoneLiveTime.textContent : '12:00'}</span><i class="bi bi-check2-all"></i></div>`;
-            }
-        }
-
-        // 7. Template Category Filter Pills
+        // 5. Template Category Filter Pills
         const filterPills = document.querySelectorAll('.tmpl-filter-pill');
         filterPills.forEach(pill => {
             pill.addEventListener('click', function () {
@@ -1506,7 +1275,7 @@
             });
         });
 
-        // 8. Template Select Handler
+        // 6. Template Select Handler
         if (templateSelect) {
             templateSelect.addEventListener('change', function () {
                 const selectedOpt = this.options[this.selectedIndex];
@@ -1559,26 +1328,21 @@
                             inputField.value = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
                         }
 
-                        inputField.addEventListener('input', updateLivePreview);
-
                         formGroup.appendChild(label);
                         formGroup.appendChild(inputField);
                         dynamicFieldsList.appendChild(formGroup);
                     });
-
-                    updateLivePreview();
                 } else {
                     manualMessageContainer.classList.remove('d-none');
                     dynamicVariablesContainer.classList.add('d-none');
                     vehiclePickerContainer.classList.add('d-none');
                     if (msgAsterisk) msgAsterisk.classList.remove('d-none');
                     updateCounter();
-                    updateLivePreview();
                 }
             });
         }
 
-        // 9. Apply Template from Catalogue Tab
+        // 7. Apply Template from Catalogue Tab
         const applyButtons = document.querySelectorAll('.btn-apply-tmpl');
         applyButtons.forEach(btn => {
             btn.addEventListener('click', function () {
@@ -1586,16 +1350,20 @@
                 templateSelect.value = code;
                 templateSelect.dispatchEvent(new Event('change'));
 
-                // Switch to simulator tab to see preview
-                const simTab = document.getElementById('simulator-tab');
-                if (simTab) {
-                    const tabTrigger = new bootstrap.Tab(simTab);
+                // Switch back to Riwayat & Logbook tab
+                const tableTab = document.getElementById('table-tab');
+                if (tableTab) {
+                    const tabTrigger = new bootstrap.Tab(tableTab);
                     tabTrigger.show();
+                }
+                const sendForm = document.getElementById('waSendForm');
+                if (sendForm) {
+                    sendForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
         });
 
-        // 10. Manual Formatting Toolbar Handlers
+        // 8. Manual Formatting Toolbar Handlers
         const formatBtns = document.querySelectorAll('.format-btn');
         formatBtns.forEach(btn => {
             btn.addEventListener('click', function () {
@@ -1617,11 +1385,10 @@
                 messageTextarea.focus();
                 messageTextarea.setSelectionRange(start + replacement.length, start + replacement.length);
                 updateCounter();
-                updateLivePreview();
             });
         });
 
-        // 11. Modal Detail Log Inspector Handler
+        // 9. Modal Detail Log Inspector Handler
         const detailButtons = document.querySelectorAll('.btn-detail-log');
         detailButtons.forEach(btn => {
             btn.addEventListener('click', function () {
@@ -1636,7 +1403,7 @@
 
                     const statusBadge = document.getElementById('modalStatusBadge');
                     statusBadge.textContent = (logData.status || 'PENDING').toUpperCase();
-                    statusBadge.className = `badge badge-soft-${logData.status === 'success' ? 'success' : (logData.status === 'failed' ? 'danger' : 'warning')}`;
+                    statusBadge.className = `badge badge-soft-${logData.status === 'success' || logData.status === 'sent' ? 'success' : (logData.status === 'failed' ? 'danger' : 'warning')}`;
 
                     document.getElementById('modalSentAt').textContent = logData.sent_at || logData.created_at || '—';
                     document.getElementById('modalMessage').textContent = logData.message || '—';
@@ -1663,7 +1430,7 @@
             });
         });
 
-        // 12. Copy JSON Helper
+        // 10. Copy JSON Helper
         const btnCopyJson = document.getElementById('btnCopyJson');
         if (btnCopyJson) {
             btnCopyJson.addEventListener('click', function () {
@@ -1677,7 +1444,7 @@
             });
         }
 
-        // 13. Form Submit Loading Spinner
+        // 11. Form Submit Loading Spinner
         const waSendForm = document.getElementById('waSendForm');
         if (waSendForm && btnSubmitWa) {
             waSendForm.addEventListener('submit', function () {
@@ -1685,9 +1452,6 @@
                 btnSubmitWa.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Mengirim via Gateway...';
             });
         }
-
-        // Trigger initial preview
-        updateLivePreview();
     });
 </script>
 @endsection
