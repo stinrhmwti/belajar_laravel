@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\DailyChecklist;
 use App\Models\Vehicle;
+use App\Services\WhatsappService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Throwable;
 
 class DailyChecklistController extends Controller
 {
@@ -42,7 +45,7 @@ class DailyChecklistController extends Controller
         return view('checklist.create', compact('vehicles'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, WhatsappService $whatsapp)
     {
         $validated = $request->validate([
             'vehicle_id' => 'required|exists:vehicles,id',
@@ -72,6 +75,37 @@ class DailyChecklistController extends Controller
         if (! empty($validated['odometer'])) {
             Vehicle::where('id', $validated['vehicle_id'])
                 ->update(['odometer_awal' => $validated['odometer']]);
+        }
+
+        // Cek apakah ada komponen yang Not OK untuk dikirimkan notifikasi peringatan ke Admin
+        $notOkItems = [];
+        if ($validated['oli_mesin'] === 'Not OK') $notOkItems[] = 'Oli Mesin';
+        if ($validated['air_radiator'] === 'Not OK') $notOkItems[] = 'Air Radiator';
+        if ($validated['minyak_rem'] === 'Not OK') $notOkItems[] = 'Minyak Rem';
+        if ($validated['ban_rem'] === 'Not OK') $notOkItems[] = 'Ban & Rem';
+        if ($validated['lampu_klakson'] === 'Not OK') $notOkItems[] = 'Lampu & Klakson';
+        if ($validated['kebersihan'] === 'Not OK') $notOkItems[] = 'Kebersihan';
+
+        if (! empty($notOkItems)) {
+            $adminNumber = config('services.whatsapp.admin_number');
+            if (! empty($adminNumber)) {
+                try {
+                    $vehicle = Vehicle::find($validated['vehicle_id']);
+                    $platNomor = $vehicle ? $vehicle->plat_nomor : '—';
+
+                    $whatsapp->sendTemplate('checklist_peringatan', $adminNumber, [
+                        'plat_nomor' => $platNomor,
+                        'nama_pemeriksa' => $validated['nama_teknisi'],
+                        'tanggal' => Carbon::parse($validated['tanggal'])->format('d/m/Y'),
+                        'komponen_bermasalah' => implode(', ', $notOkItems),
+                        'catatan' => $validated['catatan_tambahan'] ?: 'Tidak ada catatan tambahan.',
+                    ], [
+                        'user_id' => auth()->id(),
+                    ]);
+                } catch (Throwable $e) {
+                    // Abaikan kesalahan kirim WA agar proses checklist tetap sukses
+                }
+            }
         }
 
         return redirect()->route('checklist.index')->with('success', 'Checklist harian berhasil disimpan.');

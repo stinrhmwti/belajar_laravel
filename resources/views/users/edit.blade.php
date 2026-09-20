@@ -32,12 +32,16 @@
                         </div>
 
                         <div class="row g-3 mb-3">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label fw-semibold text-dark">Email <span class="text-danger">*</span></label>
                                 <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}" required style="border-radius: 8px;">
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold text-dark">No. Telepon / WhatsApp</label>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold text-dark">Nomor WhatsApp</label>
+                                <input type="text" name="no_wa" class="form-control" value="{{ old('no_wa', $user->no_wa) }}" placeholder="08123456789" style="border-radius: 8px;">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold text-dark">No. Telepon</label>
                                 <input type="text" name="no_telepon" class="form-control" value="{{ old('no_telepon', $user->no_telepon) }}" placeholder="Contoh: 081234567890" style="border-radius: 8px;">
                             </div>
                         </div>

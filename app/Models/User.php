@@ -10,6 +10,7 @@ use Illuminate\Notifications\Notifiable;
  * @property string $name
  * @property string $username
  * @property string|null $email
+ * @property string|null $no_wa
  * @property string $password
  * @property string $role
  * @property string|null $kelas
@@ -25,6 +26,7 @@ class User extends Authenticatable
         'name',
         'username',
         'email',
+        'no_wa',
         'no_telepon',
         'nomor_sim',
         'jenis_sim',

@@ -14,13 +14,14 @@
   <a href="https://getbootstrap.com"><img src="https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white" alt="Bootstrap 5"></a>
   <a href="https://leafletjs.com"><img src="https://img.shields.io/badge/Leaflet.js-Interactive%20Maps-199900?style=for-the-badge&logo=leaflet&logoColor=white" alt="Leaflet Maps"></a>
   <a href="https://mysql.com"><img src="https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL"></a>
+  <a href="https://api.ervelia.com"><img src="https://img.shields.io/badge/WhatsApp%20API-Ervelia%20Gateway-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="WhatsApp Gateway"></a>
 </p>
 
 ---
 
 ## 🌟 Tentang Proyek
 
-**Fleet Management System** adalah aplikasi web komprehensif untuk mengelola seluruh siklus operasional kendaraan perusahaan, mulai dari pemantauan aset, pelacakan rute pengiriman real-time, inspeksi harian kelaikan jalan, penanganan keluhan kerusakan, hingga rekapitulasi keuangan dan jadwal servis berkala otomatis.
+**Fleet Management System** adalah aplikasi web komprehensif untuk mengelola seluruh siklus operasional kendaraan perusahaan, mulai dari pemantauan aset, pelacakan rute pengiriman real-time, inspeksi harian kelaikan jalan, penanganan keluhan kerusakan, hingga rekapitulasi keuangan, notifikasi otomatis WhatsApp Gateway, dan jadwal servis berkala otomatis.
 
 Sistem ini didesain responsif untuk memudahkan pengemudi (*driver*) mengakses lewat *smartphone*, teknisi bengkel di lapangan, serta tim manajemen dan admin di kantor pusat.
 
@@ -65,6 +66,16 @@ Sistem ini didesain responsif untuk memudahkan pengemudi (*driver*) mengakses le
 - **3 Tingkatan Hak Akses Utama:** `Admin` (Manajemen & Fleet Control), `Teknisi` (Bengkel & Perawatan), dan `User` (Driver / Pengemudi).
 - **Dukungan Dwibahasa:** Bahasa Indonesia (`id`) & Bahasa Inggris (`en`).
 
+### 📲 9. Integrasi Notifikasi Otomatis WhatsApp Gateway API
+- **Ervelia Gateway REST API:** Pengiriman notifikasi WhatsApp berbasis event secara instan dan tanpa jeda.
+- **Event Notifikasi Otomatis:**
+  - 🚨 **Keluhan Baru:** Laporan kerusakan armada langsung diteruskan ke WhatsApp Admin & Teknisi.
+  - 🔄 **Update Progres Servis:** Status pengerjaan & penyelesaian unit diinfokan otomatis ke WhatsApp Driver pelapor.
+  - ⚠️ **Checklist Peringatan:** Hasil inspeksi checklist harian yang bermasalah (Not OK) otomatis dilaporkan ke WhatsApp Admin.
+  - 💼 **Approval Biaya Besar:** Notifikasi pengajuan anggaran perbaikan > Rp 1.000.000 ke WhatsApp Pimpinan.
+  - 🚗 **Penugasan Rute & Driver:** Pengiriman instruksi dan rute pengantaran ke WhatsApp Driver.
+- **Dashboard & Logbook WA:** Monitoring status pengiriman (`pending`, `success`, `failed`), respons JSON provider, dan tombol *Kirim Ulang (Resend)*.
+
 ---
 
 ## 🏗️ Arsitektur Sistem
@@ -80,12 +91,14 @@ graph TD
         Server --> ChecklistModule["📋 Daily Inspection & Odometer Sync"]
         Server --> ExpenseModule["💰 Rekap Biaya, Approval & Export CSV"]
         Server --> ComplaintModule["🛠️ Laporan Keluhan & Logbook Servis"]
+        Server --> WhatsappModule["📲 WhatsApp Gateway & Monitoring Logs"]
     end
 
-    subgraph Storage & Persistence
+    subgraph External & Storage Persistence
         Server --> MySQL[("🗄️ MySQL Database")]
         Server --> LocalDisk["📁 Public Storage (Foto Unit, Video Bukti, Avatar)"]
         Server --> MailServer["📧 Mailer / SMTP (Email OTP)"]
+        WhatsappModule --> ErveliaAPI["🌐 Ervelia WhatsApp Gateway REST API"]
     end
 ```
 
@@ -115,7 +128,7 @@ copy .env.example .env
 # 4. Generate Application Key
 php artisan key:generate
 
-# 5. Konfigurasikan database di file .env, lalu jalankan migrasi & seeder
+# 5. Konfigurasikan database & WhatsApp Gateway di file .env, lalu jalankan migrasi & seeder
 php artisan migrate --seed
 
 # 6. Buat link symbolic storage publik untuk media upload
@@ -126,7 +139,18 @@ php artisan serve
 ```
 Akses di browser: `http://127.0.0.1:8000`
 
-### 3. Menjalankan untuk Akses Handphone / Jaringan Wi-Fi
+### 3. Konfigurasi WhatsApp Gateway API (`.env`)
+```env
+# ============ PENGATURAN WHATSAPP GATEWAY ============
+WHATSAPP_ENABLED=true
+WHATSAPP_DRIVER=ervelia
+WHATSAPP_BASE_URL=https://api.ervelia.com
+WHATSAPP_TOKEN=token_api_gateway_anda_disini
+WHATSAPP_COUNTRY_CODE=62
+WHATSAPP_ADMIN_NUMBER=6281234567890
+```
+
+### 4. Menjalankan untuk Akses Handphone / Jaringan Wi-Fi
 Tersedia skrip instan `jalankan_di_hp.bat` di folder utama. Cukup klik ganda file tersebut untuk otomatis mendeteksi IP PC lokal dan menyalakan server dengan host `0.0.0.0:8000`.
 
 ---
@@ -135,9 +159,9 @@ Tersedia skrip instan `jalankan_di_hp.bat` di folder utama. Cukup klik ganda fil
 
 | Peran (Role) | Username | Email | Hak Akses Utama |
 | :--- | :--- | :--- | :--- |
-| **Admin** | `admin_fleet` | `admin@fleet.com` | Kontrol penuh master armada, user & SIM, trip dispatcher, approval pengeluaran, ekspor CSV |
+| **Admin** | `admin_fleet` | `admin@fleet.com` | Kontrol penuh master armada, user & SIM, trip dispatcher, approval pengeluaran, WhatsApp Gateway monitor |
 | **Teknisi** | `teknisi_utama` | `teknisi@fleet.com` | Penanganan keluhan, update progress perbaikan, ubah status servis, input checklist harian |
-| **User (Driver)** | `driver_utama` | `user@fleet.com` | Lapor kerusakan foto/video, inspeksi checklist harian & sinkronisasi odometer, pelacakan armada saya |
+| **User (Driver)** | `driver_utama` | `user@fleet.com` | Lapor kerusakan foto/video, inspeksi checklist harian & sinkronisasi odometer, pelacakan armada saya, notifikasi WA |
 
 ---
 

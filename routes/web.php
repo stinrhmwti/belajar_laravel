@@ -7,6 +7,7 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\WhatsappController;
 use Illuminate\Support\Facades\Route;
 
 // Halaman utama diarahkan ke dashboard (kalau belum login, otomatis ke /login)
@@ -115,6 +116,12 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
         Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     });
+
+    // ============ NOTIFIKASI WHATSAPP ============
+    Route::get('/whatsapp', [WhatsappController::class, 'index'])->name('whatsapp.index');
+    Route::post('/whatsapp/send', [WhatsappController::class, 'send'])->name('whatsapp.send');
+    Route::post('/whatsapp/{log}/resend', [WhatsappController::class, 'resend'])->name('whatsapp.resend');
+    Route::get('/whatsapp/{log}', [WhatsappController::class, 'show'])->name('whatsapp.show');
 });
 
 // ============================================================

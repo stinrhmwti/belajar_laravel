@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Complaint;
 use App\Models\Expense;
 use App\Models\Vehicle;
+use App\Services\WhatsappService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Throwable;
 
 class ComplaintController extends Controller
 {
@@ -32,7 +34,7 @@ class ComplaintController extends Controller
         return view('complaints.create', compact('vehicles'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, WhatsappService $whatsapp)
     {
         $validated = $request->validate([
             'vehicle_id' => 'required|exists:vehicles,id',
@@ -61,12 +63,35 @@ class ComplaintController extends Controller
             $validated['video_kerusakan'] = 'uploads/complaints/'.$filename;
         }
 
-        Complaint::create($validated);
+        $complaint = Complaint::create($validated);
+
+        // Notifikasi WhatsApp otomatis ke Admin jika nomor admin dikonfigurasi
+        $adminNumber = config('services.whatsapp.admin_number');
+        if (! empty($adminNumber)) {
+            try {
+                $vehicle = Vehicle::find($validated['vehicle_id']);
+                $platNomor = $vehicle ? $vehicle->plat_nomor : '—';
+                $merkTipe = $vehicle ? trim(($vehicle->merek ?? '') . ' ' . ($vehicle->tipe ?? '')) : 'Armada';
+                $reporterName = Auth::user() ? Auth::user()->name : 'Driver / Pengguna';
+
+                $whatsapp->sendTemplate('keluhan_baru', $adminNumber, [
+                    'nama_driver' => $reporterName,
+                    'plat_nomor' => $platNomor,
+                    'merk_tipe' => $merkTipe ?: 'Armada',
+                    'tanggal' => Carbon::parse($validated['tanggal'])->format('d/m/Y'),
+                    'deskripsi_kerusakan' => $validated['keluhan'],
+                ], [
+                    'user_id' => Auth::id(),
+                ]);
+            } catch (Throwable $e) {
+                // Abaikan kesalahan kirim WhatsApp agar proses simpan keluhan tetap berhasil
+            }
+        }
 
         return redirect()->route('complaints.index')->with('success', 'Keluhan berhasil dilaporkan. Teknisi akan segera menindaklanjuti.');
     }
 
-    public function updateStatus(Request $request, Complaint $complaint)
+    public function updateStatus(Request $request, Complaint $complaint, WhatsappService $whatsapp)
     {
         $validated = $request->validate([
             'status' => 'required|in:Baru,Diproses,Selesai',
@@ -107,6 +132,35 @@ class ComplaintController extends Controller
         unset($validated['jumlah_biaya']);
 
         $complaint->update($validated);
+
+        // Notifikasi WhatsApp otomatis ke Driver/Pelapor saat status diperbarui
+        try {
+            $driverUser = $complaint->user;
+            $targetPhone = $driverUser?->no_wa ?: $driverUser?->no_telepon;
+            if (! empty($targetPhone)) {
+                $vehicle = $complaint->vehicle;
+                $platNomor = $vehicle ? $vehicle->plat_nomor : '—';
+                $statusLabel = match ($status) {
+                    'Selesai' => 'Selesai Diperbaiki & Siap Pakai',
+                    'Diproses' => 'Sedang Dikerjakan oleh Teknisi',
+                    default => 'Dalam Antrean Verifikasi',
+                };
+                $catatan = $complaint->catatan_penyelesaian ?: ($status === 'Selesai' ? 'Unit telah diperbaiki dan siap digunakan kembali.' : 'Sedang ditangani oleh tim teknisi armada.');
+
+                $whatsapp->sendTemplate('keluhan_status', $targetPhone, [
+                    'nama_driver' => $driverUser->name,
+                    'plat_nomor' => $platNomor,
+                    'status_perbaikan' => $statusLabel,
+                    'progress' => (string) ($complaint->progress_perbaikan ?? 0),
+                    'catatan_teknisi' => $catatan,
+                    'waktu' => now()->format('d/m/Y H:i'),
+                ], [
+                    'user_id' => $driverUser->id,
+                ]);
+            }
+        } catch (Throwable $e) {
+            // Abaikan kesalahan kirim WA agar proses update status tetap sukses
+        }
 
         // Jika status selesai, catat otomatis ke rekap pengeluaran (Expenses) dan riwayat kendaraan (VehicleHistory)
         if ($status === 'Selesai') {

@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    'whatsapp' => [
+        'enabled' => env('WHATSAPP_ENABLED', true),
+        'driver' => env('WHATSAPP_DRIVER', 'ervelia'),
+        'base_url' => env('WHATSAPP_BASE_URL', ''),
+        'token' => env('WHATSAPP_TOKEN', ''),
+        'country_code' => env('WHATSAPP_COUNTRY_CODE', '62'),
+        'admin_number' => env('WHATSAPP_ADMIN_NUMBER'),
+    ],
+
 ];
+

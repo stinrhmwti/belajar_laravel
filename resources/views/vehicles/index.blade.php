@@ -199,8 +199,20 @@
 
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
     <div>
-        <h3 class="fw-bold text-dark mb-1 page-header-title">{{ __('Data Kendaraan & Servis') }}</h3>
-        <p class="text-secondary mb-0" style="font-size: 0.95rem;">{{ __('Kelola armada perusahaan, pantau odometer real-time, dan jadwalkan pemeliharaan terpadu.') }}</p>
+        <h3 class="fw-bold text-dark mb-1 page-header-title">
+            @if (auth()->check() && auth()->user()->role === 'user')
+                {{ __('Kendaraan Saya & Armada Pool') }}
+            @else
+                {{ __('Data Kendaraan & Servis') }}
+            @endif
+        </h3>
+        <p class="text-secondary mb-0" style="font-size: 0.95rem;">
+            @if (auth()->check() && auth()->user()->role === 'user')
+                {{ __('Pantau kondisi kendaraan tugas Anda, status uji KIR, jadwal servis, dan ketersediaan armada pool.') }}
+            @else
+                {{ __('Kelola armada perusahaan, pantau odometer real-time, dan jadwalkan pemeliharaan terpadu.') }}
+            @endif
+        </p>
     </div>
     <div class="d-flex align-items-center gap-2">
         @if (auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin', 'teknisi']))
@@ -215,6 +227,42 @@
         @endif
     </div>
 </div>
+
+@if (auth()->check() && auth()->user()->role === 'user' && isset($myVehicles))
+<div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4 p-3 bg-white border rounded-4 shadow-sm" style="border-radius: 14px !important;">
+    <ul class="nav nav-pills gap-2" id="driverVehicleTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a href="{{ route('vehicles.index', ['tab' => 'my']) }}" class="nav-link {{ ($viewTab ?? 'my') === 'my' ? 'active shadow-sm fw-bold bg-primary text-white' : 'bg-light text-secondary border' }} px-3.5 py-2 d-inline-flex align-items-center gap-2" style="border-radius: 10px;">
+                <i class="bi bi-person-badge-fill"></i> {{ __('Kendaraan Tugas Saya') }}
+                <span class="badge {{ ($viewTab ?? 'my') === 'my' ? 'bg-white text-primary' : 'bg-secondary-subtle text-secondary' }} rounded-pill ms-1">{{ $myVehicles->count() }}</span>
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a href="{{ route('vehicles.index', ['tab' => 'all']) }}" class="nav-link {{ ($viewTab ?? 'my') === 'all' ? 'active shadow-sm fw-bold bg-primary text-white' : 'bg-light text-secondary border' }} px-3.5 py-2 d-inline-flex align-items-center gap-2" style="border-radius: 10px;">
+                <i class="bi bi-grid-3x3-gap-fill"></i> {{ __('Semua Armada Pool') }}
+                <span class="badge {{ ($viewTab ?? 'my') === 'all' ? 'bg-white text-primary' : 'bg-secondary-subtle text-secondary' }} rounded-pill ms-1">{{ $allVehicles->count() }}</span>
+            </a>
+        </li>
+    </ul>
+    <div>
+        @if (($viewTab ?? 'my') === 'my')
+            @if ($myVehicles->isNotEmpty())
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill fs-7 d-inline-flex align-items-center gap-1.5">
+                    <i class="bi bi-shield-check"></i> Menampilkan unit yang ditugaskan kepada <strong>{{ auth()->user()->name }}</strong>
+                </span>
+            @else
+                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2 rounded-pill fs-7 d-inline-flex align-items-center gap-1.5">
+                    <i class="bi bi-info-circle"></i> Belum ada kendaraan yang terikat dengan nama Anda
+                </span>
+            @endif
+        @else
+            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-2 rounded-pill fs-7 d-inline-flex align-items-center gap-1.5">
+                <i class="bi bi-eye"></i> Mode Tinjauan Ketersediaan Seluruh Armada Pool (Read-Only)
+            </span>
+        @endif
+    </div>
+</div>
+@endif
 
 @php
     $totalKendaraan = $vehicles->count();
@@ -393,9 +441,16 @@
                 <!-- Plate & Status Header (Above Image) -->
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <!-- Plate Badge -->
-                    <span class="badge bg-dark text-white font-monospace px-3 py-2 fs-6 border border-secondary shadow-sm" onclick="navigator.clipboard.writeText('{{ $v->plat_nomor }}'); alert('Plat nomor {{ $v->plat_nomor }} berhasil disalin!');" style="cursor: pointer; border-radius: 10px; letter-spacing: 0.8px;">
-                        {{ $v->plat_nomor }} <i class="bi bi-clipboard ms-1 text-white-50" style="font-size: 0.75rem;"></i>
-                    </span>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="badge bg-dark text-white font-monospace px-3 py-2 fs-6 border border-secondary shadow-sm" onclick="navigator.clipboard.writeText('{{ $v->plat_nomor }}'); alert('Plat nomor {{ $v->plat_nomor }} berhasil disalin!');" style="cursor: pointer; border-radius: 10px; letter-spacing: 0.8px;">
+                            {{ $v->plat_nomor }} <i class="bi bi-clipboard ms-1 text-white-50" style="font-size: 0.75rem;"></i>
+                        </span>
+                        @if (auth()->check() && ($v->driver_id === auth()->id() || $v->supir_utama === auth()->user()->name))
+                            <span class="badge bg-primary text-white px-2.5 py-1.5 fw-semibold d-inline-flex align-items-center gap-1 shadow-sm" style="border-radius: 8px; font-size: 0.72rem;">
+                                <i class="bi bi-person-check-fill"></i> {{ __('Armada Anda') }}
+                            </span>
+                        @endif
+                    </div>
                     <!-- Status Badge -->
                     <div>
                         @if ($v->status === 'Siap Pakai')
@@ -566,8 +621,15 @@
                     <i class="bi bi-car-front fs-1 text-primary" style="color: #0284c7 !important;"></i>
                 </div>
             </div>
-            <h5 class="fw-bold text-dark mb-1">{{ __('Tidak ada data kendaraan') }}</h5>
-            <p class="text-secondary mb-0" style="font-size: 0.9rem;">{{ __('Belum ada data armada kendaraan yang terdaftar di dalam sistem.') }}</p>
+            <h5 class="fw-bold text-dark mb-1">{{ __('Tidak Ada Kendaraan Ditemukan') }}</h5>
+            @if (auth()->check() && auth()->user()->role === 'user' && ($viewTab ?? 'my') === 'my')
+                <p class="text-secondary mb-3" style="font-size: 0.9rem;">{{ __('Belum ada armada kendaraan yang secara spesifik ditugaskan ke akun Anda.') }}</p>
+                <a href="{{ route('vehicles.index', ['tab' => 'all']) }}" class="btn btn-outline-primary px-3 py-2" style="border-radius: 8px; font-weight: 600;">
+                    <i class="bi bi-grid-3x3-gap-fill me-1"></i> {{ __('Lihat Ketersediaan Semua Armada Pool') }}
+                </a>
+            @else
+                <p class="text-secondary mb-0" style="font-size: 0.9rem;">{{ __('Belum ada data armada kendaraan yang terdaftar atau sesuai dengan filter pencarian.') }}</p>
+            @endif
         </div>
     @endforelse
 </div>

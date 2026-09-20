@@ -34,6 +34,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users,username',
             'email' => 'required|email|max:255|unique:users,email',
+            'no_wa' => ['nullable', 'string', 'max:20'],
             'password' => 'required|string|min:6',
             'role' => 'required|in:superadmin,admin,teknisi,user,pimpinan',
             'no_telepon' => 'nullable|string|max:30',
@@ -67,6 +68,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users,username,'.$user->id,
             'email' => 'required|email|max:255|unique:users,email,'.$user->id,
+            'no_wa' => ['nullable', 'string', 'max:20'],
             'role' => 'required|in:superadmin,admin,teknisi,user,pimpinan',
             'password' => 'nullable|string|min:6',
             'no_telepon' => 'nullable|string|max:30',
@@ -110,6 +112,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,'.$user->id,
+            'no_wa' => ['nullable', 'string', 'max:20'],
             'no_telepon' => 'nullable|string|max:30',
             'nomor_sim' => 'nullable|string|max:50',
             'jenis_sim' => 'nullable|string|in:SIM A,SIM B1,SIM B2,SIM C,Lainnya',
@@ -121,6 +124,9 @@ class UserController extends Controller
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
+        if (array_key_exists('no_wa', $validated)) {
+            $user->no_wa = $validated['no_wa'];
+        }
         if (array_key_exists('no_telepon', $validated)) {
             $user->no_telepon = $validated['no_telepon'];
         }

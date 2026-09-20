@@ -223,7 +223,7 @@
             <thead>
                 <tr>
                     <th class="ps-4">{{ __('Pengguna') }}</th>
-                    <th>{{ __('Kontak / NIP') }}</th>
+                    <th>{{ __('Kontak / WhatsApp') }}</th>
                     <th>{{ __('Username & Email') }}</th>
                     <th>{{ __('Role & Hak Akses') }}</th>
                     <th>{{ __('Lisensi Driver (SIM)') }}</th>
@@ -259,11 +259,20 @@
                         </div>
                     </td>
                     <td>
+                        @if($u->no_wa)
+                            <div class="d-flex align-items-center gap-1.5 text-success fw-semibold mb-1" style="font-size:0.85rem;" title="Nomor WhatsApp">
+                                <i class="bi bi-whatsapp"></i>
+                                <span>{{ $u->no_wa }}</span>
+                            </div>
+                        @endif
                         @if($u->no_telepon)
-                            <div class="d-flex align-items-center gap-1.5 text-dark fw-semibold mb-1" style="font-size:0.85rem;">
-                                <i class="bi bi-telephone text-success"></i>
+                            <div class="d-flex align-items-center gap-1.5 text-dark fw-semibold mb-1" style="font-size:0.85rem;" title="No Telepon">
+                                <i class="bi bi-telephone text-secondary"></i>
                                 <span>{{ $u->no_telepon }}</span>
                             </div>
+                        @endif
+                        @if(!$u->no_wa && !$u->no_telepon)
+                            <span class="text-muted d-block mb-1" style="font-size:0.82rem;">—</span>
                         @endif
                         <span class="text-muted font-monospace" style="font-size:0.78rem;">ID: {{ $u->nis ?? '—' }}</span>
                     </td>

@@ -8,13 +8,13 @@ Selamat datang di direktori dokumentasi resmi **Fleet Management System (Sistem 
 
 1. **[belajar_sistem_armada.md](file:///c:/xampppp/htdocs/belajar-laravel/doc/belajar_sistem_armada.md)**  
    *Dokumentasi Utama & Analisis Lengkap Sistem* yang memuat:
-   * **Ikhtisar Sistem & 8 Fitur Unggulan**: Live GPS Fleet Tracking, Trip Dispatcher & ETA Telemetry, Smart Maintenance Alert, Rekap Biaya & Export CSV, Quick BBM Odometer Sync, Otorisasi Anggaran Berjenjang, Pemulihan Sandi OTP, dan Multi-role RBAC.
-   * **10 Modul Fungsional Lengkap**: Alur bisnis, validasi, dan controller terkait.
+   * **Ikhtisar Sistem & 9 Fitur Unggulan**: Live GPS Fleet Tracking, Trip Dispatcher & ETA Telemetry, Smart Maintenance Alert, Rekap Biaya & Export CSV, Quick BBM Odometer Sync, Otorisasi Anggaran Berjenjang, Pemulihan Sandi OTP, Multi-role RBAC, dan **Integrasi Notifikasi Otomatis WhatsApp Gateway API (Ervelia Gateway)**.
+   * **11 Modul Fungsional Lengkap**: Alur bisnis, validasi, controller, dan integrasi WhatsApp event-driven.
    * **Matriks Hak Akses Peran (RBAC)** untuk 3 peran utama (`admin`, `teknisi`, `user`/driver).
-   * **Kamus Data & Skema Database**: Detail 7 tabel utama (`users`, `vehicles`, `daily_checklists`, `expenses`, `complaints`, `vehicle_histories`, `password_reset_tokens`).
-   * **Diagram Arsitektur Mermaid**: Entity Relationship Diagram (ERD), Sequence Diagram Alur Servis & Keuangan, Sequence Diagram Reset Password OTP, dan Component Architecture.
+   * **Kamus Data & Skema Database**: Detail 9 tabel utama (`users`, `vehicles`, `daily_checklists`, `expenses`, `complaints`, `vehicle_histories`, `password_reset_tokens`, `whatsapp_templates`, `whatsapp_logs`).
+   * **Diagram Arsitektur Mermaid**: Entity Relationship Diagram (ERD), Sequence Diagram Alur Servis & Keuangan, Sequence Diagram Reset Password OTP, Sequence Diagram WhatsApp Gateway API, dan Component Architecture.
    * **Tabel Lengkap Seluruh Endpoint Rute HTTP (Routing Table)**.
-   * **Panduan Menjalankan Sistem, Akses HP/Wi-Fi Lokal, & Akun Demo Default**.
+   * **Panduan Menjalankan Sistem, Konfigurasi WhatsApp Gateway API (`.env`), Akses HP/Wi-Fi Lokal, & Akun Demo Default**.
 
 ---
 

@@ -9,9 +9,28 @@ use Illuminate\Support\Facades\Storage;
 
 class VehicleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $vehicles = Vehicle::with(['latestChecklist', 'lastServiceExpense'])->orderBy('plat_nomor')->get();
+        $user = auth()->user();
+        $query = Vehicle::with(['latestChecklist', 'lastServiceExpense'])->orderBy('plat_nomor');
+
+        // Jika peran pengguna adalah 'user' (Driver), sesuaikan data dengan kendaraan penugasannya
+        if ($user && $user->role === 'user') {
+            $myVehicles = (clone $query)->where(function ($q) use ($user) {
+                $q->where('driver_id', $user->id)
+                  ->orWhere('supir_utama', $user->name);
+            })->get();
+
+            $allVehicles = $query->get();
+
+            // Default untuk supir: prioritaskan kendaraannya sendiri jika ada
+            $viewTab = $request->query('tab', $myVehicles->isNotEmpty() ? 'my' : 'all');
+            $vehicles = ($viewTab === 'all') ? $allVehicles : $myVehicles;
+
+            return view('vehicles.index', compact('vehicles', 'myVehicles', 'allVehicles', 'viewTab'));
+        }
+
+        $vehicles = $query->get();
 
         return view('vehicles.index', compact('vehicles'));
     }

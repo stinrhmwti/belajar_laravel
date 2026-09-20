@@ -1110,6 +1110,12 @@
                 {{ __('Keluhan Kendaraan') }}
             </a>
         </li>
+        <li class="nav-item">
+            <a href="{{ route('whatsapp.index') }}" class="nav-link {{ request()->routeIs('whatsapp*') ? 'active' : '' }}">
+                <div class="nav-icon"><i class="bi bi-whatsapp"></i></div>
+                {{ __('Notifikasi WhatsApp') }}
+            </a>
+        </li>
 
 
         @if(auth()->check() && in_array(auth()->user()->role, ['superadmin', 'admin']))

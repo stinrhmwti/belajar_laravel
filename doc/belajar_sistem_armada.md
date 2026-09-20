@@ -15,6 +15,7 @@ Dokumentasi ini menyajikan panduan arsitektur, daftar modul fungsional, kamus da
 6. **Sistem Otorisasi Anggaran, Ekspor CSV & Telemetri BBM:** Validasi berjenjang untuk pengeluaran operasional berbiaya besar (> Rp 1.000.000) oleh Pimpinan/Admin, ekspor laporan pengeluaran ke CSV kompatibel Excel (UTF-8 BOM), serta modal pencatatan pengisian BBM instan dengan auto-update odometer.
 7. **Keamanan Akun & Pemulihan Kata Sandi Berbasis OTP (Security & Password Recovery):** Proteksi *rate limiting* saat login, serta alur pemulihan kata sandi menggunakan kode OTP 6 digit yang dikirimkan via notifikasi email (*15 minutes validity*).
 8. **Dukungan Multi-bahasa (Localization):** Antarmuka dwibahasa (Bahasa Indonesia & Bahasa Inggris).
+9. **Integrasi Notifikasi Otomatis WhatsApp Gateway API (Ervelia Gateway / REST API Integration):** Pengiriman pesan instan otomatis berbasis event untuk laporan kerusakan baru, progres perbaikan, peringatan checklist bermasalah, approval anggaran perbaikan besar, pengingat jatuh tempo KIR/servis berkala, serta penugasan armada ke nomor WhatsApp pengemudi dan admin secara real-time.
 
 ---
 
@@ -220,6 +221,33 @@ Dokumentasi ini menyajikan panduan arsitektur, daftar modul fungsional, kamus da
 
 ---
 
+### Modul 11: Integrasi WhatsApp Gateway & Notifikasi Otomatis (WhatsApp API Service & Logs)
+* **Tujuan:** Mengelola pengiriman notifikasi WhatsApp secara otomatis (*event-driven*) maupun manual (*direct send*) menggunakan Ervelia Gateway REST API, dilengkapi normalisasi nomor internasional otomatis (`628xxx`), mesin substitusi template dinamis, pencatatan log histori lengkap (status `pending`/`success`/`failed`, message ID, JSON response, latency), dan kemampuan kirim ulang (*resend*) pesan yang gagal.
+* **Alur Bisnis:**
+  1. **Konfigurasi Gateway:** Sistem membaca parameter `WHATSAPP_ENABLED`, `WHATSAPP_DRIVER`, `WHATSAPP_BASE_URL`, `WHATSAPP_TOKEN`, `WHATSAPP_COUNTRY_CODE`, dan `WHATSAPP_ADMIN_NUMBER` dari environment config (`config/services.php`).
+  2. **Normalisasi Nomor Telepon (`formatPhone`):** Memvalidasi dan mengubah format lokal (contoh: `08123...` atau `8123...`) menjadi format standar internasional (`628123...`) serta memverifikasi panjang nomor minimal 10 digit.
+  3. **Mesin Template Dinamis (`sendTemplate`):** Mengambil template aktif dari database berdasarkan kode unik (`code`), menggantikan placeholder variabel `{{variabel}}` dengan data nyata (nama driver, plat nomor, status perbaikan, nominal biaya, jadwal, catatan), dan mengirimkannya via service.
+  4. **Pemicu Notifikasi Otomatis (*Event Hooks*):**
+     * **Laporan Keluhan Baru (`keluhan_baru`):** Ketika driver mengirim laporan kerusakan di `/complaints`, sistem secara otomatis mengirim notifikasi rincian kerusakan ke nomor WhatsApp Admin.
+     * **Pembaruan Status & Progres Perbaikan (`keluhan_status`):** Saat teknisi memperbarui status (`Diproses` / `Selesai`) atau persentase perbaikan di `/complaints/{complaint}/status`, sistem otomatis mengirim info progres ke nomor WhatsApp pengemudi pelapor (`no_wa` / `no_telepon`).
+     * **Peringatan Checklist Harian Bermasalah (`checklist_peringatan`):** Jika hasil checklist harian di `/checklist` mendeteksi komponen berstatus `Not OK` (Oli, Radiator, Rem, Ban, Lampu, Kebersihan), sistem mengirim peringatan instan ke nomor Admin.
+     * **Permohonan Persetujuan Anggaran (`approval_biaya`):** Pengajuan biaya perbaikan bernilai besar (> Rp 1.000.000) menotifikasi Pimpinan/Admin.
+     * **Pengingat Servis & Dokumen (`servis_reminder`, `kir_reminder`):** Peringatan jatuh tempo KIR atau batas kilometer servis.
+     * **Penugasan Driver & Rute (`tugas_driver`):** Pemberitahuan penugasan armada atau rute tujuan baru ke pengemudi.
+  5. **Pencatatan Log & Resend (*Monitoring Dashboard*):**
+     * Setiap pesan yang dikirim (berhasil maupun gagal) dicatat ke tabel `whatsapp_logs` dengan status awal `pending`, lalu diperbarui ke `success` atau `failed`.
+     * Admin dan Teknisi dapat memantau seluruh riwayat log di `/whatsapp`, melakukan pencarian berdasarkan nomor/pesan/user, memfilter status, melihat rincian response JSON API di modal, dan menekan tombol **Kirim Ulang (Resend)** pada pesan yang gagal.
+* **Service:** [WhatsappService](file:///c:/xampppp/htdocs/belajar-laravel/app/Services/WhatsappService.php)
+* **Controller:** [WhatsappController](file:///c:/xampppp/htdocs/belajar-laravel/app/Http/Controllers/WhatsappController.php)
+* **Model & Tabel:** [WhatsappTemplate](file:///c:/xampppp/htdocs/belajar-laravel/app/Models/WhatsappTemplate.php) (`whatsapp_templates`), [WhatsappLog](file:///c:/xampppp/htdocs/belajar-laravel/app/Models/WhatsappLog.php) (`whatsapp_logs`), [User](file:///c:/xampppp/htdocs/belajar-laravel/app/Models/User.php) (`users`)
+* **Endpoint Rute:**
+  * `GET /whatsapp` (Name: `whatsapp.index`)
+  * `POST /whatsapp/send` (Name: `whatsapp.send`)
+  * `POST /whatsapp/{log}/resend` (Name: `whatsapp.resend`)
+  * `GET /whatsapp/{log}` (Name: `whatsapp.show`)
+
+---
+
 ## 3. MATRIKS HAK AKSES PERAN (ROLE-BASED ACCESS CONTROL)
 
 Sistem menggunakan 3 peran utama (*roles*) dengan pembagian wewenang yang tegas:
@@ -241,6 +269,7 @@ Sistem menggunakan 3 peran utama (*roles*) dengan pembagian wewenang yang tegas:
 | **Kelola Riwayat Servis (CRUD)** | ✅ Ya | ✅ Ya | ❌ Tidak |
 | **Kelola Akun Pengguna & SIM (CRUD)** | ✅ Ya | ❌ Tidak | ❌ Tidak |
 | **Update Profil & Avatar Mandiri** | ✅ Ya | ✅ Ya | ✅ Ya |
+| **Monitoring WhatsApp Logs & Kirim Pesan** | ✅ Ya (Akses & Kirim) | ✅ Ya (Akses & Kirim) | ❌ Tidak |
 
 ---
 
@@ -253,7 +282,8 @@ Sistem menggunakan 3 peran utama (*roles*) dengan pembagian wewenang yang tegas:
 | `name` | VARCHAR(255) | Nama Lengkap |
 | `username` | VARCHAR(255) (Unique) | Username Login |
 | `email` | VARCHAR(255) (Unique) | Alamat Email |
-| `no_telepon` | VARCHAR(30) (Nullable) | Nomor Telepon / WhatsApp |
+| `no_wa` | VARCHAR(20) (Nullable) | Nomor WhatsApp Khusus Notifikasi |
+| `no_telepon` | VARCHAR(30) (Nullable) | Nomor Telepon / Kontak |
 | `nomor_sim` | VARCHAR(50) (Nullable) | Nomor Surat Izin Mengemudi (SIM) |
 | `jenis_sim` | VARCHAR(20) (Nullable) | Kategori SIM (`SIM A`, `SIM B1`, `SIM B2`, `SIM C`, `Lainnya`) |
 | `masa_berlaku_sim` | DATE (Nullable) | Tanggal Batas Akhir Masa Berlaku SIM |
@@ -380,6 +410,38 @@ Sistem menggunakan 3 peran utama (*roles*) dengan pembagian wewenang yang tegas:
 
 ---
 
+### 8. Tabel `whatsapp_templates`
+| Kolom | Tipe Data | Keterangan |
+| :--- | :--- | :--- |
+| `id` | BIGINT (PK, Auto Increment) | ID Unik Template |
+| `code` | VARCHAR(50) (Unique) | Kode Unik Template (cth: `keluhan_baru`, `keluhan_status`) |
+| `name` | VARCHAR(100) | Nama Judul Template |
+| `content` | TEXT | Isi Pesan Template (mendukung placeholder `{{variabel}}`) |
+| `variables` | JSON (Nullable) | Daftar Variabel Placeholder Dinamis |
+| `description` | VARCHAR(255) (Nullable) | Deskripsi Penggunaan Template |
+| `is_active` | BOOLEAN (Default: true) | Status Keaktifan Template |
+| `created_at`, `updated_at` | TIMESTAMP | Waktu Dibuat & Diperbarui |
+
+---
+
+### 9. Tabel `whatsapp_logs`
+| Kolom | Tipe Data | Keterangan |
+| :--- | :--- | :--- |
+| `id` | BIGINT (PK, Auto Increment) | ID Unik Riwayat Pesan |
+| `whatsapp_template_id` | BIGINT (FK $\rightarrow$ `whatsapp_templates.id`, Nullable) | Relasi ke Template yang Digunakan |
+| `user_id` | BIGINT (FK $\rightarrow$ `users.id`, Nullable) | Relasi ke Pengguna Tujuan / Pemicu |
+| `phone` | VARCHAR(20) | Nomor Telepon Tujuan (Format `628xxx`) |
+| `message` | TEXT | Isi Pesan Teks yang Dikirimkan |
+| `status` | ENUM('pending', 'success', 'failed') | Status Pengiriman Pesan |
+| `provider` | VARCHAR(30) (Nullable) | Nama Provider Gateway (Default: `ervelia`) |
+| `message_id` | VARCHAR(255) (Nullable) | ID Pesan dari Response Provider Gateway |
+| `error_message` | TEXT (Nullable) | Keterangan Error Jika Pengiriman Gagal |
+| `response` | JSON (Nullable) | Payload Response Lengkap dari Provider Gateway |
+| `sent_at` | TIMESTAMP (Nullable) | Waktu Berhasil Terkirim ke Provider |
+| `created_at`, `updated_at` | TIMESTAMP | Waktu Dibuat & Diperbarui |
+
+---
+
 ## 5. DIAGRAM ARSITEKTUR & PROSES BISNIS
 
 ### A. Entity Relationship Diagram (ERD)
@@ -389,6 +451,8 @@ erDiagram
     users ||--o{ complaints : "melaporkan"
     users ||--o{ vehicle_histories : "mengerjakan"
     users ||--o{ vehicles : "ditugaskan mengemudi"
+    users ||--o{ whatsapp_logs : "menerima / memicu notifikasi"
+    whatsapp_templates ||--o{ whatsapp_logs : "digunakan dalam"
     vehicles ||--o{ daily_checklists : "diperiksa berkala"
     vehicles ||--o{ expenses : "memakan biaya"
     vehicles ||--o{ complaints : "memiliki keluhan"
@@ -399,6 +463,7 @@ erDiagram
         string name
         string username UK
         string email UK
+        string no_wa
         string no_telepon
         string nomor_sim
         string jenis_sim
@@ -554,7 +619,39 @@ sequenceDiagram
 
 ---
 
-### D. Diagram Arsitektur Aplikasi (Component Architecture)
+### E. Sequence Diagram: Alur Notifikasi WhatsApp Gateway API Otomatis & Logbook
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Driver as Driver / User
+    actor Teknisi as Teknisi Bengkel
+    participant CC as ComplaintController
+    participant WS as WhatsappService
+    participant DB as MySQL (whatsapp_logs)
+    participant API as Ervelia Gateway API
+    actor Admin as Admin Fleet
+
+    Driver->>CC: 1. Kirim Laporan Kerusakan Baru (/complaints)
+    CC->>CC: Simpan data laporan keluhan
+    CC->>WS: 2. Panggil sendTemplate('keluhan_baru', adminNumber, data)
+    WS->>DB: Buat record log awal (Status: 'pending')
+    WS->>WS: Normalisasi nomor (formatPhone: 628xxx) & ganti {{variabel}}
+    WS->>API: 3. HTTP POST /api/v1/messages/send (X-API-KEY, Payload JSON)
+    API-->>WS: Return JSON {success: true, id: "msg_12345"}
+    WS->>DB: 4. Update log (Status: 'success', message_id, sent_at)
+    API-->>Admin: 5. Notifikasi WhatsApp masuk ke HP Admin
+
+    Teknisi->>CC: 6. Update Status ke 'Selesai' (/complaints/{id}/status)
+    CC->>WS: Panggil sendTemplate('keluhan_status', driverNumber, data)
+    WS->>DB: Buat record log (Status: 'pending')
+    WS->>API: HTTP POST /api/v1/messages/send
+    API-->>Driver: 7. Notifikasi WhatsApp masuk ke HP Driver (Unit Siap Pakai)
+```
+
+---
+
+### F. Diagram Arsitektur Aplikasi (Component Architecture)
 
 ```mermaid
 graph TD
@@ -564,18 +661,20 @@ graph TD
         WebServer --> Routing["routes/web.php & auth.php"]
         Routing --> RoleMiddleware["Middleware: auth & role:superadmin,admin,teknisi,pimpinan,user"]
         
-        RoleMiddleware -->|Authorized| Controllers["Controllers Layer (Vehicle, Tracking, Expense, Complaint, User, Auth)"]
+        RoleMiddleware -->|Authorized| Controllers["Controllers Layer (Vehicle, Tracking, Expense, Complaint, Whatsapp, User, Auth)"]
         
-        Controllers -->|Data Logic| Models["Eloquent Models Layer (Vehicle, User, Expense, Complaint, Checklist, History)"]
+        Controllers -->|Service Dispatch| Services["Services Layer (WhatsappService)"]
+        Controllers -->|Data Logic| Models["Eloquent Models Layer (Vehicle, User, Expense, Complaint, Checklist, History, WhatsappLog, WhatsappTemplate)"]
         Controllers -->|Render View| Views["Blade Templates + Bootstrap 5 + Leaflet JS (Interactive Maps)"]
         
         Models --> QueryBuilder["Query Builder & Eloquent ORM"]
     end
 
-    subgraph Data & Storage Persistence
+    subgraph External Integrations & Storage
         QueryBuilder --> MySQL[("MySQL Database (Fleet DB)")]
         Controllers --> StorageDisk["Local Storage / Public Uploads (Foto Kendaraan, Bukti Rusak, Avatar)"]
         Controllers --> MailService["Mail Service / SMTP (Reset Password OTP)"]
+        Services --> ErveliaAPI["Ervelia WhatsApp Gateway REST API (/api/v1/messages/send)"]
     end
 
     Views -->|Response HTML / JSON| ClientBrowser
@@ -645,6 +744,10 @@ graph TD
 | `PUT` | `/users/{user}` | `users.update` | `auth, role:superadmin,admin` | `UserController@update` | Simpan Perubahan Pengguna |
 | `DELETE`| `/users/{user}` | `users.destroy` | `auth, role:superadmin,admin` | `UserController@destroy` | Hapus Pengguna |
 | `POST` | `/profile/update` | `profile.update` | `auth` | `UserController@updateProfile` | Update Profil, SIM & Foto Avatar |
+| `GET` | `/whatsapp` | `whatsapp.index` | `auth` | `WhatsappController@index` | Dashboard Riwayat & Monitor Log WhatsApp |
+| `POST` | `/whatsapp/send` | `whatsapp.send` | `auth` | `WhatsappController@send` | Kirim Pesan WA Manual / Berbasis Template |
+| `POST` | `/whatsapp/{log}/resend` | `whatsapp.resend` | `auth` | `WhatsappController@resend` | Kirim Ulang Pesan WhatsApp yang Gagal |
+| `GET` | `/whatsapp/{log}` | `whatsapp.show` | `auth` | `WhatsappController@show` | Ambil Detail Data Log Pesan (Format JSON) |
 
 ---
 
@@ -676,6 +779,18 @@ php artisan storage:link
 php artisan serve
 ```
 
+### Konfigurasi WhatsApp Gateway API (`.env`)
+Tambahkan variabel berikut pada file `.env` untuk mengaktifkan fitur notifikasi WhatsApp otomatis:
+```env
+# ============ PENGATURAN WHATSAPP GATEWAY ============
+WHATSAPP_ENABLED=true
+WHATSAPP_DRIVER=ervelia
+WHATSAPP_BASE_URL=https://api.ervelia.com
+WHATSAPP_TOKEN=token_api_gateway_anda_disini
+WHATSAPP_COUNTRY_CODE=62
+WHATSAPP_ADMIN_NUMBER=6281234567890
+```
+
 ### Akses Melalui Handphone / Jaringan Wi-Fi Lokal
 Tersedia skrip otomatis `jalankan_di_hp.bat` di root direktori project. Cukup klik ganda berkas tersebut untuk mendeteksi IP lokal komputer dan menjalankan server dengan host `0.0.0.0:8000`.
 
@@ -683,6 +798,6 @@ Tersedia skrip otomatis `jalankan_di_hp.bat` di root direktori project. Cukup kl
 
 | Peran (Role) | Username | Email | Kegunaan Pengujian |
 | :--- | :--- | :--- | :--- |
-| **Admin** | `admin_fleet` | `admin@fleet.com` | Akses penuh inventaris armada, trip dispatcher, approval pengeluaran, kelola user & SIM |
-| **Teknisi** | `teknisi_utama` | `teknisi@fleet.com` | Penanganan keluhan, update progress servis, isi checklist harian |
-| **User (Driver)** | `driver_utama` | `user@fleet.com` | Lapor keluhan foto/video, inspeksi checklist harian & sinkronisasi odometer, pelacakan armada saya |
+| **Admin** | `admin_fleet` | `admin@fleet.com` | Akses penuh inventaris armada, trip dispatcher, approval pengeluaran, kelola user & SIM, monitor WhatsApp Gateway |
+| **Teknisi** | `teknisi_utama` | `teknisi@fleet.com` | Penanganan keluhan, update progress servis, isi checklist harian, kirim WhatsApp servis |
+| **User (Driver)** | `driver_utama` | `user@fleet.com` | Lapor keluhan foto/video, inspeksi checklist harian & sinkronisasi odometer, pelacakan armada saya, terima notifikasi WhatsApp |
