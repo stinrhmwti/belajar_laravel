@@ -90,7 +90,10 @@ class WhatsappController extends Controller
             return back()->with('success', 'Pesan WhatsApp berhasil dikirim ke nomor ' . $log->phone);
         }
 
-        return back()->with('error', 'Gagal mengirim pesan WhatsApp ke ' . $log->phone . ': ' . ($log->error_message ?: 'Terjadi kendala pada layanan.'));
+        return back()
+            ->with('error', 'Gagal mengirim pesan WhatsApp ke ' . $log->phone . ': ' . ($log->error_message ?: 'Terjadi kendala pada layanan.'))
+            ->with('direct_wa_url', $log->wa_url)
+            ->with('failed_phone', $log->phone);
     }
 
     /**
@@ -121,8 +124,12 @@ class WhatsappController extends Controller
             return back()->with('success', 'Pesan WhatsApp berhasil dikirim ulang ke nomor ' . $newLog->phone);
         }
 
-        return back()->with('error', 'Gagal mengirim ulang pesan ke ' . $newLog->phone . ': ' . ($newLog->error_message ?: 'Terjadi kesalahan sistem.'));
+        return back()
+            ->with('error', 'Gagal mengirim ulang pesan ke ' . $newLog->phone . ': ' . ($newLog->error_message ?: 'Terjadi kesalahan sistem.'))
+            ->with('direct_wa_url', $newLog->wa_url)
+            ->with('failed_phone', $newLog->phone);
     }
+
 
     /**
      * Tampilkan detail data log WhatsApp dalam format JSON.

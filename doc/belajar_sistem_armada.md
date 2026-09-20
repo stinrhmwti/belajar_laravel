@@ -222,19 +222,24 @@ Dokumentasi ini menyajikan panduan arsitektur, daftar modul fungsional, kamus da
 ---
 
 ### Modul 11: Integrasi WhatsApp Gateway & Notifikasi Otomatis (WhatsApp API Service & Logs)
-* **Tujuan:** Mengelola pengiriman notifikasi WhatsApp secara otomatis (*event-driven*) maupun manual (*direct send*) menggunakan Ervelia Gateway REST API, dilengkapi normalisasi nomor internasional otomatis (`628xxx`), mesin substitusi template dinamis, pencatatan log histori lengkap (status `pending`/`success`/`failed`, message ID, JSON response, latency), dan kemampuan kirim ulang (*resend*) pesan yang gagal.
-* **Alur Bisnis:**
-  1. **Konfigurasi Gateway:** Sistem membaca parameter `WHATSAPP_ENABLED`, `WHATSAPP_DRIVER`, `WHATSAPP_BASE_URL`, `WHATSAPP_TOKEN`, `WHATSAPP_COUNTRY_CODE`, dan `WHATSAPP_ADMIN_NUMBER` dari environment config (`config/services.php`).
-  2. **Normalisasi Nomor Telepon (`formatPhone`):** Memvalidasi dan mengubah format lokal (contoh: `08123...` atau `8123...`) menjadi format standar internasional (`628123...`) serta memverifikasi panjang nomor minimal 10 digit.
-  3. **Mesin Template Dinamis (`sendTemplate`):** Mengambil template aktif dari database berdasarkan kode unik (`code`), menggantikan placeholder variabel `{{variabel}}` dengan data nyata (nama driver, plat nomor, status perbaikan, nominal biaya, jadwal, catatan), dan mengirimkannya via service.
-  4. **Pemicu Notifikasi Otomatis (*Event Hooks*):**
+* **Tujuan:** Mengelola pengiriman notifikasi WhatsApp secara otomatis (*event-driven*) maupun manual (*direct send*) menggunakan Ervelia / Fonnte / Wablas Gateway REST API atau mode Sandbox Simulasi Lokal, dilengkapi normalisasi nomor internasional otomatis (`628xxx`), mesin substitusi template dinamis, pencatatan log histori lengkap (status `pending`/`success`/`failed`, message ID, JSON response, latency), kemampuan kirim ulang (*resend*), serta tautan instan kirim langsung via WhatsApp Web (*wa.me fallback*).
+* **Alur Bisnis & Pilihan Provider:**
+  1. **Konfigurasi Multi-Gateway:** Sistem mendukung 4 jenis driver:
+     * `ervelia`: Custom REST API gateway endpoint (`POST /api/v1/messages/send`).
+     * `fonnte`: API Gateway Fonnte Indonesia (`https://api.fonnte.com/send` dengan header `Authorization`).
+     * `wablas`: API Gateway Wablas (`https://pati.wablas.com/api/send-message`).
+     * `sandbox` / `log`: Mode simulasi pengujian lokal (mencatat sukses dan payload mock tanpa memerlukan server gateway eksternal aktif).
+  2. **Direct WhatsApp Web Fallback (wa.me):** Ketika server gateway eksternal sedang offline atau mengalami kendala jaringan (misal cURL error), pengguna dapat langsung menekan tombol **Kirim via WhatsApp Web** pada tabel logbook, detail modal, maupun banner notifikasi untuk membuka chat WhatsApp resmi dengan nomor dan format pesan yang sudah otomatis terisi.
+  3. **Normalisasi Nomor Telepon (`formatPhone`):** Memvalidasi dan mengubah format lokal (contoh: `08123...` atau `8123...`) menjadi format standar internasional (`628123...`) serta memverifikasi panjang nomor minimal 10 digit.
+  4. **Mesin Template Dinamis (`sendTemplate`):** Mengambil template aktif dari database berdasarkan kode unik (`code`), menggantikan placeholder variabel `{{variabel}}` dengan data nyata (nama driver, plat nomor, status perbaikan, nominal biaya, jadwal, catatan), dan mengirimkannya via service.
+  5. **Pemicu Notifikasi Otomatis (*Event Hooks*):**
      * **Laporan Keluhan Baru (`keluhan_baru`):** Ketika driver mengirim laporan kerusakan di `/complaints`, sistem secara otomatis mengirim notifikasi rincian kerusakan ke nomor WhatsApp Admin.
      * **Pembaruan Status & Progres Perbaikan (`keluhan_status`):** Saat teknisi memperbarui status (`Diproses` / `Selesai`) atau persentase perbaikan di `/complaints/{complaint}/status`, sistem otomatis mengirim info progres ke nomor WhatsApp pengemudi pelapor (`no_wa` / `no_telepon`).
      * **Peringatan Checklist Harian Bermasalah (`checklist_peringatan`):** Jika hasil checklist harian di `/checklist` mendeteksi komponen berstatus `Not OK` (Oli, Radiator, Rem, Ban, Lampu, Kebersihan), sistem mengirim peringatan instan ke nomor Admin.
      * **Permohonan Persetujuan Anggaran (`approval_biaya`):** Pengajuan biaya perbaikan bernilai besar (> Rp 1.000.000) menotifikasi Pimpinan/Admin.
      * **Pengingat Servis & Dokumen (`servis_reminder`, `kir_reminder`):** Peringatan jatuh tempo KIR atau batas kilometer servis.
      * **Penugasan Driver & Rute (`tugas_driver`):** Pemberitahuan penugasan armada atau rute tujuan baru ke pengemudi.
-  5. **Pencatatan Log & Resend (*Monitoring Dashboard*):**
+  6. **Pencatatan Log & Resend (*Monitoring Dashboard*):**
      * Setiap pesan yang dikirim (berhasil maupun gagal) dicatat ke tabel `whatsapp_logs` dengan status awal `pending`, lalu diperbarui ke `success` atau `failed`.
      * Admin dan Teknisi dapat memantau seluruh riwayat log di `/whatsapp`, melakukan pencarian berdasarkan nomor/pesan/user, memfilter status, melihat rincian response JSON API di modal, dan menekan tombol **Kirim Ulang (Resend)** pada pesan yang gagal.
 * **Service:** [WhatsappService](file:///c:/xampppp/htdocs/belajar-laravel/app/Services/WhatsappService.php)

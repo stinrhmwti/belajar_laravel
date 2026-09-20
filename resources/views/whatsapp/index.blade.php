@@ -427,10 +427,20 @@
 @endif
 
 @if (session('error'))
-    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2.5 border-0 shadow-sm mb-4" role="alert" style="border-radius: 12px; background: rgba(239, 68, 68, 0.12); color: #b91c1c; border-left: 4px solid #ef4444 !important;">
-        <i class="bi bi-exclamation-octagon-fill fs-5"></i>
-        <div><strong>Kendala Pengiriman:</strong> {{ session('error') }}</div>
-        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
+    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius: 12px; background: rgba(239, 68, 68, 0.12); color: #b91c1c; border-left: 4px solid #ef4444 !important;">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-2.5">
+                <i class="bi bi-exclamation-octagon-fill fs-5"></i>
+                <div><strong>Kendala Pengiriman:</strong> {{ session('error') }}</div>
+            </div>
+            @if(session('direct_wa_url'))
+                <a href="{{ session('direct_wa_url') }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-success d-inline-flex align-items-center gap-1.5 shadow-sm text-nowrap ms-auto" style="border-radius: 8px; font-weight: 600; font-size: 0.82rem; background: #25D366; border-color: #25D366;">
+                    <i class="bi bi-whatsapp fs-6"></i>
+                    <span>Kirim via WhatsApp Web (wa.me)</span>
+                </a>
+            @endif
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 @endif
 
@@ -975,11 +985,21 @@
                                     </td>
                                     <td class="pe-3 text-end">
                                         <div class="d-inline-flex gap-1 align-items-center">
+                                            {{-- Tombol Buka di WhatsApp Web / App (wa.me) --}}
+                                            <a href="{{ $log->wa_url }}" 
+                                               target="_blank" 
+                                               rel="noopener noreferrer" 
+                                               class="btn btn-sm btn-outline-success px-1.5 py-0.5" 
+                                               style="border-radius: 6px; font-size: 0.72rem;" 
+                                               title="Buka Chat di WhatsApp Web (wa.me)">
+                                                <i class="bi bi-whatsapp"></i>
+                                            </a>
+
                                             {{-- Tombol Kirim Ulang jika Status Gagal --}}
                                             @if ($log->status === 'failed')
                                                 <form action="{{ route('whatsapp.resend', $log) }}" method="POST" class="d-inline" onsubmit="return confirm('Kirim ulang pesan WhatsApp ini ke {{ $log->phone }}?');">
                                                     @csrf
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger px-1.5 py-0.5" style="border-radius: 6px; font-size: 0.72rem;" title="Kirim Ulang Pesan">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger px-1.5 py-0.5" style="border-radius: 6px; font-size: 0.72rem;" title="Kirim Ulang via Gateway">
                                                         <i class="bi bi-arrow-repeat"></i>
                                                     </button>
                                                 </form>
@@ -995,6 +1015,7 @@
                                                         'parsed_pelapor' => $log->pelapor,
                                                         'parsed_kendaraan' => $log->kendaraan,
                                                         'parsed_kendala' => $log->kendala,
+                                                        'wa_url' => $log->wa_url,
                                                     ])) }}"
                                                     title="Lihat Detail Telemetri API">
                                                 <i class="bi bi-eye"></i> Detail
@@ -1200,7 +1221,11 @@
                     <pre id="modalResponse" class="p-3 bg-dark text-light rounded-3 small mb-0 font-monospace" style="max-height: 140px; overflow-y: auto; font-size: 0.75rem;"></pre>
                 </div>
             </div>
-            <div class="modal-footer border-top py-2.5 px-4 bg-body-tertiary">
+            <div class="modal-footer border-top py-2.5 px-4 bg-body-tertiary d-flex justify-content-between align-items-center">
+                <a href="#" id="modalBtnDirectWa" target="_blank" rel="noopener noreferrer" class="btn btn-success btn-sm px-3 d-inline-flex align-items-center gap-1.5 shadow-sm" style="border-radius: 8px;">
+                    <i class="bi bi-whatsapp"></i>
+                    <span>Kirim via WhatsApp Web</span>
+                </a>
                 <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal" style="border-radius: 8px;">Tutup</button>
             </div>
         </div>
@@ -1627,6 +1652,11 @@
 
                     const formattedJson = logData.response ? JSON.stringify(logData.response, null, 2) : '{\n  "status": "pending",\n  "message": "Menunggu respons provider"\n}';
                     document.getElementById('modalResponse').textContent = formattedJson;
+
+                    const modalBtnDirectWa = document.getElementById('modalBtnDirectWa');
+                    if (modalBtnDirectWa) {
+                        modalBtnDirectWa.href = logData.wa_url || '#';
+                    }
                 } catch (e) {
                     console.error('Error parsing log data', e);
                 }

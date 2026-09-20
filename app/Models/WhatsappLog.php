@@ -172,4 +172,15 @@ class WhatsappLog extends Model
         $cleanMsg = trim(preg_replace('/[*•_~]/', '', $this->message));
         return \Illuminate\Support\Str::limit($cleanMsg, 60);
     }
+
+    /**
+     * URL tautan langsung untuk mengirim pesan melalui WhatsApp Web / WhatsApp App (wa.me).
+     */
+    public function getWaUrlAttribute(): string
+    {
+        $phone = preg_replace('/[^0-9]/', '', $this->phone);
+        $encodedText = rawurlencode($this->message);
+        return "https://api.whatsapp.com/send?phone={$phone}&text={$encodedText}";
+    }
 }
+
