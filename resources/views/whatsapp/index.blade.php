@@ -8,38 +8,33 @@
        ========================================================= */
     :root {
         --wa-brand: #25D366;
+        --wa-brand-hover: #1ebd5a;
         --wa-brand-dark: #128C7E;
         --wa-brand-deep: #075E54;
-        --wa-chat-bg: #EFEAE2;
-        --wa-bubble-in: #FFFFFF;
-        --wa-bubble-out: #D9FDD3;
-        --wa-bubble-dark-in: #1F2C34;
-        --wa-bubble-dark-out: #005C4B;
+        --wa-chat-bg: #efeae2;
+        --wa-bubble-out: #d9fdd3;
+        --wa-bubble-dark-out: #005c4b;
     }
 
-    /* Ambient Card Glassmorphism */
+    /* Ambient Clean Cards */
     .aesthetic-card {
         background: #ffffff;
         border-radius: 16px;
         border: 1px solid #e2e8f0;
         box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.25s ease;
         position: relative;
-        overflow: hidden;
     }
     .aesthetic-card:hover {
-        box-shadow: 0 12px 30px -4px rgba(15, 23, 42, 0.1);
+        box-shadow: 0 10px 25px -4px rgba(15, 23, 42, 0.08);
     }
     body.dark-theme .aesthetic-card {
         background: #111827;
         border-color: #1e293b;
         box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
     }
-    body.dark-theme .aesthetic-card:hover {
-        box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.6);
-    }
 
-    /* Stat Cards with Gradient Sphere Backgrounds */
+    /* Stat Cards */
     .stat-card-tech {
         background: #ffffff;
         border-radius: 16px;
@@ -47,11 +42,11 @@
         padding: 1.25rem 1.4rem;
         position: relative;
         overflow: hidden;
-        transition: transform 0.25s ease, box-shadow 0.25s ease;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     .stat-card-tech:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 12px 25px -5px rgba(0, 0, 0, 0.08);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px -4px rgba(0, 0, 0, 0.06);
     }
     .stat-card-tech::after {
         content: '';
@@ -63,10 +58,6 @@
         right: -30px;
         opacity: 0.12;
         pointer-events: none;
-        transition: transform 0.4s ease;
-    }
-    .stat-card-tech:hover::after {
-        transform: scale(1.2);
     }
     .stat-card-tech.stat-success::after { background: radial-gradient(circle, #22c55e, transparent); }
     .stat-card-tech.stat-danger::after { background: radial-gradient(circle, #ef4444, transparent); }
@@ -77,18 +68,15 @@
         background: #111827;
         border-color: #1e293b;
     }
-    body.dark-theme .stat-card-tech:hover {
-        box-shadow: 0 12px 25px -5px rgba(0, 0, 0, 0.5);
-    }
 
     .icon-box-tech {
-        width: 48px;
-        height: 48px;
-        border-radius: 14px;
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.4rem;
+        font-size: 1.3rem;
         flex-shrink: 0;
     }
 
@@ -116,13 +104,6 @@
     }
     .pulse-dot.pulse-success { background: #22c55e; }
     .pulse-dot.pulse-success::after { background: rgba(34, 197, 94, 0.4); }
-    .pulse-dot.pulse-warning { background: #f59e0b; }
-    .pulse-dot.pulse-warning::after { background: rgba(245, 158, 11, 0.4); animation-name: pulse-ring-warning; }
-    @keyframes pulse-ring-warning {
-        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
-        70% { transform: scale(1.6); box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
-        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-    }
 
     /* Soft Glow Badges */
     .badge-soft-success { background: rgba(34, 197, 94, 0.12); color: #16a34a; border: 1px solid rgba(34, 197, 94, 0.25); }
@@ -137,27 +118,27 @@
     body.dark-theme .badge-soft-info { color: #38bdf8; border-color: rgba(56, 189, 248, 0.3); }
     body.dark-theme .badge-soft-primary { color: #60a5fa; border-color: rgba(96, 165, 250, 0.3); }
 
-    /* License Plate Metallic Tag */
+    /* Metallic License Plate Badge */
     .plate-badge-tech {
         background: #0f172a;
         color: #ffffff;
         font-family: 'Inter', monospace;
         font-weight: 700;
-        font-size: 0.78rem;
+        font-size: 0.74rem;
         padding: 3px 8px;
         border-radius: 6px;
         border: 1px solid #334155;
         letter-spacing: 0.8px;
         display: inline-flex;
         align-items: center;
-        gap: 4px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        gap: 5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
-    .plate-badge-tech i { color: #f59e0b; font-size: 0.75rem; }
+    .plate-badge-tech i { color: #f59e0b; font-size: 0.72rem; }
 
-    /* Interactive Template Filter Pills */
+    /* Template Filter Pills */
     .tmpl-filter-pill {
-        font-size: 0.76rem;
+        font-size: 0.75rem;
         font-weight: 600;
         padding: 5px 12px;
         border-radius: 20px;
@@ -165,35 +146,43 @@
         background: #f8fafc;
         color: #475569;
         cursor: pointer;
-        transition: all 0.2s ease;
-        text-decoration: none;
+        transition: all 0.15s ease;
         display: inline-flex;
         align-items: center;
         gap: 5px;
+        user-select: none;
     }
-    .tmpl-filter-pill:hover, .tmpl-filter-pill.active {
+    .tmpl-filter-pill:hover {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+    .tmpl-filter-pill.active {
         background: #0f172a;
         color: #ffffff;
         border-color: #0f172a;
-        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.15);
     }
     body.dark-theme .tmpl-filter-pill {
         background: #1e293b;
         border-color: #334155;
         color: #94a3b8;
     }
-    body.dark-theme .tmpl-filter-pill:hover, body.dark-theme .tmpl-filter-pill.active {
+    body.dark-theme .tmpl-filter-pill:hover {
+        background: #334155;
+        color: #ffffff;
+    }
+    body.dark-theme .tmpl-filter-pill.active {
         background: #3b82f6;
         color: #ffffff;
         border-color: #3b82f6;
     }
 
-    /* SMARTPHONE REALISTIC MOCKUP */
+    /* Realistic Smartphone Mockup */
     .phone-mockup-wrapper {
         background: #0b141a;
-        border-radius: 32px;
+        border-radius: 36px;
         padding: 12px;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25), inset 0 0 0 2px #334155;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25), inset 0 0 0 2px #334155;
         max-width: 380px;
         margin: 0 auto;
         position: relative;
@@ -212,7 +201,6 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
     }
     .phone-notch .camera-lens {
         width: 6px;
@@ -222,27 +210,27 @@
     }
     .phone-screen {
         background: var(--wa-chat-bg);
-        border-radius: 24px;
+        border-radius: 26px;
         overflow: hidden;
         position: relative;
         display: flex;
         flex-direction: column;
         min-height: 480px;
-        background-image: radial-gradient(rgba(0,0,0,0.04) 1px, transparent 0);
+        background-image: radial-gradient(rgba(0,0,0,0.05) 1px, transparent 0);
         background-size: 16px 16px;
     }
     body.dark-theme .phone-screen {
         background-color: #0b141a;
-        background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 0);
+        background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 0);
     }
     .phone-header {
         background: var(--wa-brand-deep);
         color: #ffffff;
-        padding: 14px 12px 10px 12px;
+        padding: 14px 14px 12px 14px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.12);
         z-index: 5;
     }
     .phone-chat-body {
@@ -257,13 +245,13 @@
         background: var(--wa-bubble-out);
         color: #111827;
         border-radius: 12px 12px 2px 12px;
-        padding: 10px 12px;
-        max-width: 92%;
+        padding: 10px 14px;
+        max-width: 90%;
         align-self: flex-end;
         position: relative;
         box-shadow: 0 1px 2px rgba(0,0,0,0.12);
         font-size: 0.83rem;
-        line-height: 1.45;
+        line-height: 1.5;
         word-break: break-word;
         white-space: pre-wrap;
     }
@@ -272,7 +260,7 @@
         color: #e9edef;
     }
     .chat-time-meta {
-        font-size: 0.68rem;
+        font-size: 0.65rem;
         color: #667781;
         display: flex;
         align-items: center;
@@ -288,12 +276,12 @@
         color: #54656f;
         font-size: 0.68rem;
         padding: 6px 10px;
-        border-radius: 8px;
+        border-radius: 6px;
         text-align: center;
-        margin: 4px auto 10px auto;
-        max-width: 90%;
-        line-height: 1.3;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+        margin: 4px auto 6px auto;
+        max-width: 92%;
+        line-height: 1.35;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
     body.dark-theme .security-notice-badge {
         background: #182229;
@@ -302,8 +290,8 @@
 
     /* Formatting Toolbar */
     .format-btn {
-        padding: 3px 8px;
-        font-size: 0.75rem;
+        padding: 3px 9px;
+        font-size: 0.74rem;
         font-weight: 600;
         border-radius: 6px;
         border: 1px solid #cbd5e1;
@@ -321,46 +309,40 @@
         border-color: #334155;
         color: #94a3b8;
     }
-    body.dark-theme .format-btn:hover {
-        background: #3b82f6;
-        color: #ffffff;
-        border-color: #3b82f6;
-    }
 
     /* Custom Navigation Tabs */
-    .nav-tech-tabs {
-        border-bottom: 2px solid #e2e8f0;
+    .nav-tabs-clean {
+        border-bottom: 1px solid #e2e8f0;
         gap: 8px;
     }
-    body.dark-theme .nav-tech-tabs { border-color: #1e293b; }
-    .nav-tech-tabs .nav-link {
+    body.dark-theme .nav-tabs-clean { border-color: #1e293b; }
+    .nav-tabs-clean .nav-link {
         border: none;
         color: #64748b;
         font-weight: 600;
-        font-size: 0.88rem;
-        padding: 8px 16px;
+        font-size: 0.86rem;
+        padding: 12px 18px;
         border-radius: 8px 8px 0 0;
         position: relative;
         background: transparent;
         transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
-    .nav-tech-tabs .nav-link:hover {
+    .nav-tabs-clean .nav-link:hover {
         color: #0f172a;
     }
-    body.dark-theme .nav-tech-tabs .nav-link:hover { color: #f1f5f9; }
-    .nav-tech-tabs .nav-link.active {
+    body.dark-theme .nav-tabs-clean .nav-link:hover { color: #f1f5f9; }
+    .nav-tabs-clean .nav-link.active {
         color: #16a34a;
-        background: transparent;
+        background: #ffffff;
+        border-bottom: 2px solid #16a34a;
     }
-    .nav-tech-tabs .nav-link.active::after {
-        content: '';
-        position: absolute;
-        bottom: -2px;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: #16a34a;
-        border-radius: 2px;
+    body.dark-theme .nav-tabs-clean .nav-link.active {
+        background: #111827;
+        color: #4ade80;
+        border-bottom-color: #4ade80;
     }
 
     /* Contact Card Miniature */
@@ -368,15 +350,33 @@
         background: #f8fafc;
         border: 1px solid #e2e8f0;
         border-radius: 10px;
-        padding: 8px 12px;
+        padding: 10px 14px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-top: 6px;
+        margin-top: 8px;
     }
     body.dark-theme .contact-card-mini {
         background: #1e293b;
         border-color: #334155;
+    }
+
+    /* Primary Dispatch Glow Button */
+    .btn-dispatch-wa {
+        background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);
+        border: none;
+        color: #ffffff;
+        box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+        transition: all 0.2s ease;
+    }
+    .btn-dispatch-wa:hover {
+        background: linear-gradient(135deg, #1ebd5a 0%, #0d6e63 100%);
+        box-shadow: 0 6px 18px rgba(37, 211, 102, 0.45);
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
+    .btn-dispatch-wa:active {
+        transform: translateY(0);
     }
 </style>
 
@@ -385,30 +385,32 @@
      ========================================================= --}}
 <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
     <div>
-        <div class="d-flex align-items-center gap-2 mb-1">
-            <div class="p-2 bg-success text-white rounded-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+        <div class="d-flex align-items-center gap-2.5 mb-1">
+            <div class="p-2 bg-success text-white rounded-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                 <i class="bi bi-whatsapp fs-5"></i>
             </div>
-            <h3 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
-                <span>{{ __('Pusat Notifikasi WhatsApp Gateway') }}</span>
-            </h3>
-            <span class="badge badge-soft-success px-2.5 py-1 rounded-pill d-inline-flex align-items-center gap-1.5" style="font-size: 0.74rem;">
+            <div>
+                <h3 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                    <span>{{ __('Pusat Notifikasi WhatsApp Gateway') }}</span>
+                </h3>
+            </div>
+            <span class="badge badge-soft-success px-2.5 py-1 rounded-pill d-inline-flex align-items-center gap-1.5 ms-2" style="font-size: 0.75rem;">
                 <span class="pulse-dot pulse-success"></span>
                 <span>Ervelia REST Gateway Online</span>
             </span>
         </div>
-        <p class="text-muted mb-0" style="font-size: 0.9rem;">
-            {{ __('Otomasi dispatch pesan instan, broadcast keluhan armada, pengingat servis terintegrasi, dan telemetri API.') }}
+        <p class="text-muted mb-0" style="font-size: 0.88rem;">
+            {{ __('Otomasi notifikasi kerusakan armada, pengingat servis terintegrasi, dan telemetri API real-time.') }}
         </p>
     </div>
 
     {{-- Header Quick Utilities --}}
     <div class="d-flex flex-wrap align-items-center gap-2">
-        <a href="https://web.whatsapp.com" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1.5 shadow-sm" style="border-radius: 8px; font-weight: 500;">
+        <a href="https://web.whatsapp.com" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-2 shadow-sm" style="border-radius: 8px; font-weight: 500; padding: 7px 14px;">
             <i class="bi bi-box-arrow-up-right"></i>
             <span>{{ __('Buka WhatsApp Web') }}</span>
         </a>
-        <button type="button" class="btn btn-sm btn-light border d-inline-flex align-items-center gap-1.5 shadow-sm" data-bs-toggle="modal" data-bs-target="#templateGuideModal" style="border-radius: 8px; font-weight: 500;">
+        <button type="button" class="btn btn-sm btn-light border d-inline-flex align-items-center gap-2 shadow-sm" data-bs-toggle="modal" data-bs-target="#templateGuideModal" style="border-radius: 8px; font-weight: 500; padding: 7px 14px;">
             <i class="bi bi-collection-play text-primary"></i>
             <span>{{ __('Katalog Template (7)') }}</span>
         </button>
@@ -462,7 +464,7 @@
     <div class="col-xl-3 col-sm-6">
         <div class="stat-card-tech stat-success">
             <div class="d-flex align-items-center justify-content-between mb-2">
-                <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.6px;">{{ __('Pesan Terkirim') }}</span>
+                <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.5px;">{{ __('Pesan Terkirim') }}</span>
                 <span class="badge badge-soft-success px-2 py-0.5 rounded-pill" style="font-size: 0.68rem;">
                     <i class="bi bi-arrow-up-right me-1"></i>{{ $deliveryRate }}% Rate
                 </span>
@@ -473,7 +475,7 @@
                 </div>
                 <div>
                     <h3 class="fw-bold text-dark mb-0 font-monospace">{{ $successCount }}</h3>
-                    <small class="text-muted" style="font-size: 0.78rem;">Pesan sukses via API</small>
+                    <small class="text-muted" style="font-size: 0.76rem;">Pesan sukses via API</small>
                 </div>
             </div>
         </div>
@@ -482,7 +484,7 @@
     <div class="col-xl-3 col-sm-6">
         <div class="stat-card-tech stat-danger">
             <div class="d-flex align-items-center justify-content-between mb-2">
-                <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.6px;">{{ __('Gagal Terkirim') }}</span>
+                <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.5px;">{{ __('Gagal Terkirim') }}</span>
                 <span class="badge badge-soft-danger px-2 py-0.5 rounded-pill" style="font-size: 0.68rem;">
                     Auto Resend Ready
                 </span>
@@ -493,7 +495,7 @@
                 </div>
                 <div>
                     <h3 class="fw-bold text-dark mb-0 font-monospace">{{ $failedCount }}</h3>
-                    <small class="text-muted" style="font-size: 0.78rem;">Pesan gagal / timeout</small>
+                    <small class="text-muted" style="font-size: 0.76rem;">Pesan gagal / timeout</small>
                 </div>
             </div>
         </div>
@@ -502,9 +504,9 @@
     <div class="col-xl-3 col-sm-6">
         <div class="stat-card-tech stat-warning">
             <div class="d-flex align-items-center justify-content-between mb-2">
-                <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.6px;">{{ __('Antrean Gateway') }}</span>
+                <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.5px;">{{ __('Antrean Gateway') }}</span>
                 <span class="badge badge-soft-warning px-2 py-0.5 rounded-pill" style="font-size: 0.68rem;">
-                    <span class="pulse-dot pulse-warning me-1"></span>Queue
+                    Queue Status
                 </span>
             </div>
             <div class="d-flex align-items-center gap-3">
@@ -513,7 +515,7 @@
                 </div>
                 <div>
                     <h3 class="fw-bold text-dark mb-0 font-monospace">{{ $pendingCount }}</h3>
-                    <small class="text-muted" style="font-size: 0.78rem;">Dalam proses antrean</small>
+                    <small class="text-muted" style="font-size: 0.76rem;">Dalam proses antrean</small>
                 </div>
             </div>
         </div>
@@ -522,9 +524,9 @@
     <div class="col-xl-3 col-sm-6">
         <div class="stat-card-tech stat-info">
             <div class="d-flex align-items-center justify-content-between mb-2">
-                <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.6px;">{{ __('Total Log Aktivitas') }}</span>
+                <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.5px;">{{ __('Total Log Aktivitas') }}</span>
                 <span class="badge badge-soft-info px-2 py-0.5 rounded-pill" style="font-size: 0.68rem;">
-                    PostgreSQL / MySQL
+                    REST API
                 </span>
             </div>
             <div class="d-flex align-items-center gap-3">
@@ -533,7 +535,7 @@
                 </div>
                 <div>
                     <h3 class="fw-bold text-dark mb-0 font-monospace">{{ $totalCount }}</h3>
-                    <small class="text-muted" style="font-size: 0.78rem;">Seluruh log tercatat</small>
+                    <small class="text-muted" style="font-size: 0.76rem;">Seluruh log tercatat</small>
                 </div>
             </div>
         </div>
@@ -551,9 +553,9 @@
     <div class="col-lg-5">
         <div class="aesthetic-card h-100">
             {{-- Header Card Composer --}}
-            <div class="p-3.5 px-4 border-bottom d-flex align-items-center justify-content-between bg-body-tertiary">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="p-1.5 bg-success-subtle text-success rounded-2">
+            <div class="p-3.5 px-4 border-bottom d-flex align-items-center justify-content-between bg-light bg-opacity-40">
+                <div class="d-flex align-items-center gap-2.5">
+                    <div class="p-2 bg-success-subtle text-success rounded-3 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
                         <i class="bi bi-send-check-fill fs-6"></i>
                     </div>
                     <div>
@@ -561,9 +563,9 @@
                         <small class="text-muted" style="font-size: 0.75rem;">Kirim teks manual atau template otomatis</small>
                     </div>
                 </div>
-                <button type="button" class="btn btn-sm btn-outline-success py-1 px-2.5 d-inline-flex align-items-center gap-1" id="btnUseAdminNumber" title="Isi otomatis dengan nomor Admin">
+                <button type="button" class="btn btn-sm btn-outline-success py-1 px-2.5 d-inline-flex align-items-center gap-1.5" id="btnUseAdminNumber" title="Isi otomatis dengan nomor Admin">
                     <i class="bi bi-shield-check"></i>
-                    <span style="font-size: 0.75rem;">{{ __('Nomor Admin') }}</span>
+                    <span style="font-size: 0.75rem; font-weight: 500;">{{ __('Nomor Admin') }}</span>
                 </button>
             </div>
 
@@ -573,9 +575,12 @@
                     
                     {{-- 1. PILIH PENERIMA DARI DAFTAR KONTAK --}}
                     <div class="mb-3">
-                        <label class="form-label fw-semibold text-dark d-flex justify-content-between align-items-center mb-1" style="font-size: 0.85rem;">
-                            <span><i class="bi bi-person-lines-fill text-primary me-1.5"></i>{{ __('Kontak Penerima Cepat') }}</span>
-                            <span class="text-muted small fw-normal">{{ __('Opsional') }}</span>
+                        <label class="form-label fw-semibold text-dark d-flex justify-content-between align-items-center mb-1.5" style="font-size: 0.85rem;">
+                            <span class="d-flex align-items-center gap-2">
+                                <i class="bi bi-person-lines-fill text-primary"></i>
+                                <span>{{ __('Kontak Penerima Cepat') }}</span>
+                            </span>
+                            <span class="badge bg-light text-muted fw-normal border">{{ __('Opsional') }}</span>
                         </label>
                         <select id="quickUserSelect" class="form-select form-select-sm" style="border-radius: 8px;">
                             <option value="">-- Pilih Kontak Driver / Teknisi / Admin --</option>
@@ -653,11 +658,11 @@
                         {{-- Mini Contact Card Indicator --}}
                         <div id="contactMiniCard" class="contact-card-mini d-none">
                             <div class="d-flex align-items-center gap-2">
-                                <div class="avatar-circle-sm bg-primary text-white fw-bold rounded-circle d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; font-size: 0.72rem;">
+                                <div class="avatar-circle-sm bg-primary text-white fw-bold rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 32px; height: 32px; font-size: 0.78rem;">
                                     <span id="contactMiniInitial">U</span>
                                 </div>
                                 <div>
-                                    <span id="contactMiniName" class="fw-bold text-dark d-block" style="font-size: 0.82rem;">Nama</span>
+                                    <span id="contactMiniName" class="fw-bold text-dark d-block" style="font-size: 0.84rem;">Nama</span>
                                     <span id="contactMiniRole" class="badge badge-soft-primary px-1.5 py-0.5" style="font-size: 0.65rem;">Role</span>
                                 </div>
                             </div>
@@ -670,17 +675,18 @@
 
                     {{-- 2. INPUT NOMOR TELEPON TUJUAN --}}
                     <div class="mb-3">
-                        <label for="phone" class="form-label fw-semibold text-dark mb-1" style="font-size: 0.85rem;">
-                            <i class="bi bi-phone text-success me-1"></i>{{ __('Nomor WhatsApp Tujuan') }} <span class="text-danger">*</span>
+                        <label for="phone" class="form-label fw-semibold text-dark d-flex align-items-center gap-2 mb-1.5" style="font-size: 0.85rem;">
+                            <i class="bi bi-phone text-success"></i>
+                            <span>{{ __('Nomor WhatsApp Tujuan') }} <span class="text-danger">*</span></span>
                         </label>
                         <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-light text-muted border-end-0">
+                            <span class="input-group-text bg-light text-muted border-end-0 px-2.5">
                                 <i class="bi bi-whatsapp text-success fs-6"></i>
                             </span>
                             <input type="text" 
                                    name="phone" 
                                    id="phone" 
-                                   class="form-control border-start-0 font-monospace fw-semibold" 
+                                   class="form-control border-start-0 font-monospace fw-semibold py-2" 
                                    value="{{ old('phone') }}" 
                                    placeholder="Contoh: 08123456789 atau 628123456789" 
                                    required 
@@ -692,10 +698,11 @@
                     {{-- 3. FILTER & SELECTOR TEMPLATE SISTEM --}}
                     <div class="mb-3">
                         <div class="d-flex justify-content-between align-items-center mb-1.5">
-                            <label for="template_code" class="form-label fw-semibold text-dark mb-0" style="font-size: 0.85rem;">
-                                <i class="bi bi-file-earmark-code text-info me-1"></i>{{ __('Template Sistem Armada') }}
+                            <label for="template_code" class="form-label fw-semibold text-dark d-flex align-items-center gap-2 mb-0" style="font-size: 0.85rem;">
+                                <i class="bi bi-file-earmark-code text-info"></i>
+                                <span>{{ __('Template Sistem Armada') }}</span>
                             </label>
-                            <span class="text-muted small fw-normal">{{ __('Pilih template otomatis') }}</span>
+                            <small class="text-muted">{{ __('Pilih template otomatis') }}</small>
                         </div>
 
                         {{-- Quick Category Filter Pills --}}
@@ -735,7 +742,10 @@
                     {{-- 4. QUICK PICKER KENDARAAN (Untuk isi otomatis template) --}}
                     <div class="mb-3 d-none" id="vehiclePickerContainer">
                         <label class="form-label fw-semibold text-dark d-flex justify-content-between align-items-center mb-1" style="font-size: 0.83rem;">
-                            <span><i class="bi bi-truck text-primary me-1"></i>{{ __('Sinkronisasi Data Armada') }}</span>
+                            <span class="d-flex align-items-center gap-1.5">
+                                <i class="bi bi-truck text-primary"></i>
+                                <span>{{ __('Sinkronisasi Data Armada') }}</span>
+                            </span>
                             <span class="text-muted small fw-normal">{{ __('Auto isi plat & merk') }}</span>
                         </label>
                         <select id="quickVehicleSelect" class="form-select form-select-sm" style="border-radius: 8px;">
@@ -766,9 +776,10 @@
 
                     {{-- 6. MANUAL MESSAGE TEXTAREA & FORMATTING TOOLBAR --}}
                     <div class="mb-3" id="manualMessageContainer">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <label for="message" class="form-label fw-semibold text-dark mb-0" style="font-size: 0.85rem;">
-                                <i class="bi bi-chat-left-text text-primary me-1"></i>{{ __('Isi Teks Pesan') }} <span id="msgRequiredAsterisk" class="text-danger">*</span>
+                        <div class="d-flex justify-content-between align-items-center mb-1.5">
+                            <label for="message" class="form-label fw-semibold text-dark d-flex align-items-center gap-2 mb-0" style="font-size: 0.85rem;">
+                                <i class="bi bi-chat-left-text text-primary"></i>
+                                <span>{{ __('Isi Teks Pesan') }} <span id="msgRequiredAsterisk" class="text-danger">*</span></span>
                             </label>
                             
                             {{-- Formatting Shortcode Toolbar --}}
@@ -783,18 +794,18 @@
                         <textarea name="message" 
                                   id="message" 
                                   rows="5" 
-                                  class="form-control" 
+                                  class="form-control py-2.5" 
                                   placeholder="Tuliskan pesan teks yang ingin dikirimkan via WhatsApp Gateway..." 
                                   style="border-radius: 8px; font-size: 0.88rem; font-family: inherit;">{{ old('message') }}</textarea>
                         
-                        <div class="d-flex justify-content-between align-items-center mt-1 text-muted" style="font-size: 0.76rem;">
-                            <span>Maksimal 2.000 karakter via REST API Gateway</span>
+                        <div class="d-flex justify-content-between align-items-center mt-1.5 text-muted" style="font-size: 0.76rem;">
+                            <span>Maksimal 2.000 karakter via REST API</span>
                             <span id="charCounter" class="font-monospace fw-semibold">0 karakter</span>
                         </div>
                     </div>
 
                     {{-- SUBMIT BUTTON --}}
-                    <button type="submit" id="btnSubmitWa" class="btn btn-success w-100 py-2.5 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm" style="border-radius: 10px; background: #25D366; border-color: #25D366; transition: all 0.2s ease;">
+                    <button type="submit" id="btnSubmitWa" class="btn btn-dispatch-wa w-100 py-2.5 fw-bold d-flex align-items-center justify-content-center gap-2" style="border-radius: 10px;">
                         <i class="bi bi-send-fill fs-6"></i>
                         <span>{{ __('Kirim Sekarang via Gateway') }}</span>
                     </button>
@@ -809,26 +820,26 @@
     <div class="col-lg-7">
         <div class="aesthetic-card h-100 d-flex flex-column">
             
-            {{-- Nav Tabs Switcher --}}
-            <div class="p-3 px-4 border-bottom bg-body-tertiary">
-                <ul class="nav nav-tech-tabs" id="waHubTabs" role="tablist">
+            {{-- Clean Nav Tabs Switcher --}}
+            <div class="p-0 px-3 pt-2 border-bottom bg-light bg-opacity-40">
+                <ul class="nav nav-tabs-clean" id="waHubTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active d-inline-flex align-items-center gap-1.5" id="table-tab" data-bs-toggle="tab" data-bs-target="#tab-table" type="button" role="tab" aria-selected="true">
-                            <i class="bi bi-clock-history"></i>
+                        <button class="nav-link active" id="table-tab" data-bs-toggle="tab" data-bs-target="#tab-table" type="button" role="tab" aria-selected="true">
+                            <i class="bi bi-clock-history text-primary"></i>
                             <span>{{ __('Riwayat & Logbook') }}</span>
                             <span class="badge bg-secondary rounded-pill px-1.5 py-0.5 ms-1" style="font-size: 0.68rem;">{{ $logs->total() }}</span>
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link d-inline-flex align-items-center gap-1.5" id="simulator-tab" data-bs-toggle="tab" data-bs-target="#tab-simulator" type="button" role="tab" aria-selected="false">
-                            <i class="bi bi-phone"></i>
+                        <button class="nav-link" id="simulator-tab" data-bs-toggle="tab" data-bs-target="#tab-simulator" type="button" role="tab" aria-selected="false">
+                            <i class="bi bi-phone text-success"></i>
                             <span>{{ __('Simulator Chat Live') }}</span>
                             <span class="badge badge-soft-success rounded-pill px-1.5 py-0.5 ms-1" style="font-size: 0.68rem;">Interactive</span>
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link d-inline-flex align-items-center gap-1.5" id="catalogue-tab" data-bs-toggle="tab" data-bs-target="#tab-catalogue" type="button" role="tab" aria-selected="false">
-                            <i class="bi bi-grid-fill"></i>
+                        <button class="nav-link" id="catalogue-tab" data-bs-toggle="tab" data-bs-target="#tab-catalogue" type="button" role="tab" aria-selected="false">
+                            <i class="bi bi-grid-fill text-info"></i>
                             <span>{{ __('Galeri Template') }}</span>
                         </button>
                     </li>
@@ -839,24 +850,25 @@
                 
                 {{-- TAB 1: TABEL LOG RIWAYAT PENGIRIMAN --}}
                 <div class="tab-pane fade show active h-100 d-flex flex-column" id="tab-table" role="tabpanel" aria-labelledby="table-tab">
+                    
                     {{-- Filter & Search Toolbar --}}
-                    <div class="p-3 px-4 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2.5">
+                    <div class="p-3 px-4 border-bottom bg-light bg-opacity-30 d-flex flex-wrap align-items-center justify-content-between gap-3">
                         <div class="d-flex align-items-center gap-2">
                             <span class="fw-bold text-dark small">{{ __('Filter Status:') }}</span>
                             <div class="btn-group btn-group-sm" role="group">
-                                <a href="{{ route('whatsapp.index') }}" class="btn btn-outline-secondary {{ !request('status') ? 'active' : '' }}" style="font-size: 0.74rem;">Semua</a>
-                                <a href="{{ route('whatsapp.index', ['status' => 'success']) }}" class="btn btn-outline-success {{ request('status') === 'success' ? 'active' : '' }}" style="font-size: 0.74rem;">Sukses</a>
-                                <a href="{{ route('whatsapp.index', ['status' => 'pending']) }}" class="btn btn-outline-warning {{ request('status') === 'pending' ? 'active' : '' }}" style="font-size: 0.74rem;">Pending</a>
-                                <a href="{{ route('whatsapp.index', ['status' => 'failed']) }}" class="btn btn-outline-danger {{ request('status') === 'failed' ? 'active' : '' }}" style="font-size: 0.74rem;">Gagal</a>
+                                <a href="{{ route('whatsapp.index') }}" class="btn {{ !request('status') ? 'btn-dark' : 'btn-outline-secondary' }}" style="font-size: 0.74rem;">Semua</a>
+                                <a href="{{ route('whatsapp.index', ['status' => 'success']) }}" class="btn {{ request('status') === 'success' ? 'btn-success' : 'btn-outline-success' }}" style="font-size: 0.74rem;">Sukses</a>
+                                <a href="{{ route('whatsapp.index', ['status' => 'pending']) }}" class="btn {{ request('status') === 'pending' ? 'btn-warning text-dark' : 'btn-outline-warning' }}" style="font-size: 0.74rem;">Pending</a>
+                                <a href="{{ route('whatsapp.index', ['status' => 'failed']) }}" class="btn {{ request('status') === 'failed' ? 'btn-danger' : 'btn-outline-danger' }}" style="font-size: 0.74rem;">Gagal</a>
                             </div>
                         </div>
 
                         {{-- Search Input --}}
-                        <form action="{{ route('whatsapp.index') }}" method="GET" class="d-flex align-items-center gap-1.5">
+                        <form action="{{ route('whatsapp.index') }}" method="GET" class="d-flex align-items-center gap-1.5 ms-auto">
                             @if(request('status'))
                                 <input type="hidden" name="status" value="{{ request('status') }}">
                             @endif
-                            <div class="input-group input-group-sm" style="width: 200px;">
+                            <div class="input-group input-group-sm" style="width: 220px;">
                                 <input type="text" name="search" class="form-control" placeholder="Cari pelapor / plat..." value="{{ request('search') }}" style="border-radius: 6px 0 0 6px;">
                                 <button class="btn btn-outline-secondary" type="submit" style="border-radius: 0 6px 6px 0;">
                                     <i class="bi bi-search"></i>
@@ -864,7 +876,7 @@
                             </div>
                             @if(request()->filled('search') || request()->filled('status'))
                                 <a href="{{ route('whatsapp.index') }}" class="btn btn-sm btn-light border" title="Reset Filter">
-                                    <i class="bi bi-x-lg text-muted"></i>
+                                    <i class="bi bi-x-lg text-muted" style="font-size: 0.7rem;"></i>
                                 </a>
                             @endif
                         </form>
@@ -875,19 +887,19 @@
                         <table class="table table-hover align-middle mb-0 w-100" style="font-size: 0.85rem;">
                             <thead class="table-light">
                                 <tr>
-                                    <th class="ps-3" style="width: 35px;">#</th>
-                                    <th style="width: 100px;">{{ __('Waktu') }}</th>
+                                    <th class="ps-3 text-muted" style="width: 35px;">#</th>
+                                    <th style="width: 110px;">{{ __('Waktu') }}</th>
                                     <th>{{ __('Pelapor & No. WA') }}</th>
                                     <th>{{ __('Armada') }}</th>
                                     <th>{{ __('Kategori / Pesan') }}</th>
-                                    <th style="width: 80px;">{{ __('Status') }}</th>
+                                    <th style="width: 85px;">{{ __('Status') }}</th>
                                     <th class="pe-3 text-end" style="width: 95px;">{{ __('Aksi') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($logs as $log)
                                 <tr>
-                                    <td class="ps-3 text-muted font-monospace" style="font-size: 0.8rem;">
+                                    <td class="ps-3 text-muted font-monospace" style="font-size: 0.78rem;">
                                         {{ $loop->iteration + ($logs->currentPage() - 1) * $logs->perPage() }}
                                     </td>
                                     <td>
@@ -899,25 +911,29 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <div class="d-flex align-items-center gap-1.5 mb-0.5">
-                                            <i class="bi bi-person-circle text-secondary"></i>
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <div class="rounded-circle bg-light text-secondary d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 0.72rem;">
+                                                <i class="bi bi-person-fill"></i>
+                                            </div>
                                             <span class="fw-bold text-dark" style="font-size: 0.82rem;">{{ $log->pelapor }}</span>
                                         </div>
-                                        <div class="text-muted font-monospace" style="font-size: 0.75rem;">
-                                            <i class="bi bi-whatsapp text-success me-1"></i>{{ $log->phone }}
+                                        <div class="text-muted font-monospace d-flex align-items-center gap-1.5" style="font-size: 0.75rem;">
+                                            <i class="bi bi-whatsapp text-success"></i>
+                                            <span>{{ $log->phone }}</span>
                                         </div>
                                     </td>
                                     <td>
                                         @if ($log->kendaraan)
                                             <span class="plate-badge-tech">
-                                                <i class="bi bi-truck"></i>{{ $log->kendaraan }}
+                                                <i class="bi bi-truck"></i>
+                                                <span>{{ $log->kendaraan }}</span>
                                             </span>
                                         @else
                                             <span class="text-muted font-monospace" style="font-size: 0.78rem;">—</span>
                                         @endif
                                     </td>
                                     <td>
-                                        <div class="d-flex flex-column gap-0.5">
+                                        <div class="d-flex flex-column gap-1">
                                             @if ($log->template)
                                                 @php
                                                     $tmplClass = match($log->template->code) {
@@ -937,7 +953,7 @@
                                                     {{ __('Pesan Manual') }}
                                                 </span>
                                             @endif
-                                            <span class="text-dark fw-medium d-inline-block text-truncate" style="max-width: 200px; font-size: 0.8rem;" title="{{ $log->message }}">
+                                            <span class="text-dark fw-medium d-inline-block text-truncate" style="max-width: 210px; font-size: 0.8rem;" title="{{ $log->message }}">
                                                 {{ $log->kendala }}
                                             </span>
                                         </div>
@@ -989,8 +1005,8 @@
                                 @empty
                                 <tr>
                                     <td colspan="7" class="text-center py-5 text-muted">
-                                        <div class="p-3 bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 54px; height: 54px;">
-                                            <i class="bi bi-chat-square-dots text-secondary fs-3"></i>
+                                        <div class="p-3 bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                                            <i class="bi bi-chat-square-dots text-secondary fs-4"></i>
                                         </div>
                                         <span class="fw-bold d-block text-dark">Belum ada riwayat pesan WhatsApp</span>
                                         <small class="text-muted">Kirim pesan pertama Anda menggunakan panel Composer di sebelah kiri.</small>
@@ -1033,7 +1049,7 @@
                             <div class="phone-header">
                                 <div class="d-flex align-items-center gap-2">
                                     <i class="bi bi-arrow-left fs-6"></i>
-                                    <div class="rounded-circle bg-white text-dark d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 0.75rem;">
+                                    <div class="rounded-circle bg-white text-dark d-flex align-items-center justify-content-center fw-bold" style="width: 30px; height: 30px; font-size: 0.75rem;">
                                         <i class="bi bi-person-fill text-secondary"></i>
                                     </div>
                                     <div>
@@ -1327,7 +1343,7 @@
 
                     if (vehiclePlat) {
                         contactMiniPlat.style.display = 'inline-flex';
-                        contactMiniPlat.innerHTML = `<i class="bi bi-truck"></i> ${vehiclePlat}`;
+                        contactMiniPlat.innerHTML = `<i class="bi bi-truck me-1"></i> ${vehiclePlat}`;
                     } else {
                         contactMiniPlat.style.display = 'none';
                     }
@@ -1492,8 +1508,8 @@
                         formGroup.className = 'mb-2';
 
                         const label = document.createElement('label');
-                        label.className = 'form-label text-muted small fw-semibold mb-1 text-capitalize';
-                        label.innerHTML = `<i class="bi bi-dot text-primary"></i> ${varName.replace(/_/g, ' ')}`;
+                        label.className = 'form-label text-muted small fw-semibold mb-1 text-capitalize d-flex align-items-center gap-1';
+                        label.innerHTML = `<i class="bi bi-dot text-primary"></i> <span>${varName.replace(/_/g, ' ')}</span>`;
 
                         let inputField;
                         if (varName.includes('deskripsi') || varName.includes('catatan') || varName.includes('komponen')) {
