@@ -1,111 +1,444 @@
 @extends('layouts.app')
-@section('title', 'Notifikasi WhatsApp')
+@section('title', 'Pusat Notifikasi WhatsApp Gateway')
 
 @section('content')
 <style>
-    .stat-card {
+    /* =========================================================
+       CYBER-FLEET WHATSAPP GATEWAY - HIGH-TECH DESIGN SYSTEM
+       ========================================================= */
+    :root {
+        --wa-brand: #25D366;
+        --wa-brand-dark: #128C7E;
+        --wa-brand-deep: #075E54;
+        --wa-chat-bg: #EFEAE2;
+        --wa-bubble-in: #FFFFFF;
+        --wa-bubble-out: #D9FDD3;
+        --wa-bubble-dark-in: #1F2C34;
+        --wa-bubble-dark-out: #005C4B;
+    }
+
+    /* Ambient Card Glassmorphism */
+    .aesthetic-card {
         background: #ffffff;
-        border-radius: 14px;
+        border-radius: 16px;
         border: 1px solid #e2e8f0;
-        padding: 1.25rem;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
     }
-    .stat-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    .aesthetic-card:hover {
+        box-shadow: 0 12px 30px -4px rgba(15, 23, 42, 0.1);
     }
-    .stat-card .text-muted {
-        color: #475569 !important;
+    body.dark-theme .aesthetic-card {
+        background: #111827;
+        border-color: #1e293b;
+        box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4);
     }
-    .stat-card .text-dark {
-        color: #0f172a !important;
+    body.dark-theme .aesthetic-card:hover {
+        box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.6);
     }
-    
-    /* Dark Theme Support */
-    body.dark-theme .stat-card {
+
+    /* Stat Cards with Gradient Sphere Backgrounds */
+    .stat-card-tech {
+        background: #ffffff;
+        border-radius: 16px;
+        border: 1px solid #e2e8f0;
+        padding: 1.25rem 1.4rem;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .stat-card-tech:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 25px -5px rgba(0, 0, 0, 0.08);
+    }
+    .stat-card-tech::after {
+        content: '';
+        position: absolute;
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        top: -30px;
+        right: -30px;
+        opacity: 0.12;
+        pointer-events: none;
+        transition: transform 0.4s ease;
+    }
+    .stat-card-tech:hover::after {
+        transform: scale(1.2);
+    }
+    .stat-card-tech.stat-success::after { background: radial-gradient(circle, #22c55e, transparent); }
+    .stat-card-tech.stat-danger::after { background: radial-gradient(circle, #ef4444, transparent); }
+    .stat-card-tech.stat-warning::after { background: radial-gradient(circle, #f59e0b, transparent); }
+    .stat-card-tech.stat-info::after { background: radial-gradient(circle, #06b6d4, transparent); }
+
+    body.dark-theme .stat-card-tech {
         background: #111827;
         border-color: #1e293b;
     }
-    body.dark-theme .stat-card:hover {
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25);
-    }
-    body.dark-theme .stat-card .text-muted {
-        color: #94a3b8 !important;
-    }
-    body.dark-theme .stat-card .text-dark {
-        color: #f1f5f9 !important;
+    body.dark-theme .stat-card-tech:hover {
+        box-shadow: 0 12px 25px -5px rgba(0, 0, 0, 0.5);
     }
 
-    .icon-box {
+    .icon-box-tech {
         width: 48px;
         height: 48px;
-        border-radius: 12px;
+        border-radius: 14px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.35rem;
+        font-size: 1.4rem;
+        flex-shrink: 0;
     }
 
-    .template-badge {
-        font-size: 0.72rem;
-        font-weight: 600;
-        padding: 4px 8px;
+    /* Pulsing Status Dot */
+    .pulse-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        position: relative;
+    }
+    .pulse-dot::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0; left: 0;
+        border-radius: 50%;
+        animation: pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
+    @keyframes pulse-ring {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+        70% { transform: scale(1.6); box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+    }
+    .pulse-dot.pulse-success { background: #22c55e; }
+    .pulse-dot.pulse-success::after { background: rgba(34, 197, 94, 0.4); }
+    .pulse-dot.pulse-warning { background: #f59e0b; }
+    .pulse-dot.pulse-warning::after { background: rgba(245, 158, 11, 0.4); animation-name: pulse-ring-warning; }
+    @keyframes pulse-ring-warning {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+        70% { transform: scale(1.6); box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+
+    /* Soft Glow Badges */
+    .badge-soft-success { background: rgba(34, 197, 94, 0.12); color: #16a34a; border: 1px solid rgba(34, 197, 94, 0.25); }
+    .badge-soft-danger { background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.25); }
+    .badge-soft-warning { background: rgba(245, 158, 11, 0.12); color: #d97706; border: 1px solid rgba(245, 158, 11, 0.25); }
+    .badge-soft-info { background: rgba(6, 182, 212, 0.12); color: #0891b2; border: 1px solid rgba(6, 182, 212, 0.25); }
+    .badge-soft-primary { background: rgba(59, 130, 246, 0.12); color: #2563eb; border: 1px solid rgba(59, 130, 246, 0.25); }
+
+    body.dark-theme .badge-soft-success { color: #4ade80; border-color: rgba(74, 222, 128, 0.3); }
+    body.dark-theme .badge-soft-danger { color: #f87171; border-color: rgba(248, 113, 113, 0.3); }
+    body.dark-theme .badge-soft-warning { color: #fbbf24; border-color: rgba(251, 191, 36, 0.3); }
+    body.dark-theme .badge-soft-info { color: #38bdf8; border-color: rgba(56, 189, 248, 0.3); }
+    body.dark-theme .badge-soft-primary { color: #60a5fa; border-color: rgba(96, 165, 250, 0.3); }
+
+    /* License Plate Metallic Tag */
+    .plate-badge-tech {
+        background: #0f172a;
+        color: #ffffff;
+        font-family: 'Inter', monospace;
+        font-weight: 700;
+        font-size: 0.78rem;
+        padding: 3px 8px;
         border-radius: 6px;
+        border: 1px solid #334155;
+        letter-spacing: 0.8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.15);
     }
+    .plate-badge-tech i { color: #f59e0b; font-size: 0.75rem; }
 
-    .preview-box {
+    /* Interactive Template Filter Pills */
+    .tmpl-filter-pill {
+        font-size: 0.76rem;
+        font-weight: 600;
+        padding: 5px 12px;
+        border-radius: 20px;
+        border: 1px solid #e2e8f0;
         background: #f8fafc;
-        border: 1px dashed #cbd5e1;
-        border-radius: 10px;
-        padding: 12px;
-        font-size: 0.85rem;
-        white-space: pre-wrap;
-        word-break: break-word;
-        color: #1e293b;
+        color: #475569;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
     }
-    body.dark-theme .preview-box {
+    .tmpl-filter-pill:hover, .tmpl-filter-pill.active {
+        background: #0f172a;
+        color: #ffffff;
+        border-color: #0f172a;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+    }
+    body.dark-theme .tmpl-filter-pill {
         background: #1e293b;
         border-color: #334155;
-        color: #f1f5f9;
+        color: #94a3b8;
+    }
+    body.dark-theme .tmpl-filter-pill:hover, body.dark-theme .tmpl-filter-pill.active {
+        background: #3b82f6;
+        color: #ffffff;
+        border-color: #3b82f6;
+    }
+
+    /* SMARTPHONE REALISTIC MOCKUP */
+    .phone-mockup-wrapper {
+        background: #0b141a;
+        border-radius: 32px;
+        padding: 12px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25), inset 0 0 0 2px #334155;
+        max-width: 380px;
+        margin: 0 auto;
+        position: relative;
+    }
+    .phone-notch {
+        width: 100px;
+        height: 16px;
+        background: #0b141a;
+        border-bottom-left-radius: 12px;
+        border-bottom-right-radius: 12px;
+        position: absolute;
+        top: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+    .phone-notch .camera-lens {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #1e293b;
+    }
+    .phone-screen {
+        background: var(--wa-chat-bg);
+        border-radius: 24px;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        min-height: 480px;
+        background-image: radial-gradient(rgba(0,0,0,0.04) 1px, transparent 0);
+        background-size: 16px 16px;
+    }
+    body.dark-theme .phone-screen {
+        background-color: #0b141a;
+        background-image: radial-gradient(rgba(255,255,255,0.03) 1px, transparent 0);
+    }
+    .phone-header {
+        background: var(--wa-brand-deep);
+        color: #ffffff;
+        padding: 14px 12px 10px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        z-index: 5;
+    }
+    .phone-chat-body {
+        padding: 14px;
+        flex-grow: 1;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .chat-bubble-wa {
+        background: var(--wa-bubble-out);
+        color: #111827;
+        border-radius: 12px 12px 2px 12px;
+        padding: 10px 12px;
+        max-width: 92%;
+        align-self: flex-end;
+        position: relative;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+        font-size: 0.83rem;
+        line-height: 1.45;
+        word-break: break-word;
+        white-space: pre-wrap;
+    }
+    body.dark-theme .chat-bubble-wa {
+        background: var(--wa-bubble-dark-out);
+        color: #e9edef;
+    }
+    .chat-time-meta {
+        font-size: 0.68rem;
+        color: #667781;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 3px;
+        margin-top: 4px;
+    }
+    body.dark-theme .chat-time-meta { color: #8696a0; }
+    .chat-time-meta i { color: #53bdeb; font-size: 0.75rem; }
+
+    .security-notice-badge {
+        background: #ffeecd;
+        color: #54656f;
+        font-size: 0.68rem;
+        padding: 6px 10px;
+        border-radius: 8px;
+        text-align: center;
+        margin: 4px auto 10px auto;
+        max-width: 90%;
+        line-height: 1.3;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    }
+    body.dark-theme .security-notice-badge {
+        background: #182229;
+        color: #ffd279;
+    }
+
+    /* Formatting Toolbar */
+    .format-btn {
+        padding: 3px 8px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border-radius: 6px;
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        color: #475569;
+        transition: all 0.15s ease;
+    }
+    .format-btn:hover {
+        background: #0f172a;
+        color: #ffffff;
+        border-color: #0f172a;
+    }
+    body.dark-theme .format-btn {
+        background: #1e293b;
+        border-color: #334155;
+        color: #94a3b8;
+    }
+    body.dark-theme .format-btn:hover {
+        background: #3b82f6;
+        color: #ffffff;
+        border-color: #3b82f6;
+    }
+
+    /* Custom Navigation Tabs */
+    .nav-tech-tabs {
+        border-bottom: 2px solid #e2e8f0;
+        gap: 8px;
+    }
+    body.dark-theme .nav-tech-tabs { border-color: #1e293b; }
+    .nav-tech-tabs .nav-link {
+        border: none;
+        color: #64748b;
+        font-weight: 600;
+        font-size: 0.88rem;
+        padding: 8px 16px;
+        border-radius: 8px 8px 0 0;
+        position: relative;
+        background: transparent;
+        transition: all 0.2s ease;
+    }
+    .nav-tech-tabs .nav-link:hover {
+        color: #0f172a;
+    }
+    body.dark-theme .nav-tech-tabs .nav-link:hover { color: #f1f5f9; }
+    .nav-tech-tabs .nav-link.active {
+        color: #16a34a;
+        background: transparent;
+    }
+    .nav-tech-tabs .nav-link.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #16a34a;
+        border-radius: 2px;
+    }
+
+    /* Contact Card Miniature */
+    .contact-card-mini {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 6px;
+    }
+    body.dark-theme .contact-card-mini {
+        background: #1e293b;
+        border-color: #334155;
     }
 </style>
 
-<div class="d-flex justify-content-between align-items-center mb-4">
+{{-- =========================================================
+     HEADER SECTION & TELEMETRY STATUS
+     ========================================================= --}}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
     <div>
-        <h3 class="fw-bold text-dark mb-1 d-flex align-items-center gap-2">
-            <i class="bi bi-whatsapp text-success"></i>
-            <span>{{ __('Pusat Notifikasi WhatsApp') }}</span>
-        </h3>
-        <p class="text-muted mb-0" style="font-size: 0.95rem;">
-            {{ __('Otomasi notifikasi kerusakan armada, pengingat servis, update keluhan driver, dan pengiriman pesan gateway API.') }}
+        <div class="d-flex align-items-center gap-2 mb-1">
+            <div class="p-2 bg-success text-white rounded-3 shadow-sm d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                <i class="bi bi-whatsapp fs-5"></i>
+            </div>
+            <h3 class="fw-bold text-dark mb-0 d-flex align-items-center gap-2">
+                <span>{{ __('Pusat Notifikasi WhatsApp Gateway') }}</span>
+            </h3>
+            <span class="badge badge-soft-success px-2.5 py-1 rounded-pill d-inline-flex align-items-center gap-1.5" style="font-size: 0.74rem;">
+                <span class="pulse-dot pulse-success"></span>
+                <span>Ervelia REST Gateway Online</span>
+            </span>
+        </div>
+        <p class="text-muted mb-0" style="font-size: 0.9rem;">
+            {{ __('Otomasi dispatch pesan instan, broadcast keluhan armada, pengingat servis terintegrasi, dan telemetri API.') }}
         </p>
+    </div>
+
+    {{-- Header Quick Utilities --}}
+    <div class="d-flex flex-wrap align-items-center gap-2">
+        <a href="https://web.whatsapp.com" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1.5 shadow-sm" style="border-radius: 8px; font-weight: 500;">
+            <i class="bi bi-box-arrow-up-right"></i>
+            <span>{{ __('Buka WhatsApp Web') }}</span>
+        </a>
+        <button type="button" class="btn btn-sm btn-light border d-inline-flex align-items-center gap-1.5 shadow-sm" data-bs-toggle="modal" data-bs-target="#templateGuideModal" style="border-radius: 8px; font-weight: 500;">
+            <i class="bi bi-collection-play text-primary"></i>
+            <span>{{ __('Katalog Template (7)') }}</span>
+        </button>
     </div>
 </div>
 
-{{-- Flash Alert Notifikasi --}}
+{{-- Flash Alerts --}}
 @if (session('success'))
-    <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 border-0 shadow-sm mb-4" role="alert" style="border-radius: 12px;">
+    <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2.5 border-0 shadow-sm mb-4" role="alert" style="border-radius: 12px; background: rgba(34, 197, 94, 0.12); color: #15803d; border-left: 4px solid #22c55e !important;">
         <i class="bi bi-check-circle-fill fs-5"></i>
-        <div>{{ session('success') }}</div>
+        <div><strong>Sukses:</strong> {{ session('success') }}</div>
         <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 @endif
 
 @if (session('error'))
-    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2 border-0 shadow-sm mb-4" role="alert" style="border-radius: 12px;">
-        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
-        <div>{{ session('error') }}</div>
+    <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2.5 border-0 shadow-sm mb-4" role="alert" style="border-radius: 12px; background: rgba(239, 68, 68, 0.12); color: #b91c1c; border-left: 4px solid #ef4444 !important;">
+        <i class="bi bi-exclamation-octagon-fill fs-5"></i>
+        <div><strong>Kendala Pengiriman:</strong> {{ session('error') }}</div>
         <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 @endif
 
 @if (isset($errors) && $errors->any())
-    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius: 12px;">
-        <div class="d-flex align-items-center gap-2 mb-1 fw-bold">
+    <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius: 12px; border-left: 4px solid #ef4444 !important;">
+        <div class="d-flex align-items-center gap-2 mb-1 fw-bold text-danger">
             <i class="bi bi-x-circle-fill fs-5"></i>
-            <span>Terdapat kesalahan pengisian:</span>
+            <span>Terdapat kesalahan validasi input:</span>
         </div>
-        <ul class="mb-0 ps-3">
+        <ul class="mb-0 ps-3 text-danger small">
             @foreach ($errors->all() as $error)
                 <li>{{ $error }}</li>
             @endforeach
@@ -114,79 +447,138 @@
     </div>
 @endif
 
-<!-- Summary Metric Cards -->
+{{-- =========================================================
+     SUMMARY METRIC & TELEMETRY CARDS
+     ========================================================= --}}
+@php
+    $successCount = $logs->where('status', 'success')->count();
+    $failedCount = $logs->where('status', 'failed')->count();
+    $pendingCount = $logs->where('status', 'pending')->count();
+    $totalCount = $logs->total();
+    $deliveryRate = $totalCount > 0 ? round(($successCount / $totalCount) * 100, 1) : 100;
+@endphp
+
 <div class="row g-3 mb-4">
-    <div class="col-md-3 col-sm-6">
-        <div class="stat-card d-flex align-items-center gap-3">
-            <div class="icon-box bg-success-subtle text-success">
-                <i class="bi bi-check-all"></i>
+    <div class="col-xl-3 col-sm-6">
+        <div class="stat-card-tech stat-success">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.6px;">{{ __('Pesan Terkirim') }}</span>
+                <span class="badge badge-soft-success px-2 py-0.5 rounded-pill" style="font-size: 0.68rem;">
+                    <i class="bi bi-arrow-up-right me-1"></i>{{ $deliveryRate }}% Rate
+                </span>
             </div>
-            <div>
-                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.5px;">{{ __('Pesan Sukses') }}</span>
-                <h4 class="fw-bold text-dark mb-0">{{ $logs->where('status', 'success')->count() }} <small class="text-muted fs-6 fw-normal">Pesan</small></h4>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 col-sm-6">
-        <div class="stat-card d-flex align-items-center gap-3">
-            <div class="icon-box bg-danger-subtle text-danger">
-                <i class="bi bi-exclamation-octagon-fill"></i>
-            </div>
-            <div>
-                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.5px;">{{ __('Pesan Gagal') }}</span>
-                <h4 class="fw-bold text-dark mb-0">{{ $logs->where('status', 'failed')->count() }} <small class="text-muted fs-6 fw-normal">Pesan</small></h4>
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box-tech bg-success text-white shadow-sm">
+                    <i class="bi bi-check2-all"></i>
+                </div>
+                <div>
+                    <h3 class="fw-bold text-dark mb-0 font-monospace">{{ $successCount }}</h3>
+                    <small class="text-muted" style="font-size: 0.78rem;">Pesan sukses via API</small>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3 col-sm-6">
-        <div class="stat-card d-flex align-items-center gap-3">
-            <div class="icon-box bg-warning-subtle text-warning">
-                <i class="bi bi-hourglass-split"></i>
+
+    <div class="col-xl-3 col-sm-6">
+        <div class="stat-card-tech stat-danger">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.6px;">{{ __('Gagal Terkirim') }}</span>
+                <span class="badge badge-soft-danger px-2 py-0.5 rounded-pill" style="font-size: 0.68rem;">
+                    Auto Resend Ready
+                </span>
             </div>
-            <div>
-                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.5px;">{{ __('Pending Antrean') }}</span>
-                <h4 class="fw-bold text-dark mb-0">{{ $logs->where('status', 'pending')->count() }} <small class="text-muted fs-6 fw-normal">Pesan</small></h4>
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box-tech bg-danger text-white shadow-sm">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div>
+                    <h3 class="fw-bold text-dark mb-0 font-monospace">{{ $failedCount }}</h3>
+                    <small class="text-muted" style="font-size: 0.78rem;">Pesan gagal / timeout</small>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3 col-sm-6">
-        <div class="stat-card d-flex align-items-center gap-3">
-            <div class="icon-box bg-primary-subtle text-primary">
-                <i class="bi bi-chat-dots-fill"></i>
+
+    <div class="col-xl-3 col-sm-6">
+        <div class="stat-card-tech stat-warning">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.6px;">{{ __('Antrean Gateway') }}</span>
+                <span class="badge badge-soft-warning px-2 py-0.5 rounded-pill" style="font-size: 0.68rem;">
+                    <span class="pulse-dot pulse-warning me-1"></span>Queue
+                </span>
             </div>
-            <div>
-                <span class="text-muted fw-medium d-block text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.5px;">{{ __('Total Log Terdata') }}</span>
-                <h4 class="fw-bold text-dark mb-0">{{ $logs->total() }} <small class="text-muted fs-6 fw-normal">Log</small></h4>
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box-tech bg-warning text-dark shadow-sm">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div>
+                    <h3 class="fw-bold text-dark mb-0 font-monospace">{{ $pendingCount }}</h3>
+                    <small class="text-muted" style="font-size: 0.78rem;">Dalam proses antrean</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6">
+        <div class="stat-card-tech stat-info">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.6px;">{{ __('Total Log Aktivitas') }}</span>
+                <span class="badge badge-soft-info px-2 py-0.5 rounded-pill" style="font-size: 0.68rem;">
+                    PostgreSQL / MySQL
+                </span>
+            </div>
+            <div class="d-flex align-items-center gap-3">
+                <div class="icon-box-tech bg-info text-white shadow-sm">
+                    <i class="bi bi-terminal-split"></i>
+                </div>
+                <div>
+                    <h3 class="fw-bold text-dark mb-0 font-monospace">{{ $totalCount }}</h3>
+                    <small class="text-muted" style="font-size: 0.78rem;">Seluruh log tercatat</small>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+{{-- =========================================================
+     MAIN CONSOLE: 2-COLUMN MODERN WORKSPACE
+     ========================================================= --}}
 <div class="row g-4 mb-4">
-    <!-- Form Kirim Pesan WhatsApp -->
+    
+    {{-- =====================================================
+         KOLOM KIRI: COMPOSER & DISPATCHER KILAT
+         ===================================================== --}}
     <div class="col-lg-5">
-        <div class="card border-0 shadow-sm h-100" style="border-radius: 14px;">
-            <div class="card-header bg-white py-3 border-bottom d-flex align-items-center justify-content-between">
+        <div class="aesthetic-card h-100">
+            {{-- Header Card Composer --}}
+            <div class="p-3.5 px-4 border-bottom d-flex align-items-center justify-content-between bg-body-tertiary">
                 <div class="d-flex align-items-center gap-2">
-                    <i class="bi bi-send-fill text-success fs-5"></i>
-                    <span class="fw-bold text-dark">{{ __('Kirim Pesan WhatsApp') }}</span>
+                    <div class="p-1.5 bg-success-subtle text-success rounded-2">
+                        <i class="bi bi-send-check-fill fs-6"></i>
+                    </div>
+                    <div>
+                        <h6 class="fw-bold text-dark mb-0">{{ __('Composer Pesan & Dispatch') }}</h6>
+                        <small class="text-muted" style="font-size: 0.75rem;">Kirim teks manual atau template otomatis</small>
+                    </div>
                 </div>
-                <button type="button" class="btn btn-sm btn-outline-secondary" id="btnUseAdminNumber" title="Isi dengan Nomor WA Admin">
-                    <i class="bi bi-shield-lock me-1"></i>{{ __('Admin') }}
+                <button type="button" class="btn btn-sm btn-outline-success py-1 px-2.5 d-inline-flex align-items-center gap-1" id="btnUseAdminNumber" title="Isi otomatis dengan nomor Admin">
+                    <i class="bi bi-shield-check"></i>
+                    <span style="font-size: 0.75rem;">{{ __('Nomor Admin') }}</span>
                 </button>
             </div>
-            <div class="card-body p-4">
+
+            <div class="p-4">
                 <form action="{{ route('whatsapp.send') }}" method="POST" id="waSendForm">
                     @csrf
                     
-                    {{-- Quick Picker Kontak Pengguna --}}
+                    {{-- 1. PILIH PENERIMA DARI DAFTAR KONTAK --}}
                     <div class="mb-3">
-                        <label class="form-label fw-semibold text-dark d-flex justify-content-between align-items-center" style="font-size: 0.88rem;">
-                            <span>{{ __('Pilih Penerima Cepat (Driver / Staff)') }}</span>
+                        <label class="form-label fw-semibold text-dark d-flex justify-content-between align-items-center mb-1" style="font-size: 0.85rem;">
+                            <span><i class="bi bi-person-lines-fill text-primary me-1.5"></i>{{ __('Kontak Penerima Cepat') }}</span>
                             <span class="text-muted small fw-normal">{{ __('Opsional') }}</span>
                         </label>
                         <select id="quickUserSelect" class="form-select form-select-sm" style="border-radius: 8px;">
-                            <option value="">-- Pilih dari Kontak Pengguna --</option>
+                            <option value="">-- Pilih Kontak Driver / Teknisi / Admin --</option>
                             @php
                                 $driverUsers = $users->where('role', 'user');
                                 $teknisiUsers = $users->where('role', 'teknisi');
@@ -206,7 +598,7 @@
                                         <option value="{{ $userPhone ?: '' }}" 
                                                 data-user-id="{{ $user->id }}" 
                                                 data-user-name="{{ $user->name }}"
-                                                data-user-role="{{ $user->role }}"
+                                                data-user-role="Pengemudi"
                                                 data-vehicle-plat="{{ $assignedVehicle ? $assignedVehicle->plat_nomor : '' }}"
                                                 data-vehicle-merk="{{ $assignedVehicle ? trim(($assignedVehicle->merek ?? '') . ' ' . ($assignedVehicle->tipe ?? '')) : '' }}">
                                             {{ $user->name }} {{ $assignedVehicle ? '— [' . $assignedVehicle->plat_nomor . ']' : '' }} ({{ $userPhone ?: 'Belum ada WA' }})
@@ -222,7 +614,7 @@
                                         <option value="{{ $userPhone ?: '' }}" 
                                                 data-user-id="{{ $user->id }}" 
                                                 data-user-name="{{ $user->name }}"
-                                                data-user-role="{{ $user->role }}">
+                                                data-user-role="Teknisi">
                                             {{ $user->name }} ({{ $userPhone ?: 'Belum ada WA' }})
                                         </option>
                                     @endforeach
@@ -236,7 +628,7 @@
                                         <option value="{{ $userPhone ?: '' }}" 
                                                 data-user-id="{{ $user->id }}" 
                                                 data-user-name="{{ $user->name }}"
-                                                data-user-role="{{ $user->role }}">
+                                                data-user-role="Admin Fleet">
                                             {{ $user->name }} ({{ $userPhone ?: 'Belum ada WA' }})
                                         </option>
                                     @endforeach
@@ -250,313 +642,507 @@
                                         <option value="{{ $userPhone ?: '' }}" 
                                                 data-user-id="{{ $user->id }}" 
                                                 data-user-name="{{ $user->name }}"
-                                                data-user-role="{{ $user->role }}">
+                                                data-user-role="{{ ucfirst($user->role) }}">
                                             {{ $user->name }} [{{ ucfirst($user->role) }}] ({{ $userPhone ?: 'Belum ada WA' }})
                                         </option>
                                     @endforeach
                                 </optgroup>
                             @endif
                         </select>
+
+                        {{-- Mini Contact Card Indicator --}}
+                        <div id="contactMiniCard" class="contact-card-mini d-none">
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="avatar-circle-sm bg-primary text-white fw-bold rounded-circle d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; font-size: 0.72rem;">
+                                    <span id="contactMiniInitial">U</span>
+                                </div>
+                                <div>
+                                    <span id="contactMiniName" class="fw-bold text-dark d-block" style="font-size: 0.82rem;">Nama</span>
+                                    <span id="contactMiniRole" class="badge badge-soft-primary px-1.5 py-0.5" style="font-size: 0.65rem;">Role</span>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <span id="contactMiniPhone" class="font-monospace text-muted small d-block">628xxx</span>
+                                <span id="contactMiniPlat" class="plate-badge-tech" style="font-size: 0.68rem; display: none;"></span>
+                            </div>
+                        </div>
                     </div>
 
-                    {{-- Input Nomor Telepon --}}
+                    {{-- 2. INPUT NOMOR TELEPON TUJUAN --}}
                     <div class="mb-3">
-                        <label for="phone" class="form-label fw-semibold text-dark" style="font-size: 0.88rem;">
-                            {{ __('Nomor WhatsApp Tujuan') }} <span class="text-danger">*</span>
+                        <label for="phone" class="form-label fw-semibold text-dark mb-1" style="font-size: 0.85rem;">
+                            <i class="bi bi-phone text-success me-1"></i>{{ __('Nomor WhatsApp Tujuan') }} <span class="text-danger">*</span>
                         </label>
-                        <div class="input-group">
+                        <div class="input-group input-group-sm">
                             <span class="input-group-text bg-light text-muted border-end-0">
-                                <i class="bi bi-telephone-fill text-success"></i>
+                                <i class="bi bi-whatsapp text-success fs-6"></i>
                             </span>
                             <input type="text" 
                                    name="phone" 
                                    id="phone" 
-                                   class="form-control border-start-0" 
+                                   class="form-control border-start-0 font-monospace fw-semibold" 
                                    value="{{ old('phone') }}" 
                                    placeholder="Contoh: 08123456789 atau 628123456789" 
                                    required 
-                                   style="border-radius: 0 8px 8px 0;">
+                                   style="border-radius: 0 8px 8px 0; font-size: 0.88rem;">
                         </div>
                         <input type="hidden" name="user_id" id="selectedUserId" value="{{ old('user_id') }}">
                     </div>
 
-                    {{-- Quick Picker Template Sistem --}}
+                    {{-- 3. FILTER & SELECTOR TEMPLATE SISTEM --}}
                     <div class="mb-3">
-                        <label for="template_code" class="form-label fw-semibold text-dark" style="font-size: 0.88rem;">
-                            {{ __('Pilih Template Sistem Armada') }}
-                        </label>
-                        <select name="template_code" id="template_code" class="form-select" style="border-radius: 8px;">
-                            <option value="">-- Pesan Manual (Tulis Teks Bebas) --</option>
+                        <div class="d-flex justify-content-between align-items-center mb-1.5">
+                            <label for="template_code" class="form-label fw-semibold text-dark mb-0" style="font-size: 0.85rem;">
+                                <i class="bi bi-file-earmark-code text-info me-1"></i>{{ __('Template Sistem Armada') }}
+                            </label>
+                            <span class="text-muted small fw-normal">{{ __('Pilih template otomatis') }}</span>
+                        </div>
+
+                        {{-- Quick Category Filter Pills --}}
+                        <div class="d-flex flex-wrap gap-1.5 mb-2">
+                            <button type="button" class="tmpl-filter-pill active" data-filter="all">Semua</button>
+                            <button type="button" class="tmpl-filter-pill" data-filter="keluhan">🚨 Keluhan</button>
+                            <button type="button" class="tmpl-filter-pill" data-filter="servis">🔧 Servis</button>
+                            <button type="button" class="tmpl-filter-pill" data-filter="checklist">📋 Checklist</button>
+                            <button type="button" class="tmpl-filter-pill" data-filter="biaya">💼 Approval</button>
+                            <button type="button" class="tmpl-filter-pill" data-filter="tugas">📍 Rute</button>
+                        </div>
+
+                        <select name="template_code" id="template_code" class="form-select form-select-sm" style="border-radius: 8px;">
+                            <option value="" data-category="manual">-- Pesan Manual (Tulis Teks Bebas) --</option>
                             @foreach ($templates as $tmpl)
+                                @php
+                                    $cat = match(true) {
+                                        str_contains($tmpl->code, 'keluhan') => 'keluhan',
+                                        str_contains($tmpl->code, 'servis') || str_contains($tmpl->code, 'kir') => 'servis',
+                                        str_contains($tmpl->code, 'checklist') => 'checklist',
+                                        str_contains($tmpl->code, 'approval') || str_contains($tmpl->code, 'biaya') => 'biaya',
+                                        str_contains($tmpl->code, 'tugas') || str_contains($tmpl->code, 'driver') => 'tugas',
+                                        default => 'lainnya',
+                                    };
+                                @endphp
                                 <option value="{{ $tmpl->code }}" 
+                                        data-category="{{ $cat }}"
                                         data-content="{{ $tmpl->content }}"
                                         data-vars="{{ json_encode($tmpl->variables) }}"
                                         @selected(old('template_code') == $tmpl->code)>
-                                    {{ $tmpl->name }} ({{ $tmpl->code }})
+                                    {{ $tmpl->name }} [{{ $tmpl->code }}]
                                 </option>
                             @endforeach
                         </select>
                     </div>
 
-                    {{-- Quick Picker Kendaraan Armada (Untuk isi variabel cepat) --}}
+                    {{-- 4. QUICK PICKER KENDARAAN (Untuk isi otomatis template) --}}
                     <div class="mb-3 d-none" id="vehiclePickerContainer">
-                        <label class="form-label fw-semibold text-dark d-flex justify-content-between align-items-center" style="font-size: 0.85rem;">
-                            <span><i class="bi bi-truck text-primary me-1"></i>{{ __('Pilih Kendaraan Armada') }}</span>
-                            <span class="text-muted small fw-normal">{{ __('Otomatis isi plat & merk') }}</span>
+                        <label class="form-label fw-semibold text-dark d-flex justify-content-between align-items-center mb-1" style="font-size: 0.83rem;">
+                            <span><i class="bi bi-truck text-primary me-1"></i>{{ __('Sinkronisasi Data Armada') }}</span>
+                            <span class="text-muted small fw-normal">{{ __('Auto isi plat & merk') }}</span>
                         </label>
                         <select id="quickVehicleSelect" class="form-select form-select-sm" style="border-radius: 8px;">
-                            <option value="">-- Pilih Kendaraan Terdaftar --</option>
+                            <option value="">-- Pilih Armada Terdaftar --</option>
                             @foreach ($vehicles as $v)
                                 <option value="{{ $v->plat_nomor }}" 
                                         data-plat="{{ $v->plat_nomor }}"
                                         data-merk="{{ trim(($v->merek ?? '') . ' ' . ($v->tipe ?? '')) }}"
                                         data-odo="{{ $v->odometer_awal ?? 0 }}"
                                         data-driver="{{ $v->supir_utama ?: ($v->driver?->name ?: 'Belum ada driver') }}">
-                                    {{ $v->plat_nomor }} - {{ $v->merek }} {{ $v->tipe }} ({{ $v->supir_utama ?: 'Driver: —' }})
+                                    {{ $v->plat_nomor }} — {{ $v->merek }} {{ $v->tipe }} ({{ $v->supir_utama ?: 'Driver: —' }})
                                 </option>
                             @endforeach
                         </select>
                     </div>
 
-                    {{-- Dynamic Variable Inputs for Selected Template --}}
+                    {{-- 5. DYNAMIC VARIABLES CONTAINER --}}
                     <div id="dynamicVariablesContainer" class="p-3 bg-light rounded-3 border mb-3 d-none">
-                        <span class="fw-bold text-dark d-block mb-2" style="font-size: 0.85rem;">
-                            <i class="bi bi-sliders text-primary me-1"></i>{{ __('Parameter Variabel Template') }}
-                        </span>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 0.82rem;">
+                                <i class="bi bi-sliders2 text-primary"></i>
+                                <span>{{ __('Variabel Parameter Template') }}</span>
+                            </span>
+                            <span class="badge badge-soft-primary px-2 py-0.5" style="font-size: 0.68rem;">Placeholder Bindings</span>
+                        </div>
                         <div id="dynamicFieldsList" class="d-flex flex-column gap-2"></div>
                     </div>
 
-                    {{-- Live Preview Box --}}
-                    <div class="mb-3 d-none" id="previewContainer">
-                        <label class="form-label fw-semibold text-dark mb-1" style="font-size: 0.85rem;">
-                            <i class="bi bi-eye text-info me-1"></i>{{ __('Pratinjau Pesan yang Akan Dikirim') }}
-                        </label>
-                        <div id="livePreviewBox" class="preview-box"></div>
-                    </div>
+                    {{-- 6. MANUAL MESSAGE TEXTAREA & FORMATTING TOOLBAR --}}
+                    <div class="mb-3" id="manualMessageContainer">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label for="message" class="form-label fw-semibold text-dark mb-0" style="font-size: 0.85rem;">
+                                <i class="bi bi-chat-left-text text-primary me-1"></i>{{ __('Isi Teks Pesan') }} <span id="msgRequiredAsterisk" class="text-danger">*</span>
+                            </label>
+                            
+                            {{-- Formatting Shortcode Toolbar --}}
+                            <div class="d-flex align-items-center gap-1">
+                                <button type="button" class="format-btn" data-format="bold" title="Teks Tebal (*teks*)"><b>B</b></button>
+                                <button type="button" class="format-btn" data-format="italic" title="Teks Miring (_teks_)"><i>I</i></button>
+                                <button type="button" class="format-btn" data-format="strike" title="Teks Coret (~teks~)"><s>S</s></button>
+                                <button type="button" class="format-btn" data-format="bullet" title="Poin Bullet (•)">•</button>
+                            </div>
+                        </div>
 
-                    {{-- Manual Message Textarea --}}
-                    <div class="mb-4" id="manualMessageContainer">
-                        <label for="message" class="form-label fw-semibold text-dark" style="font-size: 0.88rem;">
-                            {{ __('Isi Pesan') }} <span id="msgRequiredAsterisk" class="text-danger">*</span>
-                        </label>
                         <textarea name="message" 
                                   id="message" 
                                   rows="5" 
                                   class="form-control" 
-                                  placeholder="Tuliskan isi pesan yang ingin dikirim..." 
-                                  style="border-radius: 8px;">{{ old('message') }}</textarea>
-                        <div class="form-text text-muted d-flex justify-content-between align-items-center" style="font-size: 0.8rem;">
-                            <span>Maksimal 2.000 karakter.</span>
-                            <span id="charCounter" class="font-monospace">0 karakter</span>
+                                  placeholder="Tuliskan pesan teks yang ingin dikirimkan via WhatsApp Gateway..." 
+                                  style="border-radius: 8px; font-size: 0.88rem; font-family: inherit;">{{ old('message') }}</textarea>
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-1 text-muted" style="font-size: 0.76rem;">
+                            <span>Maksimal 2.000 karakter via REST API Gateway</span>
+                            <span id="charCounter" class="font-monospace fw-semibold">0 karakter</span>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-success w-100 py-2.5 fw-semibold d-flex align-items-center justify-content-center gap-2 shadow-sm" style="border-radius: 8px;">
-                        <i class="bi bi-send-check-fill fs-6"></i>
-                        <span>{{ __('Kirim Pesan WhatsApp') }}</span>
+                    {{-- SUBMIT BUTTON --}}
+                    <button type="submit" id="btnSubmitWa" class="btn btn-success w-100 py-2.5 fw-bold d-flex align-items-center justify-content-center gap-2 shadow-sm" style="border-radius: 10px; background: #25D366; border-color: #25D366; transition: all 0.2s ease;">
+                        <i class="bi bi-send-fill fs-6"></i>
+                        <span>{{ __('Kirim Sekarang via Gateway') }}</span>
                     </button>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Tabel Riwayat Pengiriman WhatsApp -->
+    {{-- =====================================================
+         KOLOM KANAN: SMARTPHONE MOCKUP & LOG MONITOR TABLE
+         ===================================================== --}}
     <div class="col-lg-7">
-        <div class="card border-0 shadow-sm h-100" style="border-radius: 14px;">
-            <div class="card-header bg-white py-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
-                <div class="d-flex align-items-center gap-2">
-                    <i class="bi bi-clock-history text-primary fs-5"></i>
-                    <span class="fw-bold text-dark">{{ __('Riwayat Pengiriman Pesan') }}</span>
-                </div>
-                
-                {{-- Form Filter Pencarian & Status --}}
-                <form action="{{ route('whatsapp.index') }}" method="GET" class="d-flex flex-wrap align-items-center gap-2">
-                    <select name="status" class="form-select form-select-sm" style="width: 120px; border-radius: 6px;" onchange="this.form.submit()">
-                        <option value="">Semua Status</option>
-                        <option value="success" @selected(request('status') === 'success')>Sukses</option>
-                        <option value="pending" @selected(request('status') === 'pending')>Pending</option>
-                        <option value="failed" @selected(request('status') === 'failed')>Gagal</option>
-                    </select>
-                    
-                    <div class="input-group input-group-sm" style="width: 170px;">
-                        <input type="text" name="search" class="form-control" placeholder="Cari pelapor/plat..." value="{{ request('search') }}" style="border-radius: 6px 0 0 6px;">
-                        <button class="btn btn-outline-secondary" type="submit" style="border-radius: 0 6px 6px 0;">
-                            <i class="bi bi-search"></i>
+        <div class="aesthetic-card h-100 d-flex flex-column">
+            
+            {{-- Nav Tabs Switcher --}}
+            <div class="p-3 px-4 border-bottom bg-body-tertiary">
+                <ul class="nav nav-tech-tabs" id="waHubTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active d-inline-flex align-items-center gap-1.5" id="table-tab" data-bs-toggle="tab" data-bs-target="#tab-table" type="button" role="tab" aria-selected="true">
+                            <i class="bi bi-clock-history"></i>
+                            <span>{{ __('Riwayat & Logbook') }}</span>
+                            <span class="badge bg-secondary rounded-pill px-1.5 py-0.5 ms-1" style="font-size: 0.68rem;">{{ $logs->total() }}</span>
                         </button>
-                    </div>
-
-                    @if(request()->filled('status') || request()->filled('search'))
-                        <a href="{{ route('whatsapp.index') }}" class="btn btn-sm btn-light text-muted" title="Reset Filter">
-                            <i class="bi bi-x-circle"></i>
-                        </a>
-                    @endif
-                </form>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link d-inline-flex align-items-center gap-1.5" id="simulator-tab" data-bs-toggle="tab" data-bs-target="#tab-simulator" type="button" role="tab" aria-selected="false">
+                            <i class="bi bi-phone"></i>
+                            <span>{{ __('Simulator Chat Live') }}</span>
+                            <span class="badge badge-soft-success rounded-pill px-1.5 py-0.5 ms-1" style="font-size: 0.68rem;">Interactive</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link d-inline-flex align-items-center gap-1.5" id="catalogue-tab" data-bs-toggle="tab" data-bs-target="#tab-catalogue" type="button" role="tab" aria-selected="false">
+                            <i class="bi bi-grid-fill"></i>
+                            <span>{{ __('Galeri Template') }}</span>
+                        </button>
+                    </li>
+                </ul>
             </div>
 
-            <div class="table-responsive flex-grow-1">
-                <table class="table table-hover align-middle mb-0 w-100">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="ps-3" style="width: 40px;">No</th>
-                            <th style="width: 115px;">{{ __('Waktu') }}</th>
-                            <th>{{ __('Pelapor & Kontak') }}</th>
-                            <th>{{ __('Kendaraan Armada') }}</th>
-                            <th>{{ __('Kategori & Kendala') }}</th>
-                            <th style="width: 85px;">{{ __('Status') }}</th>
-                            <th class="pe-3 text-end" style="width: 90px;">{{ __('Aksi') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($logs as $log)
-                        <tr>
-                            <td class="ps-3 text-muted font-monospace" style="font-size: 0.85rem;">
-                                {{ $loop->iteration + ($logs->currentPage() - 1) * $logs->perPage() }}
-                            </td>
-                            <td>
-                                <span class="fw-semibold text-dark d-block" style="font-size: 0.82rem;">
-                                    {{ $log->created_at ? $log->created_at->format('d/m/Y') : '—' }}
-                                </span>
-                                <span class="text-muted font-monospace" style="font-size: 0.75rem;">
-                                    {{ $log->created_at ? $log->created_at->format('H:i:s') : '' }}
-                                </span>
-                            </td>
-                            <td>
-                                <div class="d-flex align-items-center gap-1.5 mb-0.5">
-                                    <i class="bi bi-person-circle text-secondary" style="font-size: 0.95rem;"></i>
-                                    <span class="fw-bold text-dark" style="font-size: 0.85rem;">{{ $log->pelapor }}</span>
-                                </div>
-                                <div class="text-muted font-monospace" style="font-size: 0.78rem;">
-                                    <i class="bi bi-whatsapp text-success me-1"></i>{{ $log->phone }}
-                                </div>
-                            </td>
-                            <td>
-                                @if ($log->kendaraan)
-                                    <div class="d-inline-flex align-items-center gap-1.5 px-2.5 py-1 bg-light text-dark border rounded-2" style="font-size: 0.82rem;">
-                                        <i class="bi bi-truck text-primary"></i>
-                                        <span class="fw-bold">{{ $log->kendaraan }}</span>
-                                    </div>
-                                @else
-                                    <span class="text-muted font-monospace" style="font-size: 0.8rem;">—</span>
-                                @endif
-                            </td>
-                            <td>
-                                <div class="d-flex flex-column gap-1">
-                                    @if ($log->template)
-                                        @php
-                                            $tmplClass = match($log->template->code) {
-                                                'keluhan_baru' => 'bg-danger-subtle text-danger border border-danger-subtle',
-                                                'keluhan_status' => 'bg-info-subtle text-info border border-info-subtle',
-                                                'servis_reminder' => 'bg-warning-subtle text-warning border border-warning-subtle',
-                                                'checklist_peringatan' => 'bg-warning-subtle text-dark border border-warning',
-                                                default => 'bg-light text-primary border',
-                                            };
-                                        @endphp
-                                        <span class="badge {{ $tmplClass }} align-self-start px-2 py-0.5" style="font-size: 0.7rem;">
-                                            {{ $log->template->name }}
-                                        </span>
-                                    @else
-                                        <span class="badge bg-light text-secondary border align-self-start px-2 py-0.5" style="font-size: 0.7rem;">
-                                            {{ __('Pesan Manual') }}
-                                        </span>
-                                    @endif
-                                    <span class="text-dark fw-medium d-inline-block text-truncate" style="max-width: 220px; font-size: 0.82rem;" title="{{ $log->message }}">
-                                        {{ $log->kendala }}
-                                    </span>
-                                </div>
-                            </td>
-                            <td>
-                                <span class="badge bg-{{ $log->statusBadge() }} px-2 py-1 text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">
-                                    {{ $log->status }}
-                                </span>
-                            </td>
-                            <td class="pe-3 text-end">
-                                <div class="d-inline-flex gap-1 align-items-center">
-                                    {{-- Tombol Kirim Ulang jika Status Gagal --}}
-                                    @if ($log->status === 'failed')
-                                        <form action="{{ route('whatsapp.resend', $log) }}" method="POST" class="d-inline" onsubmit="return confirm('Kirim ulang pesan WhatsApp ini ke {{ $log->phone }}?');">
-                                            @csrf
-                                            <button type="submit" class="btn btn-sm btn-outline-danger px-2 py-0.5" style="border-radius: 6px; font-size: 0.75rem;" title="Kirim Ulang Pesan">
-                                                <i class="bi bi-arrow-repeat"></i>
-                                            </button>
-                                        </form>
-                                    @endif
+            <div class="tab-content flex-grow-1 p-0" id="waHubTabContent">
+                
+                {{-- TAB 1: TABEL LOG RIWAYAT PENGIRIMAN --}}
+                <div class="tab-pane fade show active h-100 d-flex flex-column" id="tab-table" role="tabpanel" aria-labelledby="table-tab">
+                    {{-- Filter & Search Toolbar --}}
+                    <div class="p-3 px-4 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-2.5">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="fw-bold text-dark small">{{ __('Filter Status:') }}</span>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="{{ route('whatsapp.index') }}" class="btn btn-outline-secondary {{ !request('status') ? 'active' : '' }}" style="font-size: 0.74rem;">Semua</a>
+                                <a href="{{ route('whatsapp.index', ['status' => 'success']) }}" class="btn btn-outline-success {{ request('status') === 'success' ? 'active' : '' }}" style="font-size: 0.74rem;">Sukses</a>
+                                <a href="{{ route('whatsapp.index', ['status' => 'pending']) }}" class="btn btn-outline-warning {{ request('status') === 'pending' ? 'active' : '' }}" style="font-size: 0.74rem;">Pending</a>
+                                <a href="{{ route('whatsapp.index', ['status' => 'failed']) }}" class="btn btn-outline-danger {{ request('status') === 'failed' ? 'active' : '' }}" style="font-size: 0.74rem;">Gagal</a>
+                            </div>
+                        </div>
 
-                                    {{-- Tombol Detail Log --}}
-                                    <button type="button" 
-                                            class="btn btn-sm btn-light border px-2 py-0.5 btn-detail-log" 
-                                            style="border-radius: 6px; font-size: 0.75rem;" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#detailLogModal"
-                                            data-log="{{ json_encode(array_merge($log->load(['template', 'user'])->toArray(), [
-                                                'parsed_pelapor' => $log->pelapor,
-                                                'parsed_kendaraan' => $log->kendaraan,
-                                                'parsed_kendala' => $log->kendala,
-                                            ])) }}"
-                                            title="Lihat Rincian Laporan & Pesan">
-                                        <i class="bi bi-eye"></i> Detail
+                        {{-- Search Input --}}
+                        <form action="{{ route('whatsapp.index') }}" method="GET" class="d-flex align-items-center gap-1.5">
+                            @if(request('status'))
+                                <input type="hidden" name="status" value="{{ request('status') }}">
+                            @endif
+                            <div class="input-group input-group-sm" style="width: 200px;">
+                                <input type="text" name="search" class="form-control" placeholder="Cari pelapor / plat..." value="{{ request('search') }}" style="border-radius: 6px 0 0 6px;">
+                                <button class="btn btn-outline-secondary" type="submit" style="border-radius: 0 6px 6px 0;">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                            @if(request()->filled('search') || request()->filled('status'))
+                                <a href="{{ route('whatsapp.index') }}" class="btn btn-sm btn-light border" title="Reset Filter">
+                                    <i class="bi bi-x-lg text-muted"></i>
+                                </a>
+                            @endif
+                        </form>
+                    </div>
+
+                    {{-- Table Content --}}
+                    <div class="table-responsive flex-grow-1">
+                        <table class="table table-hover align-middle mb-0 w-100" style="font-size: 0.85rem;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-3" style="width: 35px;">#</th>
+                                    <th style="width: 100px;">{{ __('Waktu') }}</th>
+                                    <th>{{ __('Pelapor & No. WA') }}</th>
+                                    <th>{{ __('Armada') }}</th>
+                                    <th>{{ __('Kategori / Pesan') }}</th>
+                                    <th style="width: 80px;">{{ __('Status') }}</th>
+                                    <th class="pe-3 text-end" style="width: 95px;">{{ __('Aksi') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($logs as $log)
+                                <tr>
+                                    <td class="ps-3 text-muted font-monospace" style="font-size: 0.8rem;">
+                                        {{ $loop->iteration + ($logs->currentPage() - 1) * $logs->perPage() }}
+                                    </td>
+                                    <td>
+                                        <span class="fw-semibold text-dark d-block" style="font-size: 0.8rem;">
+                                            {{ $log->created_at ? $log->created_at->format('d/m/Y') : '—' }}
+                                        </span>
+                                        <span class="text-muted font-monospace" style="font-size: 0.72rem;">
+                                            {{ $log->created_at ? $log->created_at->format('H:i:s') : '' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-1.5 mb-0.5">
+                                            <i class="bi bi-person-circle text-secondary"></i>
+                                            <span class="fw-bold text-dark" style="font-size: 0.82rem;">{{ $log->pelapor }}</span>
+                                        </div>
+                                        <div class="text-muted font-monospace" style="font-size: 0.75rem;">
+                                            <i class="bi bi-whatsapp text-success me-1"></i>{{ $log->phone }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if ($log->kendaraan)
+                                            <span class="plate-badge-tech">
+                                                <i class="bi bi-truck"></i>{{ $log->kendaraan }}
+                                            </span>
+                                        @else
+                                            <span class="text-muted font-monospace" style="font-size: 0.78rem;">—</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-column gap-0.5">
+                                            @if ($log->template)
+                                                @php
+                                                    $tmplClass = match($log->template->code) {
+                                                        'keluhan_baru' => 'badge-soft-danger',
+                                                        'keluhan_status' => 'badge-soft-info',
+                                                        'servis_reminder' => 'badge-soft-warning',
+                                                        'checklist_peringatan' => 'badge-soft-warning',
+                                                        'approval_biaya' => 'badge-soft-primary',
+                                                        default => 'badge-soft-success',
+                                                    };
+                                                @endphp
+                                                <span class="badge {{ $tmplClass }} align-self-start px-2 py-0.5" style="font-size: 0.68rem;">
+                                                    {{ $log->template->name }}
+                                                </span>
+                                            @else
+                                                <span class="badge badge-soft-info align-self-start px-2 py-0.5" style="font-size: 0.68rem;">
+                                                    {{ __('Pesan Manual') }}
+                                                </span>
+                                            @endif
+                                            <span class="text-dark fw-medium d-inline-block text-truncate" style="max-width: 200px; font-size: 0.8rem;" title="{{ $log->message }}">
+                                                {{ $log->kendala }}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if($log->status === 'success')
+                                            <span class="badge badge-soft-success px-2 py-0.5 d-inline-flex align-items-center gap-1 text-uppercase" style="font-size: 0.68rem;">
+                                                <i class="bi bi-check-all"></i>Sukses
+                                            </span>
+                                        @elseif($log->status === 'failed')
+                                            <span class="badge badge-soft-danger px-2 py-0.5 d-inline-flex align-items-center gap-1 text-uppercase" style="font-size: 0.68rem;">
+                                                <i class="bi bi-x-circle"></i>Gagal
+                                            </span>
+                                        @else
+                                            <span class="badge badge-soft-warning px-2 py-0.5 d-inline-flex align-items-center gap-1 text-uppercase" style="font-size: 0.68rem;">
+                                                <i class="bi bi-hourglass-split"></i>Pending
+                                            </span>
+                                        @endif
+                                    </td>
+                                    <td class="pe-3 text-end">
+                                        <div class="d-inline-flex gap-1 align-items-center">
+                                            {{-- Tombol Kirim Ulang jika Status Gagal --}}
+                                            @if ($log->status === 'failed')
+                                                <form action="{{ route('whatsapp.resend', $log) }}" method="POST" class="d-inline" onsubmit="return confirm('Kirim ulang pesan WhatsApp ini ke {{ $log->phone }}?');">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger px-1.5 py-0.5" style="border-radius: 6px; font-size: 0.72rem;" title="Kirim Ulang Pesan">
+                                                        <i class="bi bi-arrow-repeat"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+
+                                            {{-- Tombol Detail Log --}}
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-light border px-2 py-0.5 btn-detail-log" 
+                                                    style="border-radius: 6px; font-size: 0.74rem;" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#detailLogModal"
+                                                    data-log="{{ json_encode(array_merge($log->load(['template', 'user'])->toArray(), [
+                                                        'parsed_pelapor' => $log->pelapor,
+                                                        'parsed_kendaraan' => $log->kendaraan,
+                                                        'parsed_kendala' => $log->kendala,
+                                                    ])) }}"
+                                                    title="Lihat Detail Telemetri API">
+                                                <i class="bi bi-eye"></i> Detail
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="7" class="text-center py-5 text-muted">
+                                        <div class="p-3 bg-light rounded-circle d-inline-flex align-items-center justify-content-center mb-2" style="width: 54px; height: 54px;">
+                                            <i class="bi bi-chat-square-dots text-secondary fs-3"></i>
+                                        </div>
+                                        <span class="fw-bold d-block text-dark">Belum ada riwayat pesan WhatsApp</span>
+                                        <small class="text-muted">Kirim pesan pertama Anda menggunakan panel Composer di sebelah kiri.</small>
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {{-- Pagination Footer --}}
+                    @if ($logs->hasPages())
+                        <div class="p-3 px-4 border-top d-flex justify-content-between align-items-center bg-body-tertiary">
+                            <span class="text-muted small">
+                                Menampilkan {{ $logs->firstItem() ?? 0 }} - {{ $logs->lastItem() ?? 0 }} dari {{ $logs->total() }} log
+                            </span>
+                            <div>
+                                {{ $logs->links() }}
+                            </div>
+                        </div>
+                    @endif
+                </div>
+
+                {{-- TAB 2: SMARTPHONE WHATSAPP SIMULATOR LIVE --}}
+                <div class="tab-pane fade p-4" id="tab-simulator" role="tabpanel" aria-labelledby="simulator-tab">
+                    <div class="text-center mb-3">
+                        <span class="badge badge-soft-success px-3 py-1 rounded-pill mb-1">
+                            <i class="bi bi-phone me-1"></i>Live Smartphone Mockup Simulator
+                        </span>
+                        <p class="text-muted small mb-0">Tampilan pesan terformat di smartphone pengemudi / staf secara real-time.</p>
+                    </div>
+
+                    {{-- Realistic Smartphone Body --}}
+                    <div class="phone-mockup-wrapper">
+                        <div class="phone-notch">
+                            <div class="camera-lens"></div>
+                        </div>
+                        <div class="phone-screen">
+                            {{-- Phone WhatsApp Top Header --}}
+                            <div class="phone-header">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-arrow-left fs-6"></i>
+                                    <div class="rounded-circle bg-white text-dark d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 0.75rem;">
+                                        <i class="bi bi-person-fill text-secondary"></i>
+                                    </div>
+                                    <div>
+                                        <span id="phoneRecipientName" class="fw-bold d-block" style="font-size: 0.8rem; line-height: 1.2;">Fleet Control Center</span>
+                                        <small class="text-white-50" style="font-size: 0.65rem;">online</small>
+                                    </div>
+                                </div>
+                                <div class="d-flex align-items-center gap-2.5 fs-6 text-white-50">
+                                    <i class="bi bi-camera-video"></i>
+                                    <i class="bi bi-telephone"></i>
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </div>
+                            </div>
+
+                            {{-- Phone WhatsApp Chat Screen --}}
+                            <div class="phone-chat-body">
+                                <div class="security-notice-badge">
+                                    <i class="bi bi-lock-fill me-1"></i>Pesan ini dienkripsi secara end-to-end melalui Ervelia WhatsApp Gateway API.
+                                </div>
+
+                                {{-- Live Chat Bubble --}}
+                                <div class="chat-bubble-wa" id="phoneLiveBubble">
+                                    Pilih template atau tulis teks pesan pada panel composer untuk melihat pratinjau live di sini.
+                                    <div class="chat-time-meta">
+                                        <span id="phoneLiveTime">12:00</span>
+                                        <i class="bi bi-check2-all"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- TAB 3: KATALOG 7 TEMPLATE SISTEM --}}
+                <div class="tab-pane fade p-4" id="tab-catalogue" role="tabpanel" aria-labelledby="catalogue-tab">
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="fw-bold text-dark mb-0">Katalog Template Resmi Sistem Armada</h6>
+                            <small class="text-muted">Template bawaan yang digunakan untuk notifikasi event-driven.</small>
+                        </div>
+                        <span class="badge bg-primary rounded-pill px-2.5 py-1">7 Template Aktif</span>
+                    </div>
+
+                    <div class="row g-3">
+                        @foreach ($templates as $tmpl)
+                            <div class="col-md-6">
+                                <div class="p-3 bg-light rounded-3 border h-100 d-flex flex-column justify-content-between">
+                                    <div>
+                                        <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                            <span class="fw-bold text-dark" style="font-size: 0.85rem;">{{ $tmpl->name }}</span>
+                                            <span class="badge bg-dark font-monospace" style="font-size: 0.65rem;">{{ $tmpl->code }}</span>
+                                        </div>
+                                        <p class="text-muted small mb-2" style="font-size: 0.76rem;">{{ $tmpl->description }}</p>
+                                        <div class="p-2.5 bg-white rounded border small font-monospace text-muted mb-2" style="font-size: 0.72rem; max-height: 85px; overflow-y: auto; white-space: pre-wrap;">{{ $tmpl->content }}</div>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary w-100 btn-apply-tmpl" data-code="{{ $tmpl->code }}" style="font-size: 0.75rem; border-radius: 6px;">
+                                        <i class="bi bi-pencil-square me-1"></i>Gunakan di Composer
                                     </button>
                                 </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="7" class="text-center py-5 text-muted">
-                                <i class="bi bi-chat-square-dots fs-1 d-block mb-2 opacity-50"></i>
-                                <span class="fw-semibold d-block">Belum ada riwayat pesan WhatsApp</span>
-                                <small>Kirim pesan baru menggunakan formulir di sebelah kiri.</small>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            {{-- Laravel Built-in Pagination --}}
-            @if ($logs->hasPages())
-                <div class="card-footer bg-white py-3 border-top d-flex justify-content-between align-items-center">
-                    <span class="text-muted small">
-                        Menampilkan {{ $logs->firstItem() ?? 0 }} - {{ $logs->lastItem() ?? 0 }} dari {{ $logs->total() }} log
-                    </span>
-                    <div>
-                        {{ $logs->links() }}
+                            </div>
+                        @endforeach
                     </div>
                 </div>
-            @endif
+
+            </div>
         </div>
     </div>
 </div>
 
-<!-- Modal Detail Log WhatsApp & Laporan Armada -->
+{{-- =========================================================
+     MODAL DETAIL TELEMETRI & LOG INSPECTOR
+     ========================================================= --}}
 <div class="modal fade" id="detailLogModal" tabindex="-1" aria-labelledby="detailLogModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content border-0 shadow" style="border-radius: 14px;">
-            <div class="modal-header border-bottom py-3">
-                <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2" id="detailLogModalLabel">
-                    <i class="bi bi-info-circle text-primary"></i>
-                    <span>Detail Laporan Armada & Pesan WhatsApp</span>
-                </h5>
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header border-bottom py-3 px-4 bg-body-tertiary">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="p-1.5 bg-primary-subtle text-primary rounded-2">
+                        <i class="bi bi-cpu-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="detailLogModalLabel">
+                            {{ __('Telemetri Pesan & Diagnostik Gateway') }}
+                        </h5>
+                        <small class="text-muted" style="font-size: 0.75rem;">Detail payload REST API Ervelia dan status pengiriman</small>
+                    </div>
+                </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
-                {{-- Info Ringkas Pelapor, Kendaraan, dan Status --}}
+                {{-- Info Ringkas Kartu --}}
                 <div class="row g-3 mb-3">
                     <div class="col-md-4">
                         <div class="p-3 bg-light rounded-3 border h-100">
-                            <span class="text-muted small fw-semibold d-block text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Pelapor / Pengirim</span>
+                            <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.5px;">Pelapor / Pengemudi</span>
                             <div id="modalPelapor" class="fw-bold text-dark fs-6 mt-1"></div>
                             <div id="modalPhone" class="text-muted font-monospace small"></div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="p-3 bg-light rounded-3 border h-100">
-                            <span class="text-muted small fw-semibold d-block text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Kendaraan Terkait</span>
+                            <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.5px;">Armada Terkait</span>
                             <div id="modalKendaraan" class="fw-bold text-primary fs-6 mt-1"></div>
                             <div id="modalTemplateName" class="text-muted small"></div>
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="p-3 bg-light rounded-3 border h-100">
-                            <span class="text-muted small fw-semibold d-block text-uppercase" style="font-size: 0.7rem; letter-spacing: 0.5px;">Status Gateway</span>
+                            <span class="text-muted fw-bold text-uppercase" style="font-size: 0.68rem; letter-spacing: 0.5px;">Status Gateway</span>
                             <div class="d-flex align-items-center gap-2 mt-1">
                                 <span id="modalStatusBadge" class="badge"></span>
                                 <span id="modalSentAt" class="text-dark small font-monospace"></span>
@@ -565,39 +1151,100 @@
                     </div>
                 </div>
 
-                {{-- Kendala / Bagian Rusak --}}
+                {{-- Kendala yang dilaporkan --}}
                 <div class="mb-3">
-                    <label class="fw-semibold text-dark small d-block mb-1">
-                        <i class="bi bi-wrench-adjustable text-danger me-1"></i>Kendala / Bagian yang Dilaporkan
+                    <label class="fw-bold text-dark small d-block mb-1">
+                        <i class="bi bi-wrench-adjustable text-danger me-1"></i>Bagian Kerusakan / Kendala Dilaporkan
                     </label>
-                    <div id="modalKendala" class="p-2.5 bg-danger-subtle text-danger rounded border border-danger-subtle fw-semibold" style="font-size: 0.88rem;"></div>
+                    <div id="modalKendala" class="p-2.5 bg-danger-subtle text-danger rounded-3 border border-danger-subtle fw-semibold" style="font-size: 0.85rem;"></div>
                 </div>
 
-                {{-- Teks Pesan WhatsApp Lengkap --}}
+                {{-- Isi Pesan Lengkap --}}
                 <div class="mb-3">
-                    <label class="fw-semibold text-muted small d-block mb-1">
-                        <i class="bi bi-whatsapp text-success me-1"></i>Format Isi Pesan WhatsApp
+                    <label class="fw-bold text-dark small d-block mb-1">
+                        <i class="bi bi-whatsapp text-success me-1"></i>Format Isi Pesan Teks
                     </label>
-                    <div id="modalMessage" class="p-3 bg-light rounded border text-dark font-monospace" style="font-size: 0.85rem; white-space: pre-wrap; word-break: break-word;"></div>
+                    <div id="modalMessage" class="p-3 bg-light rounded-3 border text-dark font-monospace" style="font-size: 0.82rem; white-space: pre-wrap; word-break: break-word;"></div>
                 </div>
 
+                {{-- Error Banner jika ada --}}
                 <div id="modalErrorSection" class="mb-3 d-none">
-                    <label class="fw-semibold text-danger small d-block mb-1">Keterangan Error Provider</label>
-                    <div id="modalError" class="p-2 bg-danger-subtle text-danger rounded border border-danger-subtle small font-monospace"></div>
+                    <label class="fw-bold text-danger small d-block mb-1">Pesan Kesalahan Provider Gateway</label>
+                    <div id="modalError" class="p-2.5 bg-danger-subtle text-danger rounded-3 border border-danger-subtle small font-monospace"></div>
                 </div>
 
+                {{-- Raw JSON Telemetry --}}
                 <div>
-                    <label class="fw-semibold text-muted small d-block mb-1">Response JSON (Ervelia Gateway)</label>
-                    <pre id="modalResponse" class="p-2 bg-dark text-light rounded small mb-0" style="max-height: 120px; overflow-y: auto; font-size: 0.75rem;"></pre>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="fw-bold text-muted small mb-0">Payload JSON Response (Ervelia Gateway)</label>
+                        <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2" id="btnCopyJson" style="font-size: 0.7rem;">
+                            <i class="bi bi-clipboard me-1"></i>Salin JSON
+                        </button>
+                    </div>
+                    <pre id="modalResponse" class="p-3 bg-dark text-light rounded-3 small mb-0 font-monospace" style="max-height: 140px; overflow-y: auto; font-size: 0.75rem;"></pre>
                 </div>
             </div>
-            <div class="modal-footer border-top py-2">
-                <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal" style="border-radius: 6px;">Tutup</button>
+            <div class="modal-footer border-top py-2.5 px-4 bg-body-tertiary">
+                <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal" style="border-radius: 8px;">Tutup</button>
             </div>
         </div>
     </div>
 </div>
 
+{{-- =========================================================
+     MODAL KATALOG 7 TEMPLATE SISTEM ARMADA
+     ========================================================= --}}
+<div class="modal fade" id="templateGuideModal" tabindex="-1" aria-labelledby="templateGuideModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px;">
+            <div class="modal-header border-bottom py-3 px-4 bg-body-tertiary">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="p-1.5 bg-success-subtle text-success rounded-2">
+                        <i class="bi bi-collection-play-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="templateGuideModalLabel">
+                            {{ __('Katalog 7 Template Otomasi WhatsApp') }}
+                        </h5>
+                        <small class="text-muted" style="font-size: 0.75rem;">Panduan pemicu otomatis dan placeholder variabel</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4" style="max-height: 70vh; overflow-y: auto;">
+                <div class="row g-3">
+                    @foreach ($templates as $tmpl)
+                        <div class="col-12">
+                            <div class="p-3 bg-light rounded-3 border">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <span class="fw-bold text-dark" style="font-size: 0.9rem;">{{ $tmpl->name }}</span>
+                                    <span class="badge bg-dark font-monospace">{{ $tmpl->code }}</span>
+                                </div>
+                                <p class="text-muted small mb-2">{{ $tmpl->description }}</p>
+                                <div class="p-2.5 bg-white rounded border small font-monospace text-dark mb-2" style="white-space: pre-wrap; font-size: 0.78rem;">{{ $tmpl->content }}</div>
+                                <div class="d-flex flex-wrap gap-1 align-items-center">
+                                    <span class="text-muted small fw-semibold me-1" style="font-size: 0.72rem;">Variabel:</span>
+                                    @if($tmpl->variables)
+                                        @foreach($tmpl->variables as $v)
+                                            <span class="badge badge-soft-primary px-2 py-0.5" style="font-size: 0.68rem;">@{{ {{ $v }} }}</span>
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            <div class="modal-footer border-top py-2.5 px-4 bg-body-tertiary">
+                <button type="button" class="btn btn-secondary btn-sm px-3" data-bs-dismiss="modal" style="border-radius: 8px;">Tutup</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- =========================================================
+     INTERACTIVE JAVASCRIPT ENGINE
+     ========================================================= --}}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const phoneInput = document.getElementById('phone');
@@ -610,33 +1257,56 @@
         const manualMessageContainer = document.getElementById('manualMessageContainer');
         const dynamicVariablesContainer = document.getElementById('dynamicVariablesContainer');
         const dynamicFieldsList = document.getElementById('dynamicFieldsList');
-        const previewContainer = document.getElementById('previewContainer');
-        const livePreviewBox = document.getElementById('livePreviewBox');
         const charCounter = document.getElementById('charCounter');
         const msgAsterisk = document.getElementById('msgRequiredAsterisk');
         const btnUseAdminNumber = document.getElementById('btnUseAdminNumber');
+        const btnSubmitWa = document.getElementById('btnSubmitWa');
+
+        // Phone Simulator Elements
+        const phoneLiveBubble = document.getElementById('phoneLiveBubble');
+        const phoneLiveTime = document.getElementById('phoneLiveTime');
+        const phoneRecipientName = document.getElementById('phoneRecipientName');
+
+        // Contact Mini Card
+        const contactMiniCard = document.getElementById('contactMiniCard');
+        const contactMiniName = document.getElementById('contactMiniName');
+        const contactMiniRole = document.getElementById('contactMiniRole');
+        const contactMiniPhone = document.getElementById('contactMiniPhone');
+        const contactMiniPlat = document.getElementById('contactMiniPlat');
+        const contactMiniInitial = document.getElementById('contactMiniInitial');
 
         const adminNumber = @json(config('services.whatsapp.admin_number', ''));
 
-        // Tombol cepat nomor admin
+        // Update Phone Live Clock
+        function updateLiveClock() {
+            const now = new Date();
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            if (phoneLiveTime) phoneLiveTime.textContent = timeStr;
+        }
+        updateLiveClock();
+
+        // 1. Tombol Cepat Isi Nomor Admin
         if (btnUseAdminNumber) {
             btnUseAdminNumber.addEventListener('click', function () {
                 if (adminNumber) {
                     phoneInput.value = adminNumber;
                     if (selectedUserId) selectedUserId.value = '';
+                    if (phoneRecipientName) phoneRecipientName.textContent = 'Admin Fleet Control';
+                    if (contactMiniCard) contactMiniCard.classList.add('d-none');
                 } else {
-                    alert('Nomor admin belum diisi di .env (WHATSAPP_ADMIN_NUMBER)');
+                    alert('Nomor admin belum dikonfigurasi di file .env (WHATSAPP_ADMIN_NUMBER)');
                 }
             });
         }
 
-        // Quick User Picker
+        // 2. Quick User Picker Handler
         if (quickUserSelect) {
             quickUserSelect.addEventListener('change', function () {
                 const selected = this.options[this.selectedIndex];
                 const phone = this.value;
                 const userId = selected.getAttribute('data-user-id');
                 const userName = selected.getAttribute('data-user-name');
+                const userRole = selected.getAttribute('data-user-role') || 'Staf';
                 const vehiclePlat = selected.getAttribute('data-vehicle-plat');
                 const vehicleMerk = selected.getAttribute('data-vehicle-merk');
 
@@ -647,7 +1317,26 @@
                     selectedUserId.value = userId || '';
                 }
 
-                // Jika ada field nama_driver / driver / nama_pemeriksa pada variabel template yang aktif, isi otomatis
+                if (userName && phone) {
+                    contactMiniCard.classList.remove('d-none');
+                    contactMiniName.textContent = userName;
+                    contactMiniRole.textContent = userRole;
+                    contactMiniPhone.textContent = phone;
+                    contactMiniInitial.textContent = userName.charAt(0).toUpperCase();
+                    if (phoneRecipientName) phoneRecipientName.textContent = userName;
+
+                    if (vehiclePlat) {
+                        contactMiniPlat.style.display = 'inline-flex';
+                        contactMiniPlat.innerHTML = `<i class="bi bi-truck"></i> ${vehiclePlat}`;
+                    } else {
+                        contactMiniPlat.style.display = 'none';
+                    }
+                } else {
+                    contactMiniCard.classList.add('d-none');
+                    if (phoneRecipientName) phoneRecipientName.textContent = 'Fleet Control Center';
+                }
+
+                // Auto-fill template variables
                 if (userName) {
                     const driverInputs = document.querySelectorAll('input[name="data[nama_driver]"], input[name="data[driver]"], input[name="data[nama_pemeriksa]"]');
                     driverInputs.forEach(input => {
@@ -655,7 +1344,6 @@
                     });
                 }
 
-                // Jika driver memiliki kendaraan terkait, otomatis sinkronkan ke template & picker kendaraan
                 if (vehiclePlat) {
                     const platInput = document.querySelector('input[name="data[plat_nomor]"]');
                     const merkInput = document.querySelector('input[name="data[merk_tipe]"]');
@@ -676,7 +1364,7 @@
             });
         }
 
-        // Quick Vehicle Picker
+        // 3. Quick Vehicle Picker Handler
         if (quickVehicleSelect) {
             quickVehicleSelect.addEventListener('change', function () {
                 const selected = this.options[this.selectedIndex];
@@ -701,25 +1389,45 @@
             });
         }
 
-        // Update counter pesan manual
+        // 4. Character Counter for Manual Message
         function updateCounter() {
             if (messageTextarea && charCounter) {
                 charCounter.textContent = `${messageTextarea.value.length} karakter`;
             }
         }
-
         if (messageTextarea) {
-            messageTextarea.addEventListener('input', updateCounter);
+            messageTextarea.addEventListener('input', function () {
+                updateCounter();
+                updateLivePreview();
+            });
             updateCounter();
         }
 
-        // Render live preview untuk template
+        // 5. WhatsApp Text Formatter (WhatsApp bold *text*, italics _text_, strikethrough ~text~)
+        function formatWhatsappText(raw) {
+            if (!raw) return 'Tulis teks pesan untuk melihat pratinjau live.';
+            let formatted = raw
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\*(.*?)\*/g, '<strong>$1</strong>')
+                .replace(/_(.*?)_/g, '<em>$1</em>')
+                .replace(/~(.*?)~/g, '<del>$1</del>')
+                .replace(/\n/g, '<br>');
+            return formatted;
+        }
+
+        // 6. Live Preview Update Function
         function updateLivePreview() {
             const selectedOpt = templateSelect.options[templateSelect.selectedIndex];
             let content = selectedOpt.getAttribute('data-content');
 
             if (!content) {
-                livePreviewBox.textContent = messageTextarea.value;
+                const manualText = messageTextarea.value;
+                const formattedHtml = formatWhatsappText(manualText);
+                if (phoneLiveBubble) {
+                    phoneLiveBubble.innerHTML = `${formattedHtml} <div class="chat-time-meta"><span>${phoneLiveTime ? phoneLiveTime.textContent : '12:00'}</span><i class="bi bi-check2-all"></i></div>`;
+                }
                 return;
             }
 
@@ -731,10 +1439,33 @@
                 content = content.replace(regex, val);
             });
 
-            livePreviewBox.textContent = content;
+            const formattedHtml = formatWhatsappText(content);
+            if (phoneLiveBubble) {
+                phoneLiveBubble.innerHTML = `${formattedHtml} <div class="chat-time-meta"><span>${phoneLiveTime ? phoneLiveTime.textContent : '12:00'}</span><i class="bi bi-check2-all"></i></div>`;
+            }
         }
 
-        // Dynamic Template Selection Handler
+        // 7. Template Category Filter Pills
+        const filterPills = document.querySelectorAll('.tmpl-filter-pill');
+        filterPills.forEach(pill => {
+            pill.addEventListener('click', function () {
+                filterPills.forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+
+                const filter = this.getAttribute('data-filter');
+                for (let i = 0; i < templateSelect.options.length; i++) {
+                    const opt = templateSelect.options[i];
+                    const cat = opt.getAttribute('data-category');
+                    if (filter === 'all' || cat === filter || opt.value === '') {
+                        opt.style.display = 'block';
+                    } else {
+                        opt.style.display = 'none';
+                    }
+                }
+            });
+        });
+
+        // 8. Template Select Handler
         if (templateSelect) {
             templateSelect.addEventListener('change', function () {
                 const selectedOpt = this.options[this.selectedIndex];
@@ -744,10 +1475,8 @@
                 dynamicFieldsList.innerHTML = '';
 
                 if (content) {
-                    // Sembunyikan textarea manual & tampilkan kontainer dinamis + preview
                     manualMessageContainer.classList.add('d-none');
                     dynamicVariablesContainer.classList.remove('d-none');
-                    previewContainer.classList.remove('d-none');
                     vehiclePickerContainer.classList.remove('d-none');
                     if (msgAsterisk) msgAsterisk.classList.add('d-none');
 
@@ -758,14 +1487,13 @@
                         vars = [];
                     }
 
-                    // Buat input field untuk tiap variabel template
                     vars.forEach(varName => {
                         const formGroup = document.createElement('div');
                         formGroup.className = 'mb-2';
 
                         const label = document.createElement('label');
                         label.className = 'form-label text-muted small fw-semibold mb-1 text-capitalize';
-                        label.textContent = varName.replace(/_/g, ' ');
+                        label.innerHTML = `<i class="bi bi-dot text-primary"></i> ${varName.replace(/_/g, ' ')}`;
 
                         let inputField;
                         if (varName.includes('deskripsi') || varName.includes('catatan') || varName.includes('komponen')) {
@@ -782,7 +1510,6 @@
                         inputField.placeholder = `Isi nilai untuk ${varName.replace(/_/g, ' ')}...`;
                         inputField.style.borderRadius = '6px';
 
-                        // Nilai default untuk tanggal/waktu jika ada
                         if (varName === 'tanggal') {
                             const now = new Date();
                             inputField.value = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
@@ -800,18 +1527,60 @@
 
                     updateLivePreview();
                 } else {
-                    // Tampilkan kembali textarea manual
                     manualMessageContainer.classList.remove('d-none');
                     dynamicVariablesContainer.classList.add('d-none');
-                    previewContainer.classList.add('d-none');
                     vehiclePickerContainer.classList.add('d-none');
                     if (msgAsterisk) msgAsterisk.classList.remove('d-none');
                     updateCounter();
+                    updateLivePreview();
                 }
             });
         }
 
-        // Handle modal detail log
+        // 9. Apply Template from Catalogue Tab
+        const applyButtons = document.querySelectorAll('.btn-apply-tmpl');
+        applyButtons.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const code = this.getAttribute('data-code');
+                templateSelect.value = code;
+                templateSelect.dispatchEvent(new Event('change'));
+
+                // Switch to simulator tab to see preview
+                const simTab = document.getElementById('simulator-tab');
+                if (simTab) {
+                    const tabTrigger = new bootstrap.Tab(simTab);
+                    tabTrigger.show();
+                }
+            });
+        });
+
+        // 10. Manual Formatting Toolbar Handlers
+        const formatBtns = document.querySelectorAll('.format-btn');
+        formatBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const format = this.getAttribute('data-format');
+                if (!messageTextarea) return;
+
+                const start = messageTextarea.selectionStart;
+                const end = messageTextarea.selectionEnd;
+                const text = messageTextarea.value;
+                const selectedText = text.substring(start, end);
+
+                let replacement = '';
+                if (format === 'bold') replacement = `*${selectedText || 'teks'}*`;
+                else if (format === 'italic') replacement = `_${selectedText || 'teks'}_`;
+                else if (format === 'strike') replacement = `~${selectedText || 'teks'}~`;
+                else if (format === 'bullet') replacement = `• ${selectedText || 'poin'}`;
+
+                messageTextarea.value = text.substring(0, start) + replacement + text.substring(end);
+                messageTextarea.focus();
+                messageTextarea.setSelectionRange(start + replacement.length, start + replacement.length);
+                updateCounter();
+                updateLivePreview();
+            });
+        });
+
+        // 11. Modal Detail Log Inspector Handler
         const detailButtons = document.querySelectorAll('.btn-detail-log');
         detailButtons.forEach(btn => {
             btn.addEventListener('click', function () {
@@ -826,7 +1595,7 @@
 
                     const statusBadge = document.getElementById('modalStatusBadge');
                     statusBadge.textContent = (logData.status || 'PENDING').toUpperCase();
-                    statusBadge.className = `badge bg-${logData.status === 'success' ? 'success' : (logData.status === 'failed' ? 'danger' : 'secondary')}`;
+                    statusBadge.className = `badge badge-soft-${logData.status === 'success' ? 'success' : (logData.status === 'failed' ? 'danger' : 'warning')}`;
 
                     document.getElementById('modalSentAt').textContent = logData.sent_at || logData.created_at || '—';
                     document.getElementById('modalMessage').textContent = logData.message || '—';
@@ -840,12 +1609,39 @@
                         errorSection.classList.add('d-none');
                     }
 
-                    document.getElementById('modalResponse').textContent = logData.response ? JSON.stringify(logData.response, null, 2) : 'Tidak ada payload response';
+                    const formattedJson = logData.response ? JSON.stringify(logData.response, null, 2) : '{\n  "status": "pending",\n  "message": "Menunggu respons provider"\n}';
+                    document.getElementById('modalResponse').textContent = formattedJson;
                 } catch (e) {
                     console.error('Error parsing log data', e);
                 }
             });
         });
+
+        // 12. Copy JSON Helper
+        const btnCopyJson = document.getElementById('btnCopyJson');
+        if (btnCopyJson) {
+            btnCopyJson.addEventListener('click', function () {
+                const text = document.getElementById('modalResponse').textContent;
+                navigator.clipboard.writeText(text).then(() => {
+                    this.innerHTML = '<i class="bi bi-check2 text-success me-1"></i>Tersalin!';
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="bi bi-clipboard me-1"></i>Salin JSON';
+                    }, 2000);
+                });
+            });
+        }
+
+        // 13. Form Submit Loading Spinner
+        const waSendForm = document.getElementById('waSendForm');
+        if (waSendForm && btnSubmitWa) {
+            waSendForm.addEventListener('submit', function () {
+                btnSubmitWa.disabled = true;
+                btnSubmitWa.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Mengirim via Gateway...';
+            });
+        }
+
+        // Trigger initial preview
+        updateLivePreview();
     });
 </script>
 @endsection
